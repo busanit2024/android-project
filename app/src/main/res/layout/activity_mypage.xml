@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/layout/activity_profile.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#F5F5F5">
+
+    <!-- 프로필 헤더 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="16dp">
+
+        <!-- 프로필 사진 -->
+        <ImageView
+            android:id="@+id/profile"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/profile"
+            android:layout_marginRight="16dp"
+            android:background=
+                "?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="프로필 이미지"
+            android:scaleType="centerInside"
+            android:layout_gravity="center" />
+
+        <!-- 회원 정보 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="사용자명"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="example@email.com"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- 편집 아이콘 -->
+        <ImageView
+            android:id="@+id/edit_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_edit"
+            android:contentDescription="Edit Profile"
+            android:padding="4dp" />
+    </LinearLayout>
+
+    <!-- 구분선 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#525252"
+        android:layout_marginBottom="16dp" />
+
+    <!-- 각 메뉴 버튼들 -->
+    <Button
+        android:id="@+id/my_review"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="나의 리뷰"
+        android:backgroundTint="@color/light_gray"
+        android:textColor="@color/black"
+        android:textSize="16dp"
+        android:drawableLeft="@drawable/ic_arrow_down"
+        android:gravity="start|center_vertical"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp" />
+
+    <Button
+        android:id="@+id/my_restroom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="등록한 화장실"
+        android:backgroundTint="@color/light_gray"
+        android:textColor="@color/black"
+        android:textSize="16dp"
+        android:drawableLeft="@drawable/ic_arrow_down"
+        android:gravity="start|center_vertical"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp" />
+
+    <Button
+        android:id="@+id/my_favorite"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="즐겨찾기"
+        android:backgroundTint="@color/light_gray"
+        android:textColor="@color/black"
+        android:textSize="16dp"
+        android:drawableLeft="@drawable/ic_arrow_down"
+        android:gravity="start|center_vertical"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp" />
+
+    <Button
+        android:id="@+id/admin_page"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="관리자 페이지"
+        android:backgroundTint="@color/light_gray"
+        android:textColor="@color/black"
+        android:textSize="16dp"
+        android:drawableLeft="@drawable/ic_arrow_down"
+        android:gravity="start|center_vertical"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- 구분선 아래 고정된 버튼 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="bottom"
+        android:paddingTop="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/logout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="로그아웃"
+                android:textSize="16dp"
+                android:backgroundTint="@color/gray"
+                android:textColor="@color/black"
+                android:layout_marginEnd="4dp" />
+
+            <Button
+                android:id="@+id/edit_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="회원정보 수정"
+                android:textSize="16dp"
+                android:backgroundTint="@color/gray"
+                android:textColor="@color/black"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp" />
+
+            <Button
+                android:id="@+id/delete_account"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="회원탈퇴"
+                android:textSize="16dp"
+                android:backgroundTint="@color/gray"
+                android:textColor="@color/black"
+                android:layout_marginStart="4dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

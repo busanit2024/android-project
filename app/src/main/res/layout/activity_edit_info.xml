@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5"
+    android:padding="16dp">
+
+    <!-- ScrollView 추가 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp">
+
+                <!-- 상단 타이틀 -->
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="회원정보 수정"
+                    android:textSize="20sp"
+                    android:textColor="#000"
+                    android:layout_centerInParent="true" />
+
+                <!-- X 이미지 -->
+                <ImageView
+                    android:id="@+id/X"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/X"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true" />
+            </RelativeLayout>
+
+
+            <!-- 프로필 이미지 -->
+            <ImageView
+                android:id="@+id/profile_image"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:src="@drawable/profile"
+                android:layout_gravity="center_horizontal"
+                android:background=
+                    "?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="프로필 이미지"
+                android:scaleType="centerInside"
+                android:padding="16dp" />
+
+            <!-- 이메일 입력란 (readonly) -->
+            <EditText
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="이메일(불러오기)"
+                android:background="#E0E0E0"
+                android:padding="12dp"
+                android:inputType="textEmailAddress"
+                android:enabled="false"
+                android:focusable="false"
+                android:textColor="#000" />
+
+            <!-- 기존 비밀번호 입력란 -->
+            <EditText
+                android:id="@+id/current_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="기존 비밀번호"
+                android:background="#E0E0E0"
+                android:padding="12dp"
+                android:inputType="textPassword"
+                android:textColor="#000"
+                android:layout_marginTop="8dp" />
+
+            <!-- 바꿀 비밀번호 입력란 -->
+            <EditText
+                android:id="@+id/new_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="바꿀 비밀번호"
+                android:background="#E0E0E0"
+                android:padding="12dp"
+                android:inputType="textPassword"
+                android:textColor="#000"
+                android:layout_marginTop="8dp" />
+
+            <!-- 바꿀 닉네임 입력란 -->
+            <EditText
+                android:id="@+id/new_nickname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="바꿀 닉네임"
+                android:background="#E0E0E0"
+                android:padding="12dp"
+                android:inputType="text"
+                android:textColor="#000"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- 정보 수정하기 버튼 -->
+    <Button
+        android:id="@+id/info_update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#000"
+        android:text="정보 수정하기"
+        android:textColor="#FFF" />
+
+</LinearLayout>

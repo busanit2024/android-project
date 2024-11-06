@@ -16,6 +16,7 @@ class EditInfoActivity : AppCompatActivity() {
         findViewById<ImageView>(R.id.X).setOnClickListener {
             val intent = Intent(this, MyPageActivity::class.java)
             startActivity(intent)
+
         }
     }
 

@@ -38,11 +38,10 @@
                     android:id="@+id/X"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/X"
+                    android:src="@drawable/cancel"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true" />
             </RelativeLayout>
-
 
             <!-- 프로필 이미지 -->
             <ImageView

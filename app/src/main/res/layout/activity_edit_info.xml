@@ -43,18 +43,39 @@
                     android:layout_centerVertical="true" />
             </RelativeLayout>
 
-            <!-- 프로필 이미지 -->
-            <ImageView
-                android:id="@+id/profile_image"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:src="@drawable/profile"
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:background=
-                    "?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="프로필 이미지"
-                android:scaleType="centerInside"
-                android:padding="16dp" />
+                android:padding="16dp">
+
+                <!-- 프로필 이미지 -->
+                <ImageView
+                    android:id="@+id/profile_image"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:src="@drawable/profile"
+                    android:layout_gravity="center_horizontal"
+                    android:background=
+                        "?android:attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="프로필 이미지"
+                    android:scaleType="centerInside"
+                    android:padding="16dp" />
+
+                <!-- 카메라 아이콘 -->
+                <ImageView
+                    android:id="@+id/ic_camera"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_alignEnd="@id/profile_image"
+                    android:layout_alignBottom="@id/profile_image"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="카메라 아이콘"
+                    android:src="@drawable/camera" />
+                />
+            </RelativeLayout>
 
             <!-- 이메일 입력란 (readonly) -->
             <EditText

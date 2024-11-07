@@ -1,4 +1,4 @@
-import java.util.Properties
+import org.jetbrains.kotlin.gradle.utils.`is`
 
 plugins {
 //  alias(libs.plugins.android.application)
@@ -6,11 +6,9 @@ plugins {
   id("com.android.application")
   id("org.jetbrains.kotlin.android")
   id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+  id("org.jetbrains.kotlin.kapt")
   id("com.google.devtools.ksp")
 }
-
-val properties = Properties()
-properties.load(project.rootProject.file("secrets.properties").inputStream())
 
 android {
   namespace = "com.busanit.searchrestroom"
@@ -23,24 +21,14 @@ android {
     versionCode = 1
     versionName = "1.0"
 
-    buildConfigField("String", "MAPS_API_KEY", properties.getProperty("MAPS_API_KEY") )
-
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
   buildTypes {
-    debug {
-      buildConfigField("String", "MAPS_API_KEY", "\"${project.properties["MAPS_API_KEY"]}\"")
-    }
     release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-      buildConfigField("String", "MAPS_API_KEY", "\"${project.properties["MAPS_API_KEY"]}\"")
     }
-  }
-
-  buildFeatures {
-    buildConfig = true
   }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -60,19 +48,19 @@ dependencies {
   implementation(libs.material)
   implementation(libs.androidx.activity)
   implementation(libs.androidx.constraintlayout)
-  implementation(libs.places)
   testImplementation(libs.junit)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
   implementation("com.google.android.gms:play-services-maps:19.0.0")
   implementation("com.google.android.gms:play-services-location:21.3.0")
-  implementation ("com.google.android.libraries.places:places:2.4.0")
 
   val room_version = "2.6.1"
 
   implementation("androidx.room:room-runtime:$room_version")
   annotationProcessor("androidx.room:room-compiler:$room_version")
 //
+  // To use Kotlin annotation processing tool (kapt)
+  kapt("androidx.room:room-compiler:$room_version")
   // To use Kotlin Symbol Processing (KSP)
   ksp("androidx.room:room-compiler:$room_version")
 

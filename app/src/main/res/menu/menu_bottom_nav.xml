@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/activity_home"
+        android:title="홈"
+        android:icon="@drawable/ic_launcher_background"/>
+    <item
+        android:id="@+id/my_favorite"
+        android:title="즐겨찾기"
+        android:icon="@drawable/ic_star"/>
+    <item
+        android:id="@+id/activity_mypage"
+        android:title="마이페이지"
+        android:icon="@drawable/ic_person"/>
+</menu>

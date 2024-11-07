@@ -1,6 +1,7 @@
 package com.busanit.teamproject
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -123,6 +124,7 @@ class EditInfoActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("IntentReset")
     private fun showImagePickerDialog() {
         // 카메라와 갤러리를 선택할 수 있는 다이얼로그 호출
         val options = arrayOf("카메라로 촬영", "갤러리에서 선택")

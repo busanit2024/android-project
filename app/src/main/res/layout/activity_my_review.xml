@@ -28,7 +28,6 @@
             android:text="나의 리뷰"
             android:textSize="18sp"
             android:gravity="center"
-            android:layout_marginStart="140dp"
             android:textColor="@color/black" />
     </LinearLayout>
 

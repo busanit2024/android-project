@@ -12,6 +12,7 @@
         android:padding="16dp"
         android:gravity="center_vertical">
         <TextView
+            android:id="@+id/building_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -32,40 +33,89 @@
         android:padding="16dp"
         android:gravity="center_vertical">
 
-        <TextView
-            android:layout_width="490dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="작성일자\n리뷰 내용"
-            android:textSize="16dp" />
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:gravity="center_vertical"
+            android:layout_weight="20">
 
-        <TextView
-            android:layout_width="260dp"
+            <TextView
+                android:id="@+id/review_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="작성일자"
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/review_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="리뷰 내용"
+                android:textSize="16dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="삭제 | 수정"
-            android:textSize="16dp" />
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/delete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="삭제    |"
+                android:textSize="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/update"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="수정"
+                android:textSize="16dp"
+                android:layout_marginRight="20dp"/>
+
+        </LinearLayout>
+
 
     </LinearLayout>
     
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
         android:gravity="center_vertical">
         <ImageView
+            android:id="@+id/review_image1"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:layout_weight="1"
             android:src="@drawable/empty_image" />
         <ImageView
+            android:id="@+id/review_image2"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:layout_weight="1"
             android:layout_marginLeft="10dp"
             android:src="@drawable/empty_image" />
         <ImageView
+            android:id="@+id/review_image3"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:layout_weight="1"
@@ -73,6 +123,15 @@
             android:src="@drawable/empty_image" />
 
     </LinearLayout>
+
+    <!-- 구분선 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#525252"
+        android:layout_marginBottom="16dp" />
+
+
 
 
 </LinearLayout>

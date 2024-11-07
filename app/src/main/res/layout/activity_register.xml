@@ -23,14 +23,14 @@
         android:inputType="textPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="password"
+        android:hint="소문자, 숫자를 포함한 6 ~ 15자리 비밀번호"
         android:layout_marginHorizontal="20dp" />
     <EditText
         android:id="@+id/register_password_check"
         android:inputType="textPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="password_check"
+        android:hint="비밀번호 확인"
         android:layout_marginHorizontal="20dp" />
     <EditText
         android:id="@+id/register_nickname"

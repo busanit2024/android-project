@@ -6,17 +6,26 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.room.Room
+import com.busanit.searchrestroom.database.AppDatabase
+import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity() {
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
@@ -34,12 +43,26 @@ class MainActivity : AppCompatActivity() {
 
   var googleMap: GoogleMap? = null
 
+  private lateinit var job : Job
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
     setContentView(binding.root)
 
     binding.mapView.onCreate(savedInstanceState)
+
+    job = CoroutineScope(Dispatchers.IO).launch {
+      DatabaseCopier.copyAttachedDatabase(context = applicationContext)
+    }
+
+    runBlocking {
+      job.join()
+    }
+
+    val db = DatabaseCopier.getAppDataBase(context = applicationContext)
+    var restroom = db!!.restroomDao().getRestroomById(1)
+    Log.d("test", "restroom: $restroom")
 
     if (checkPermissions()) {
       initMap()
@@ -121,8 +144,10 @@ class MainActivity : AppCompatActivity() {
   }
 
   override fun onDestroy() {
+    job.cancel()
     super.onDestroy()
     binding.mapView.onDestroy()
+
   }
 
   override fun onLowMemory() {

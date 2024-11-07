@@ -1,9 +1,7 @@
 package com.busanit.searchrestroom.database
 
-import android.content.Context
 import android.util.Log
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -17,42 +15,22 @@ import com.busanit.searchrestroom.database.Member
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.database.Review
 import com.busanit.searchrestroom.database.ReviewImage
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.internal.synchronized
 
 @Database(entities = [Restroom::class, Member::class, Bookmark::class, Review::class, ReviewImage::class ], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun restroomDao(): RestroomDao
-    abstract fun memberDao(): MemberDao
-    abstract fun bookmarkDao(): BookmarkDao
-    abstract fun reviewDao(): ReviewDao
-    abstract fun reviewImageDao(): ReviewImageDao
+  abstract fun restroomDao(): RestroomDao
+  abstract fun memberDao(): MemberDao
+  abstract fun bookmarkDao(): BookmarkDao
+  abstract fun reviewDao(): ReviewDao
+  abstract fun reviewImageDao(): ReviewImageDao
 
-    companion object {
-        @Volatile
-        private var INSTANCE: AppDatabase? = null
-
-        @OptIn(InternalCoroutinesApi::class)
-        @JvmStatic
-        fun getDatabase(context: Context): AppDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    "app_database"
-                ).addMigrations(MIGRATION_1_2)  // 필요 시 마이그레이션 추가하세요!
-                    .build()
-                INSTANCE = instance
-                instance
-            }
-        }
-
-        @JvmField
-        val MIGRATION_1_2 : Migration = object : Migration(1, 2) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                Log.d("test", "migrate")
-            }
-        }
+  companion object {
+    @JvmField
+    val MIGRATION_1_2 : Migration = object : Migration(1, 2) {
+      override fun migrate(db: SupportSQLiteDatabase) {
+        Log.d("test", "migrate")
+      }
     }
+  }
 
 }

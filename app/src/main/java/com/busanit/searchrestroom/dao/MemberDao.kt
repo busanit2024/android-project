@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.busanit.searchrestroom.entity.Member
+import com.busanit.searchrestroom.database.Member
 
 @Dao
 interface MemberDao {

@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.busanit.searchrestroom.entity.Restroom
+import com.busanit.searchrestroom.database.Restroom
 
 @Dao
 interface RestroomDao {

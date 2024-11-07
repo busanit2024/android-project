@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.busanit.searchrestroom.entity.Bookmark
+import com.busanit.searchrestroom.database.Bookmark
 
 @Dao
 interface BookmarkDao {

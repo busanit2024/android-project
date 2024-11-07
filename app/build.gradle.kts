@@ -6,6 +6,9 @@ plugins {
   id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
   id("org.jetbrains.kotlin.kapt")
   id("com.google.devtools.ksp")
+  // Add the Google services Gradle plugin
+  id("com.google.gms.google-services")
+
 }
 
 android {
@@ -20,6 +23,7 @@ android {
     versionName = "1.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    multiDexEnabled = true // 파이어베이스 인증, 플레이 서비스 인증 라이브러리 추가 및 앱 빌드 시 오류 막기 위해
   }
 
   buildTypes {
@@ -81,6 +85,20 @@ dependencies {
 
   // optional - Paging 3 Integration
   implementation("androidx.room:room-paging:$room_version")
+
+  // Import the Firebase BoM
+  implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+
+  // Add the dependency for the Firebase Authentication library
+  implementation("com.google.firebase:firebase-auth-ktx:23.1.0")
+
+  // Also add the dependency for the Google Play services library and specify its version
+  implementation("com.google.android.gms:play-services-auth:21.2.0")
+
+  // multidex
+  implementation("androidx.multidex:multidex:2.0.1")
+
+  implementation("com.google.firebase:firebase-auth:23.1.0")
 }
 
 secrets {

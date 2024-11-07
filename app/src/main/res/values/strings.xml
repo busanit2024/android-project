@@ -1,3 +1,15 @@
 <resources>
   <string name="app_name">SearchRestroom</string>
+  <string name="success_google_login">구글 로그인에 성공했습니다</string>
+  <string name="success_kakao_login">카카오 로그인에 성공했습니다</string>
+  <string name="success_naver_login">네이버 로그인에 성공했습니다</string>
+  <string name="success_login">로그인에 성공했습니다</string>
+  <string name="failed_google_login">구글 로그인에 실패했습니다</string>
+  <string name="failed_kakao_login">카카오 로그인에 실패했습니다</string>
+  <string name="failed_naver_login">네이버 로그인에 실패했습니다</string>
+  <string name="failed_login">로그인에 실패했습니다</string>
+  <string name="success_logout">로그아웃에 성공했습니다</string>
+  <string name="status_login">이미 로그인 되어있습니다</string>
+  // 내 Auth2.0의 클라이언트 id에서 default_web_client_id를 확인해서 가져오면 됩니다!
+  <string name="web_client_id"></string>
 </resources>

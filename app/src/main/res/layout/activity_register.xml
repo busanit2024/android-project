@@ -9,94 +9,76 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
         android:layout_gravity="center"
-        android:text="로그인"
+        android:text="회원가입"
         android:textSize="35dp"
         android:textStyle="bold" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="23dp"
-        android:text="이메일"
-        android:textSize="23dp" />
     <EditText
-        android:id="@+id/login_email"
+        android:id="@+id/register_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="email"
         android:layout_marginHorizontal="20dp" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginLeft="23dp"
-        android:text="비밀번호"
-        android:textSize="23dp" />
     <EditText
-        android:id="@+id/login_password"
+        android:id="@+id/register_password"
         android:inputType="textPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="password"
         android:layout_marginHorizontal="20dp" />
-    <Button
-        android:id="@+id/login_btn"
-        android:layout_width="150dp"
+    <EditText
+        android:id="@+id/register_password_check"
+        android:inputType="textPassword"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="20dp"
-        android:text="로그인"
-        android:textSize="18dp" />
-    <LinearLayout
-        android:layout_width="wrap_content"
+        android:hint="password_check"
+        android:layout_marginHorizontal="20dp" />
+    <EditText
+        android:id="@+id/register_nickname"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center">
-        <Button
-            android:id="@+id/findId_btn"
-            android:layout_width="170dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:text="아이디 찾기"
-            android:textSize="18dp" />
-        <Button
-            android:id="@+id/findpw_btn"
-            android:layout_width="170dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:text="비밀번호 찾기"
-            android:textSize="18dp" />
-    </LinearLayout>
+        android:hint="nickname"
+        android:layout_marginHorizontal="20dp" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
         android:layout_gravity="center"
-        android:text="소셜 로그인"
+        android:text="소셜 ID로 가입하기"
         android:textSize="18dp"
         android:textStyle="bold" />
     <ImageButton
-        android:id="@+id/login_google"
+        android:id="@+id/register_google"
         android:layout_width="700px"
         android:layout_height="160px"
         android:layout_margin="15dp"
         android:layout_gravity="center"
-        android:background="@drawable/google_login" />
+        android:background="@drawable/google_register" />
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center">
         <ImageButton
-            android:id="@+id/login_kakao"
+            android:id="@+id/register_kakao"
             android:layout_width="80dp"
             android:layout_height="75dp"
             android:layout_margin="15dp"
             android:layout_gravity="center"
             android:background="@drawable/kakao" />
         <ImageButton
-            android:id="@+id/login_naver"
+            android:id="@+id/register_naver"
             android:layout_width="80dp"
             android:layout_height="75dp"
             android:layout_margin="15dp"
             android:layout_gravity="center"
             android:background="@drawable/naver" />
     </LinearLayout>
+    <Button
+        android:id="@+id/register_btn"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="20dp"
+        android:text="회원가입라라라라라랄"
+        android:textSize="18dp" />
+
 </LinearLayout>

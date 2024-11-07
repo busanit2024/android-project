@@ -1,3 +1,8 @@
 <resources>
   <string name="app_name">SearchRestroom</string>
+  <string name="etcTxt"> 화장실이 작아서 문을 열고 닫기가 불편하고
+  세면대 관리가 이루어지지 않아서 좀 더러운데
+    그래도 급할 때는 쓸만함
+    계단 타야해서 휠체어는 못 쓸 듯
+  </string>
 </resources>

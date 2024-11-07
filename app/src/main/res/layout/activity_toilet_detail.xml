@@ -53,6 +53,7 @@
                     android:text="건물명 / 상세주소"
                     android:textSize="25sp"
                     android:textStyle="bold"/>
+                
                 <View
                     android:layout_width="0dp"
                     android:layout_height="0dp"

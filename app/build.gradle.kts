@@ -1,12 +1,16 @@
+import java.util.Properties
+
 plugins {
 //  alias(libs.plugins.android.application)
 //  alias(libs.plugins.kotlin.android)
   id("com.android.application")
   id("org.jetbrains.kotlin.android")
   id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
-  id("org.jetbrains.kotlin.kapt")
   id("com.google.devtools.ksp")
 }
+
+val properties = Properties()
+properties.load(project.rootProject.file("secrets.properties").inputStream())
 
 android {
   namespace = "com.busanit.searchrestroom"
@@ -19,14 +23,24 @@ android {
     versionCode = 1
     versionName = "1.0"
 
+    buildConfigField("String", "MAPS_API_KEY", properties.getProperty("MAPS_API_KEY") )
+
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
   buildTypes {
+    debug {
+      buildConfigField("String", "MAPS_API_KEY", "\"${project.properties["MAPS_API_KEY"]}\"")
+    }
     release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+      buildConfigField("String", "MAPS_API_KEY", "\"${project.properties["MAPS_API_KEY"]}\"")
     }
+  }
+
+  buildFeatures {
+    buildConfig = true
   }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -59,8 +73,6 @@ dependencies {
   implementation("androidx.room:room-runtime:$room_version")
   annotationProcessor("androidx.room:room-compiler:$room_version")
 //
-  // To use Kotlin annotation processing tool (kapt)
-  kapt("androidx.room:room-compiler:$room_version")
   // To use Kotlin Symbol Processing (KSP)
   ksp("androidx.room:room-compiler:$room_version")
 

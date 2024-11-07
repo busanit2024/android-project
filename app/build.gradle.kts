@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.utils.`is`
+import java.util.Properties
 
 plugins {
 //  alias(libs.plugins.android.application)

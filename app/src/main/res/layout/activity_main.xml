@@ -6,15 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
-
-
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-
+    tools:context=".activity.MainActivity">
 
 
   <include
@@ -32,51 +24,88 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"/>
 
-  <com.google.android.material.floatingactionbutton.FloatingActionButton
-      android:id="@+id/myLocationButton"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:clickable="true"
-      android:src="@drawable/icon_location"
+
+
+
+  <androidx.coordinatorlayout.widget.CoordinatorLayout
+      android:layout_height="0dp"
+      android:layout_width="0dp"
+      app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintBottom_toBottomOf="parent"
-      android:layout_marginEnd="8dp"
-      android:layout_marginBottom="8dp"
-      app:fabSize="mini"/>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
-
-  <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-      android:background="@color/white"
-      android:paddingHorizontal="32dp"
-      android:paddingTop="36dp"
-      android:paddingBottom="48dp"
-      android:orientation="vertical"
+      app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintBottom_toTopOf="@id/bottomNavigation">
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/myLocationButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:translationY="-36dp"
+        android:clickable="true"
+        android:src="@drawable/icon_location"
+        app:fabSize="normal"
+        app:layout_anchor="@id/bottomSheet"
+        app:layout_anchorGravity="top|end"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addRestroomButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:translationY="-36dp"
+        android:clickable="true"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+        android:src="@drawable/icon_plus"
+        app:fabSize="normal"
+        app:layout_anchor="@id/myLocationButton"
+        app:layout_anchorGravity="top|center_horizontal"
+        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"/>
+
+
     <LinearLayout
+        android:id="@+id/bottomSheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-      android:orientation="horizontal">
-      <TextView
-          android:layout_width="0dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        android:background="@color/white"
+        android:paddingHorizontal="32dp"
+        android:paddingTop="18dp"
+        android:paddingBottom="48dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation">
+
+      <com.google.android.material.divider.MaterialDivider
+          android:layout_width="64dp"
           android:layout_height="wrap_content"
-          android:text="상세검색"
-          android:textSize="20dp"
-          android:textStyle="bold"
-          android:layout_weight="1"
+        android:layout_gravity="center_horizontal"
           android:layout_marginBottom="24dp"/>
-      <ImageView
-          android:id="@+id/menuCollapseButton"
-          android:layout_width="32dp"
-          android:layout_height="32dp"
-        android:src="@drawable/icon_down"
-        app:tint="@android:color/secondary_text_light"
-        />
-    </LinearLayout>
+
+
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="상세검색"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            android:layout_marginBottom="24dp" />
+        <ImageView
+            android:id="@+id/menuCollapseButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/icon_down"
+            app:tint="@android:color/secondary_text_light"
+            />
+      </LinearLayout>
 
 
       <RadioGroup
@@ -84,7 +113,8 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:orientation="horizontal"
-        >
+          android:layout_marginBottom="16dp"
+          >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -96,7 +126,7 @@
             android:id="@+id/searchRadius200"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-          />
+            />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -114,85 +144,78 @@
             android:text="500m"/>
       </RadioGroup>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-      android:orientation="horizontal">
-      <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="남여공용"
-          android:textStyle="bold"
-        android:textSize="16dp"
-          android:layout_marginEnd="32dp"/>
-      <CheckBox
-          android:id="@+id/checkUnisexFalse"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"/>
-      <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:labelFor="@+id/checkUnisexFalse"
-        android:text="분리"
-          android:layout_marginEnd="16dp"/>
 
-      <CheckBox
-          android:id="@+id/checkUnisexTrue"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"/>
-      <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:labelFor="@+id/checkUnisexTrue"
-          android:text="공용"/>
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-      <TextView
+      <LinearLayout
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="편의시설"
-          android:textStyle="bold"
-          android:textSize="16dp"
-          android:layout_marginEnd="32dp"/>
-      <CheckBox
-          android:id="@+id/checkDiaper"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"/>
-      <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:labelFor="@+id/checkUnisexFalse"
-          android:text="기저귀 교환대"
-          android:layout_marginEnd="16dp"/>
+          android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="편의시설"
+            android:textStyle="bold"
+            android:textSize="16dp"
+            android:layout_marginVertical="10dp"
+            android:layout_marginEnd="32dp"/>
 
-      <CheckBox
-          android:id="@+id/checkAccessible"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"/>
-      <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:labelFor="@+id/checkUnisexTrue"
-          android:text="장애인용"/>
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+          android:orientation="vertical">
+          <LinearLayout
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/checkUnisex"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="남여공용"
+                app:chipCornerRadius="99dp"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/checkAccessible"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="장애인용"
+                app:chipCornerRadius="99dp"/>
+          </LinearLayout>
+
+          <com.google.android.material.chip.Chip
+              android:id="@+id/checkDiaper"
+              style="@style/Widget.MaterialComponents.Chip.Choice"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="기저귀교환대"
+              app:chipCornerRadius="99dp"/>
+        </LinearLayout>
+
+
+      </LinearLayout>
 
     </LinearLayout>
+
+
+  </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+
 
   <com.google.android.material.bottomnavigation.BottomNavigationView
-    android:id="@+id/bottomNavigation"
+      android:id="@+id/bottomNavigation"
       android:layout_width="match_parent"
       android:layout_height="64dp"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:menu="@menu/menu_bottom_nav"
-    app:labelVisibilityMode="labeled"
-      android:background="@color/white"
-    app:itemTextColor="@color/black"
-    app:itemIconTint="@android:color/secondary_text_light"/>
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:menu="@menu/menu_bottom_nav"
+      app:labelVisibilityMode="labeled"
+      app:itemTextColor="@color/black"
+      app:itemIconTint="@android:color/secondary_text_light"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

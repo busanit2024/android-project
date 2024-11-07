@@ -1,26 +1,27 @@
-package com.busanit.searchrestroom
+package com.busanit.searchrestroom.activity
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.room.Room
-import com.busanit.searchrestroom.database.AppDatabase
+import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
+import com.busanit.searchrestroom.databinding.SearchBarBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -30,6 +31,7 @@ import kotlinx.coroutines.runBlocking
 class MainActivity : AppCompatActivity() {
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
+  // 지도 초기화
   val PERMISSIONS = arrayOf(
     android.Manifest.permission.ACCESS_COARSE_LOCATION,
     android.Manifest.permission.ACCESS_FINE_LOCATION
@@ -45,13 +47,19 @@ class MainActivity : AppCompatActivity() {
 
   private lateinit var job : Job
 
+
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
     setContentView(binding.root)
+
+    val searchBar = findViewById<View>(R.id.search_bar)
+    val menuButton = searchBar.findViewById<ImageView>(R.id.menuButton)
 
     binding.mapView.onCreate(savedInstanceState)
 
+
+    // DB 가져오기
     job = CoroutineScope(Dispatchers.IO).launch {
       DatabaseCopier.copyAttachedDatabase(context = applicationContext)
     }
@@ -71,7 +79,35 @@ class MainActivity : AppCompatActivity() {
     }
 
     binding.myLocationButton.setOnClickListener { onMyLocationButtonClick() }
+
+    binding.addRestroomButton.setOnClickListener {
+      // TODO: 화장실 추가 액티비티로 이동
+    }
+
+    //상세검색 메뉴 관련
+    var bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
+    bottomSheetBehavior.peekHeight = 96
+
+    menuButton.setOnClickListener {
+      if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+      } else {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+      }
+    }
+
+    binding.menuCollapseButton.setOnClickListener {
+      if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+    }
+
+    binding.bottomNavigation.setOnItemSelectedListener {
+      //it.itemid에 따라 액티비티 이동
+      true
+    }
   }
+
 
   override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)

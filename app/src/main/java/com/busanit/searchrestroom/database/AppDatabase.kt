@@ -1,20 +1,20 @@
-package com.busanit.teamproject.database
+package com.busanit.searchrestroom.database
 
 import android.util.Log
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.busanit.teamproject.dao.BookmarkDao
-import com.busanit.teamproject.dao.MemberDao
-import com.busanit.teamproject.dao.RestroomDao
-import com.busanit.teamproject.dao.ReviewDao
-import com.busanit.teamproject.dao.ReviewImageDao
-import com.busanit.teamproject.database.Bookmark
-import com.busanit.teamproject.database.Member
-import com.busanit.teamproject.database.Restroom
-import com.busanit.teamproject.database.Review
-import com.busanit.teamproject.database.ReviewImage
+import com.busanit.searchrestroom.dao.BookmarkDao
+import com.busanit.searchrestroom.dao.MemberDao
+import com.busanit.searchrestroom.dao.RestroomDao
+import com.busanit.searchrestroom.dao.ReviewDao
+import com.busanit.searchrestroom.dao.ReviewImageDao
+import com.busanit.searchrestroom.database.Bookmark
+import com.busanit.searchrestroom.database.Member
+import com.busanit.searchrestroom.database.Restroom
+import com.busanit.searchrestroom.database.Review
+import com.busanit.searchrestroom.database.ReviewImage
 
 @Database(entities = [Restroom::class, Member::class, Bookmark::class, Review::class, ReviewImage::class ], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {

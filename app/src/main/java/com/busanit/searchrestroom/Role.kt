@@ -1,4 +1,4 @@
-package com.busanit.teamproject
+package com.busanit.searchrestroom
 
 enum class Role {
     USER, ADMIN

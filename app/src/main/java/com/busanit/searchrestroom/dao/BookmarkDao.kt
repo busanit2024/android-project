@@ -1,10 +1,10 @@
-package com.busanit.teamproject.dao
+package com.busanit.searchrestroom.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.busanit.teamproject.database.Bookmark
+import com.busanit.searchrestroom.database.Bookmark
 
 @Dao
 interface BookmarkDao {

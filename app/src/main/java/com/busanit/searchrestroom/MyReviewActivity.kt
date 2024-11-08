@@ -1,9 +1,12 @@
-package com.busanit.teamproject
+package com.busanit.searchrestroom
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.busanit.teamproject.databinding.ActivityMyReviewBinding
+import com.busanit.searchrestroom.R
+import com.busanit.searchrestroom.databinding.ActivityMyReviewBinding
+import com.busanit.searchrestroom.MyReview
+import com.busanit.searchrestroom.ReviewAdapter
 import java.sql.Timestamp
 
 class MyReviewActivity : AppCompatActivity() {

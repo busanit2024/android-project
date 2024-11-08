@@ -1,4 +1,4 @@
-package com.busanit.teamproject.database
+package com.busanit.searchrestroom.database
 
 import android.content.Context
 import android.content.pm.PackageInfo

@@ -1,10 +1,10 @@
-package com.busanit.teamproject.dao
+package com.busanit.searchrestroom.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.busanit.teamproject.database.Member
+import com.busanit.searchrestroom.database.Member
 
 @Dao
 interface MemberDao {

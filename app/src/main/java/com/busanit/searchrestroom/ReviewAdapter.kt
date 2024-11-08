@@ -1,4 +1,4 @@
-package com.busanit.teamproject
+package com.busanit.searchrestroom
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.busanit.searchrestroom.R
+import com.busanit.searchrestroom.MyReview
 
 class ReviewAdapter(
     private val reviewList: List<MyReview>

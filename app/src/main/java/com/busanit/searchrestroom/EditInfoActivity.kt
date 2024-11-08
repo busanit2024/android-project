@@ -1,4 +1,4 @@
-package com.busanit.teamproject
+package com.busanit.searchrestroom
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -17,7 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.busanit.teamproject.databinding.ActivityEditInfoBinding
+import com.busanit.searchrestroom.databinding.ActivityEditInfoBinding
 
 class EditInfoActivity : AppCompatActivity() {
 

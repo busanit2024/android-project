@@ -1,12 +1,10 @@
-package com.busanit.teamproject
+package com.busanit.searchrestroom
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.busanit.teamproject.databinding.ActivityMainBinding
+import com.busanit.searchrestroom.databinding.ActivityMainBinding
+import com.busanit.searchrestroom.MyPageActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {

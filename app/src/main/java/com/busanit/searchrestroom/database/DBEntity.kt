@@ -1,4 +1,4 @@
-package com.busanit.teamproject.database
+package com.busanit.searchrestroom.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

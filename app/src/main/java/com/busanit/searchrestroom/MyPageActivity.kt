@@ -1,4 +1,4 @@
-package com.busanit.teamproject
+package com.busanit.searchrestroom
 
 import android.content.Intent
 import android.content.SharedPreferences
@@ -6,7 +6,12 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.busanit.teamproject.databinding.ActivityMypageBinding
+import com.busanit.searchrestroom.EditInfoActivity
+import com.busanit.searchrestroom.FavoriteActivity
+import com.busanit.searchrestroom.MainActivity
+import com.busanit.searchrestroom.MyReviewActivity
+import com.busanit.searchrestroom.R
+import com.busanit.searchrestroom.databinding.ActivityMypageBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MyPageActivity : AppCompatActivity() {
@@ -36,7 +41,7 @@ class MyPageActivity : AppCompatActivity() {
         }
 
         binding.adminPage.setOnClickListener {
-            if (isLoggedIn() && sharedPreferences.getString("userRole", "") == "ADMIN") {
+            if (isLoggedIn() && sharedPreferences.getString("userRole", "") == "USER") {
                 // 관리자 페이지 이동 (관리자로 로그인한 경우에만 보이게 함)
 //                startActivity(Intent(this, AdminPageActivity::class.java))
             }

@@ -2,6 +2,7 @@ package com.busanit.searchrestroom.activity
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -165,16 +166,19 @@ class MainActivity : AppCompatActivity(){
     bottomSheetBehavior.peekHeight = 200
 
     listButton.setOnClickListener {
-      if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-      } else {
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-      }
+      val intent = Intent(this, SearchListActivity::class.java)
+      intent.putParcelableArrayListExtra("locations", locations as ArrayList<Restroom>)
+      intent.putExtra("selectedPlace", selectedPlace)
+      startActivity(intent)
     }
 
     binding.menuCollapseButton.setOnClickListener {
       if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        binding.menuCollapseButton.setImageResource(R.drawable.icon_up)
+      } else {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        binding.menuCollapseButton.setImageResource(R.drawable.icon_down)
       }
     }
 

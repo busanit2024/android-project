@@ -94,7 +94,7 @@
             android:id="@+id/menuCollapseButton"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@drawable/icon_down"
+            android:src="@drawable/icon_up"
             app:tint="@android:color/secondary_text_light"
             />
       </LinearLayout>
@@ -159,7 +159,7 @@
             android:layout_height="wrap_content">
             <com.google.android.material.chip.Chip
                 android:id="@+id/checkUnisex"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="남여공용"
@@ -167,14 +167,14 @@
                 android:layout_marginEnd="8dp"/>
             <com.google.android.material.chip.Chip
                 android:id="@+id/checkAccessible"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="장애인용"
                 app:chipCornerRadius="99dp"/>
           <com.google.android.material.chip.Chip
               android:id="@+id/checkDiaper"
-              style="@style/Widget.MaterialComponents.Chip.Choice"
+              style="@style/Widget.MaterialComponents.Chip.Filter"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:text="기저귀교환대"

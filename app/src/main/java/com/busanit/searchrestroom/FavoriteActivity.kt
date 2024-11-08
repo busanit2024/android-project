@@ -1,10 +1,12 @@
-package com.busanit.teamproject
+package com.busanit.searchrestroom
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.busanit.teamproject.databinding.ActivityFavoriteBinding
+import com.busanit.searchrestroom.R
+import com.busanit.searchrestroom.databinding.ActivityFavoriteBinding
+import com.busanit.searchrestroom.FavoriteItem
 
 class FavoriteActivity : AppCompatActivity() {
 

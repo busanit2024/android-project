@@ -1,5 +1,6 @@
 [versions]
 agp = "8.6.0"
+flexbox = "3.0.0"
 kotlin = "1.9.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -9,22 +10,46 @@ appcompat = "1.7.0"
 material = "1.12.0"
 activity = "1.9.3"
 constraintlayout = "2.2.0"
-materialVersion = "1.6.1"
+materialVersion = "1.12.0"
+multidex = "2.0.1"
+placesVersion = "4.0.0"
+playServicesAuth = "21.2.0"
+playServicesLocation = "21.3.0"
+playServicesMaps = "19.0.0"
 roomCommon = "2.6.1"
 roomRuntimeAndroid = "2.7.0-alpha11"
+places = "4.0.0"
+secretsGradlePlugin = "2.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-multidex = { module = "androidx.multidex:multidex", version.ref = "multidex" }
+androidx-room-guava = { module = "androidx.room:room-guava", version.ref = "roomCommon" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomCommon" }
+androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "roomCommon" }
+androidx-room-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCommon" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomCommon" }
+androidx-room-rxjava2 = { module = "androidx.room:room-rxjava2", version.ref = "roomCommon" }
+androidx-room-rxjava3 = { module = "androidx.room:room-rxjava3", version.ref = "roomCommon" }
+androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "roomCommon" }
+flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+#noinspection SimilarGradleDependency
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+#noinspection SimilarGradleDependency
 material-v161 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
 androidx-room-runtime-android = { group = "androidx.room", name = "room-runtime-android", version.ref = "roomRuntimeAndroid" }
+places = { module = "com.google.android.libraries.places:places", version.ref = "placesVersion" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

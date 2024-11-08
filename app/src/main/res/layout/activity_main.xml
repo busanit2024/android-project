@@ -162,15 +162,9 @@
             android:layout_marginVertical="10dp"
             android:layout_marginEnd="32dp"/>
 
-        <LinearLayout
+        <com.google.android.material.chip.ChipGroup
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-          android:orientation="vertical">
-          <LinearLayout
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal">
-
+            android:layout_height="wrap_content">
             <com.google.android.material.chip.Chip
                 android:id="@+id/checkUnisex"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
@@ -179,7 +173,6 @@
                 android:text="남여공용"
                 app:chipCornerRadius="99dp"
                 android:layout_marginEnd="8dp"/>
-
             <com.google.android.material.chip.Chip
                 android:id="@+id/checkAccessible"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
@@ -187,8 +180,6 @@
                 android:layout_height="wrap_content"
                 android:text="장애인용"
                 app:chipCornerRadius="99dp"/>
-          </LinearLayout>
-
           <com.google.android.material.chip.Chip
               android:id="@+id/checkDiaper"
               style="@style/Widget.MaterialComponents.Chip.Choice"
@@ -196,7 +187,7 @@
               android:layout_height="wrap_content"
               android:text="기저귀교환대"
               app:chipCornerRadius="99dp"/>
-        </LinearLayout>
+        </com.google.android.material.chip.ChipGroup>
 
 
       </LinearLayout>

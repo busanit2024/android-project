@@ -81,6 +81,14 @@ class MainActivity : AppCompatActivity() {
     var filterDistance = 200.0
     binding.searchRadius200.isChecked = true
 
+    // 상세 검색 조건 설정
+    var filterUnisex = false
+    var filterAccessible = false
+    var filterDiaper = false
+    binding.checkDiaper.isChecked = filterDiaper
+    binding.checkAccessible.isChecked = filterAccessible
+    binding.checkUnisex.isChecked = filterUnisex
+
     val db = DatabaseCopier.getAppDataBase(context = applicationContext)
     var restroom = db!!.restroomDao().getRestroomById(1)
     Log.d("test", "restroom: $restroom")
@@ -102,7 +110,10 @@ class MainActivity : AppCompatActivity() {
       locations.clear()
       locations.addAll(locationsList.filter { restroom ->
         val distanceToRestroom = calculateDistance(getMyLocation(), restroom)
-        distanceToRestroom <= filterDistance
+        val matchesUisex = !filterUnisex || (restroom.unisex ?: false)
+        val matchesAccessible = !filterAccessible || (restroom.accessible ?: false)
+        val matchesDiaper = !filterDiaper || (restroom.diaper ?: false)
+        distanceToRestroom <= filterDistance && matchesUisex && matchesAccessible && matchesDiaper
       })
 
       // 업데이트된 locations를 화면에 표시
@@ -122,6 +133,19 @@ class MainActivity : AppCompatActivity() {
         filterDistance = 500.0
         updateLocations()
       }
+    }
+
+    binding.checkUnisex.setOnCheckedChangeListener { _, isChecked ->
+      filterUnisex = isChecked
+      updateLocations()
+    }
+    binding.checkAccessible.setOnCheckedChangeListener { _, isChecked ->
+      filterAccessible = isChecked
+      updateLocations()
+    }
+    binding.checkDiaper.setOnCheckedChangeListener { _, isChecked ->
+      filterDiaper = isChecked
+      updateLocations()
     }
 
     // 초기 위치 업데이트

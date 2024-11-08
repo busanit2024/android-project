@@ -2,8 +2,9 @@ package com.busanit.searchrestroom.activity
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -11,17 +12,24 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
+import com.busanit.searchrestroom.BuildConfig
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
-import com.busanit.searchrestroom.databinding.SearchBarBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +37,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.math.cos
-import kotlin.math.sqrt
 
 class MainActivity : AppCompatActivity() {
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
@@ -50,6 +57,15 @@ class MainActivity : AppCompatActivity() {
 
   private lateinit var job: Job
 
+  private val searchViewModel : SearchViewModel by viewModels()
+
+  private lateinit var selectedPlace : LatLng
+
+  private var filterDistance = 200.0
+  private var filterUnisex = false
+  private var filterAccessible = false
+  private var filterDiaper = false
+
   // 주변 화장실 좌표 리스트를 저장할 변수 (이름, 좌표)
   var locations = mutableListOf<Restroom>()
 
@@ -62,6 +78,7 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
 
+    selectedPlace = getMyLocation()
     val searchBar = findViewById<View>(R.id.search_bar)
     val menuButton = searchBar.findViewById<ImageView>(R.id.menuButton)
 
@@ -78,13 +95,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 기본 검색 반경 설정
-    var filterDistance = 200.0
     binding.searchRadius200.isChecked = true
 
     // 상세 검색 조건 설정
-    var filterUnisex = false
-    var filterAccessible = false
-    var filterDiaper = false
     binding.checkDiaper.isChecked = filterDiaper
     binding.checkAccessible.isChecked = filterAccessible
     binding.checkUnisex.isChecked = filterUnisex
@@ -92,33 +105,6 @@ class MainActivity : AppCompatActivity() {
     val db = DatabaseCopier.getAppDataBase(context = applicationContext)
     var restroom = db!!.restroomDao().getRestroomById(1)
     Log.d("test", "restroom: $restroom")
-
-    fun updateLocations() {
-      val distance = filterDistance
-      val latChange = distance / (111.32 * 1000)
-      val longChange = distance / (111.32 * 1000 * cos(Math.toRadians(getMyLocation().latitude)))
-
-      val minLat = getMyLocation().latitude - latChange
-      val maxLat = getMyLocation().latitude + latChange
-      val minLong = getMyLocation().longitude - longChange
-      val maxLong = getMyLocation().longitude + longChange
-
-      val db = DatabaseCopier.getAppDataBase(context = applicationContext)
-      val locationsList = db!!.restroomDao().getRestroomsWithinArea(minLat, maxLat, minLong, maxLong) as MutableList<Restroom>
-
-      // 필터링된 위치만 locations에 저장
-      locations.clear()
-      locations.addAll(locationsList.filter { restroom ->
-        val distanceToRestroom = calculateDistance(getMyLocation(), restroom)
-        val matchesUisex = !filterUnisex || (restroom.unisex ?: false)
-        val matchesAccessible = !filterAccessible || (restroom.accessible ?: false)
-        val matchesDiaper = !filterDiaper || (restroom.diaper ?: false)
-        distanceToRestroom <= filterDistance && matchesUisex && matchesAccessible && matchesDiaper
-      })
-
-      // 업데이트된 locations를 화면에 표시
-      updateMapMarkers()
-    }
 
     // 필터 반경이 변경될 때마다 업데이트
     binding.searchRadius200.setOnCheckedChangeListener { _, isChecked ->
@@ -151,13 +137,20 @@ class MainActivity : AppCompatActivity() {
     // 초기 위치 업데이트
     updateLocations()
 
-
-
     if (checkPermissions()) {
       initMap()
     } else {
       ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSION_CODE)
     }
+
+    setupSearchBar()
+
+    searchViewModel.selectedLocation.observe(this, Observer { location ->
+      val (latLng, name) = location
+      googleMap?.addMarker(MarkerOptions().position(latLng).title(name))
+      googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+
+    })
 
     binding.myLocationButton.setOnClickListener { onMyLocationButtonClick() }
 
@@ -224,7 +217,7 @@ class MainActivity : AppCompatActivity() {
       when {
         checkPermissions() -> {
           it.isMyLocationEnabled = true
-          it.moveCamera(CameraUpdateFactory.newLatLngZoom(getMyLocation(), DEFAULT_ZOOM_LEVEL))
+          it.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedPlace, DEFAULT_ZOOM_LEVEL))
         }
 
         else -> {
@@ -237,11 +230,42 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
+  private fun updateLocations() {
+    val distance = filterDistance
+    val latChange = distance / (111.32 * 1000)
+    val longChange = distance / (111.32 * 1000 * cos(Math.toRadians(selectedPlace.latitude)))
+
+    val minLat = selectedPlace.latitude - latChange
+    val maxLat = selectedPlace.latitude + latChange
+    val minLong = selectedPlace.longitude - longChange
+    val maxLong = selectedPlace.longitude + longChange
+
+    val db = DatabaseCopier.getAppDataBase(context = applicationContext)
+    val locationsList = db!!.restroomDao().getRestroomsWithinArea(minLat, maxLat, minLong, maxLong) as MutableList<Restroom>
+
+    // 필터링된 위치만 locations에 저장
+    locations.clear()
+    locations.addAll(locationsList.filter { restroom ->
+      val distanceToRestroom = calculateDistance(selectedPlace, restroom)
+      val matchesUisex = !filterUnisex || (restroom.unisex ?: false)
+      val matchesAccessible = !filterAccessible || (restroom.accessible ?: false)
+      val matchesDiaper = !filterDiaper || (restroom.diaper ?: false)
+      distanceToRestroom <= filterDistance && matchesUisex && matchesAccessible && matchesDiaper
+    })
+
+    // 업데이트된 locations를 화면에 표시
+    updateMapMarkers()
+  }
+
   // 마커를 업데이트하는 함수
-  fun updateMapMarkers() {
+  private fun updateMapMarkers() {
     // 기존 마커 제거
     markers.forEach { it.remove() }
     markers.clear()
+
+    val iconBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_pin_bitmap)
+    val iconBitmapScaled = Bitmap.createScaledBitmap(iconBitmap, 80, 80, false)
+    val markerIcon = BitmapDescriptorFactory.fromBitmap(iconBitmapScaled)
 
     // locations 리스트에 있는 위치로 새 마커 추가
     locations.forEach { location ->
@@ -249,6 +273,7 @@ class MainActivity : AppCompatActivity() {
         com.google.android.gms.maps.model.MarkerOptions()
           .position(LatLng(location.latitude!!, location.longitude!!))
           .title(location.restroomName)
+          .icon(markerIcon)
       )
       marker?.let { markers.add(it) }  // null 체크 후 리스트에 추가
     }
@@ -278,6 +303,7 @@ class MainActivity : AppCompatActivity() {
 
       else -> Toast.makeText(applicationContext, "위치사용권한 설정에 동의해주세요", Toast.LENGTH_LONG).show()
     }
+    selectedPlace = getMyLocation()
   }
 
   // 위치 간 거리 계산 함수
@@ -289,6 +315,28 @@ class MainActivity : AppCompatActivity() {
       results
     )
     return results[0].toDouble()
+  }
+
+  private fun setupSearchBar() {
+    if (!Places.isInitialized()) {
+      Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
+    }
+
+    val autocompleteFragment = supportFragmentManager
+      .findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
+
+    autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
+    autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+      override fun onPlaceSelected(place: Place) {
+        searchViewModel.setSelectedLocation(place.latLng!!, place.name)
+        selectedPlace = place.latLng!!
+        updateLocations()
+      }
+
+      override fun onError(status: com.google.android.gms.common.api.Status) {
+        Log.e("error", "An error occurred: $status")
+      }
+    })
   }
 
 

@@ -8,13 +8,16 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.location.Location
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
@@ -45,7 +48,7 @@ class MainActivity : AppCompatActivity(){
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
   // 지도 초기화
-  val PERMISSIONS = arrayOf(
+  private val PERMISSIONS = arrayOf(
     android.Manifest.permission.ACCESS_COARSE_LOCATION,
     android.Manifest.permission.ACCESS_FINE_LOCATION
   )
@@ -81,11 +84,19 @@ class MainActivity : AppCompatActivity(){
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
 
+    if (checkPermissions()) {
+      initMap()
+    } else {
+      ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSION_CODE)
+    }
+
+    binding.mapView.onCreate(savedInstanceState)
+
     selectedPlace = getMyLocation()
     val searchBar = findViewById<View>(R.id.search_bar)
     val listButton = searchBar.findViewById<LinearLayout>(R.id.listButton)
 
-    binding.mapView.onCreate(savedInstanceState)
+
 
 
     // DB 가져오기
@@ -140,12 +151,6 @@ class MainActivity : AppCompatActivity(){
     // 초기 위치 업데이트
     updateLocations()
 
-    if (checkPermissions()) {
-      initMap()
-    } else {
-      ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSION_CODE)
-    }
-
     setupSearchBar()
 
     searchViewModel.selectedLocation.observe(this, Observer { location ->
@@ -168,7 +173,8 @@ class MainActivity : AppCompatActivity(){
     listButton.setOnClickListener {
       val intent = Intent(this, SearchListActivity::class.java)
       intent.putParcelableArrayListExtra("locations", locations as ArrayList<Restroom>)
-      intent.putExtra("selectedPlace", selectedPlace)
+      intent.putExtra("currentLat", selectedPlace.latitude)
+      intent.putExtra("currentLong", selectedPlace.longitude)
       startActivity(intent)
     }
 
@@ -195,9 +201,35 @@ class MainActivity : AppCompatActivity(){
     grantResults: IntArray
   ) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-    initMap()
+    if (requestCode == REQUEST_PERMISSION_CODE) {
+      if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+        initMap()
+      } else {
+        showPermissionDeniedDialog()
+      }
+    }
   }
+
+  private fun showPermissionDeniedDialog() {
+    // 권한 거부 시 사용자에게 안내하는 다이얼로그 표시
+    AlertDialog.Builder(this)
+      .setTitle("권한 필요")
+      .setMessage("앱을 사용하려면 위치 권한이 필요합니다.")
+      .setPositiveButton("권한 설정") { _, _ ->
+        // 권한 설정 화면으로 이동
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", packageName, null)
+        intent.data = uri
+        startActivity(intent)
+      }
+      .setNegativeButton("취소") { _, _ ->
+        // 앱 종료 또는 권한이 필요한 기능 비활성화
+        // finish() // 앱 종료
+        // 또는 권한이 필요한 기능을 비활성화하는 처리
+      }
+      .show()
+  }
+
 
   private fun checkPermissions(): Boolean {
 

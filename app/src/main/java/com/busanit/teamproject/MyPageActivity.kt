@@ -1,87 +1,130 @@
 package com.busanit.teamproject
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.busanit.teamproject.databinding.ActivityMypageBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MyPageActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMypageBinding
+    private lateinit var sharedPreferences: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityMypageBinding.inflate(layoutInflater)
+        binding = ActivityMypageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE)
+        updateUI()
+
+        // 각 버튼의 클릭 리스너 설정
         binding.myReview.setOnClickListener {
-            // 나의 리뷰
-            val intent = Intent(this, MyReviewActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, MyReviewActivity::class.java))
         }
 
         binding.myRestroom.setOnClickListener {
-            // 등록한 화장실
+            // 등록한 화장실 화면으로 이동
         }
 
         binding.myFavorite.setOnClickListener {
-            // 즐겨찾기
-            val intent = Intent(this, FavoriteActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, FavoriteActivity::class.java))
         }
 
         binding.adminPage.setOnClickListener {
-            // 관리자 페이지(단, 로그인 했을 때만 보이게 하기!)
+            if (isLoggedIn() && sharedPreferences.getString("userRole", "") == "ADMIN") {
+                // 관리자 페이지 이동 (관리자로 로그인한 경우에만 보이게 함)
+//                startActivity(Intent(this, AdminPageActivity::class.java))
+            }
         }
 
         binding.logout.setOnClickListener {
-            // 로그아웃
+            if (isLoggedIn()) {
+                logout()  // 로그아웃 처리
+            } else {
+                showToast("로그인 화면으로 이동합니다.")
+//                startActivity(Intent(this, LoginActivity::class.java))  // 로그인 화면으로 이동
+            }
         }
 
-        // 회원정보 수정 버튼
         binding.editInfo.setOnClickListener {
-            // 회원정보 수정
-            val intent = Intent(this, EditInfoActivity::class.java)
-            startActivity(intent)
+            if (isLoggedIn()) {
+                startActivity(Intent(this, EditInfoActivity::class.java))
+            } else {
+                showToast("로그인이 필요합니다.")
+//                startActivity(Intent(this, LoginActivity::class.java))
+            }
         }
 
-        // 편집 아이콘
         binding.editIcon.setOnClickListener {
-            // 회원정보 수정
-            val intent = Intent(this, EditInfoActivity::class.java)
-            startActivity(intent)
+            if (isLoggedIn()) {
+                startActivity(Intent(this, EditInfoActivity::class.java))
+            } else {
+                showToast("로그인이 필요합니다.")
+//                startActivity(Intent(this, LoginActivity::class.java))
+            }
         }
 
         binding.deleteAccount.setOnClickListener {
-            // 회원탈퇴
-
+            if (isLoggedIn()) {
+                // 회원 탈퇴 처리
+                deleteAccount()
+            } else {
+//                startActivity(Intent(this, SignupActivity::class.java))  // 회원가입 화면으로 이동
+            }
         }
 
-        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
-        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+        // BottomNavigationView 설정
+        findViewById<BottomNavigationView>(R.id.bottom_navigation).setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.activity_home -> {
-                    // 홈 화면으로 이동
-                    val intent = Intent(this, MyPageActivity::class.java)
-                    // 지금은 MyPageActivity로 이동하게 되어있지만 나중에 합칠 땐 이걸 MainActivity로 수정해야 함!
-                    startActivity(intent)
-                    return@setOnNavigationItemSelectedListener true
+                    startActivity(Intent(this, MainActivity::class.java))
+                    true
                 }
-
                 R.id.my_favorite -> {
-                    // 즐겨찾기 화면으로 이동
-                    val intent = Intent(this, FavoriteActivity::class.java)
-                    startActivity(intent)
-                    return@setOnNavigationItemSelectedListener true
+                    startActivity(Intent(this, FavoriteActivity::class.java))
+                    true
                 }
-
                 R.id.activity_mypage -> {
-                    // 마이페이지 화면으로 이동
-                    val intent = Intent(this, MyPageActivity::class.java)
-                    startActivity(intent)
-                    return@setOnNavigationItemSelectedListener true
+                    // 현재 페이지 유지(지금이 마이페이지)
+                    true
                 }
+                else -> false
             }
-            false
         }
+    }
+
+    private fun updateUI() {
+        val isAdmin = sharedPreferences.getString("userRole", "") == "ADMIN"
+        val isLoggedIn = isLoggedIn()
+
+        binding.logout.text = if (isLoggedIn) "로그아웃" else "로그인"
+        binding.deleteAccount.text = if (isLoggedIn) "회원탈퇴" else "회원가입"
+
+        binding.adminPage.visibility = if (isLoggedIn && isAdmin) View.VISIBLE else View.GONE
+    }
+
+    private fun isLoggedIn(): Boolean {
+        return sharedPreferences.getBoolean("isLoggedIn", false)
+    }
+
+    private fun logout() {
+        with(sharedPreferences.edit()) {
+            putBoolean("isLoggedIn", false)
+            apply()
+        }
+        updateUI()
+    }
+
+    private fun deleteAccount() {
+        // 회원탈퇴 로직 구현
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

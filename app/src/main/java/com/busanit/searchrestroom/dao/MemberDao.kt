@@ -8,16 +8,19 @@ import com.busanit.searchrestroom.database.Member
 
 @Dao
 interface MemberDao {
+  @Query("select * from member where email = :email")
+  suspend fun getMemberByEmail(email: String): Member?
+
   @Query("select * from member")
-  fun getAll(): List<Member>
+  suspend fun getAll(): List<Member>
 
   @Query("select * from member where member_id = :id")
-  fun getMemberById(id: Int): Member
+  suspend fun getMemberById(id: Int): Member
 
   @Insert
-  fun insert(vararg member: Member)
+  suspend fun insert(vararg member: Member)
 
   @Delete
-  fun delete(member: Member)
+  suspend fun delete(member: Member)
 
 }

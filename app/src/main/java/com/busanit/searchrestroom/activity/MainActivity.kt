@@ -313,6 +313,8 @@ class MainActivity : AppCompatActivity(){
 
   // 마커를 업데이트하는 함수
   private fun updateMapMarkers() {
+
+    googleMap?.clear()
     // 기존 마커 제거
     markers.forEach { it.remove() }
     markers.clear()
@@ -362,13 +364,15 @@ class MainActivity : AppCompatActivity(){
 
   private fun onMyLocationButtonClick() {
     when {
-      checkPermissions() -> googleMap?.moveCamera(
-        CameraUpdateFactory.newLatLngZoom(getMyLocation(), DEFAULT_ZOOM_LEVEL)
-      )
+      checkPermissions() -> {
+        selectedPlace = getMyLocation()
+        googleMap?.moveCamera(
+          CameraUpdateFactory.newLatLngZoom(selectedPlace, DEFAULT_ZOOM_LEVEL)
+        )
+      }
 
       else -> Toast.makeText(applicationContext, "위치사용권한 설정에 동의해주세요", Toast.LENGTH_LONG).show()
     }
-    selectedPlace = getMyLocation()
     updateLocations()
   }
 

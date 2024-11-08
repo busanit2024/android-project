@@ -73,18 +73,10 @@
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         android:background="@color/white"
         android:paddingHorizontal="32dp"
-        android:paddingTop="18dp"
+        android:paddingTop="24dp"
         android:paddingBottom="48dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigation">
-
-      <com.google.android.material.divider.MaterialDivider
-          android:layout_width="64dp"
-          android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-          android:layout_marginBottom="24dp"/>
-
-
 
       <LinearLayout
           android:layout_width="match_parent"

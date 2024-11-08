@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -81,7 +82,7 @@ class MainActivity : AppCompatActivity(){
 
     selectedPlace = getMyLocation()
     val searchBar = findViewById<View>(R.id.search_bar)
-    val menuButton = searchBar.findViewById<ImageView>(R.id.menuButton)
+    val listButton = searchBar.findViewById<LinearLayout>(R.id.listButton)
 
     binding.mapView.onCreate(savedInstanceState)
 
@@ -149,7 +150,7 @@ class MainActivity : AppCompatActivity(){
     searchViewModel.selectedLocation.observe(this, Observer { location ->
       val (latLng, name) = location
       googleMap?.addMarker(MarkerOptions().position(latLng).title(name))
-      googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+      googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM_LEVEL))
 
     })
 
@@ -161,9 +162,9 @@ class MainActivity : AppCompatActivity(){
 
     //상세검색 메뉴 관련
     var bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
-    bottomSheetBehavior.peekHeight = 96
+    bottomSheetBehavior.peekHeight = 200
 
-    menuButton.setOnClickListener {
+    listButton.setOnClickListener {
       if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
       } else {
@@ -233,7 +234,15 @@ class MainActivity : AppCompatActivity(){
         googleMap?.clear()
         googleMap?.addMarker(MarkerOptions().position(latLng))
         updateLocations()
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM_LEVEL))
+      }
+
+      googleMap!!.setOnMarkerClickListener { marker ->
+        if (marker.tag != "selected") {
+          val id = marker.tag as Int
+          //TODO("마커 클릭했을 때 id에 해당하는 상세페이지로 이동")
+        }
+        true
       }
 
     }
@@ -273,16 +282,17 @@ class MainActivity : AppCompatActivity(){
     markers.clear()
 
     val iconBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_pin_bitmap)
-    val iconBitmapScaled = Bitmap.createScaledBitmap(iconBitmap, 80, 80, false)
+    val iconBitmapScaled = Bitmap.createScaledBitmap(iconBitmap, 100, 100, false)
     val markerIcon = BitmapDescriptorFactory.fromBitmap(iconBitmapScaled)
 
     // 선택한 위치에 마커 추가
     selectedPlace?.let { latLng ->
-      googleMap?.addMarker(
+      val selectedMarker = googleMap?.addMarker(
         MarkerOptions()
           .position(latLng)
           .title("선택한 위치")
       )
+      selectedMarker?.tag = "selected"
     }
 
     // locations 리스트에 있는 위치로 새 마커 추가
@@ -293,6 +303,7 @@ class MainActivity : AppCompatActivity(){
           .title(location.restroomName)
           .icon(markerIcon)
       )
+      marker?.tag = location.restroomId
       marker?.let { markers.add(it) }  // null 체크 후 리스트에 추가
     }
   }
@@ -322,6 +333,7 @@ class MainActivity : AppCompatActivity(){
       else -> Toast.makeText(applicationContext, "위치사용권한 설정에 동의해주세요", Toast.LENGTH_LONG).show()
     }
     selectedPlace = getMyLocation()
+    updateLocations()
   }
 
   // 위치 간 거리 계산 함수

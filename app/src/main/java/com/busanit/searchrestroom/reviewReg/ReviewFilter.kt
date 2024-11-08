@@ -28,3 +28,4 @@ enum class FilterOption(val filterType: FilterType, val optionName: String) {
         }
     }
 }
+

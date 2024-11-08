@@ -23,6 +23,7 @@ import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
@@ -38,7 +39,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.math.cos
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(){
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
   // 지도 초기화
@@ -227,6 +228,14 @@ class MainActivity : AppCompatActivity() {
 
       updateMapMarkers()
 
+      googleMap!!.setOnMapClickListener { latLng ->
+        selectedPlace = latLng
+        googleMap?.clear()
+        googleMap?.addMarker(MarkerOptions().position(latLng))
+        updateLocations()
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+      }
+
     }
   }
 
@@ -266,6 +275,15 @@ class MainActivity : AppCompatActivity() {
     val iconBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_pin_bitmap)
     val iconBitmapScaled = Bitmap.createScaledBitmap(iconBitmap, 80, 80, false)
     val markerIcon = BitmapDescriptorFactory.fromBitmap(iconBitmapScaled)
+
+    // 선택한 위치에 마커 추가
+    selectedPlace?.let { latLng ->
+      googleMap?.addMarker(
+        MarkerOptions()
+          .position(latLng)
+          .title("선택한 위치")
+      )
+    }
 
     // locations 리스트에 있는 위치로 새 마커 추가
     locations.forEach { location ->

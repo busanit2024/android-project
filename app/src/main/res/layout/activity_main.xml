@@ -108,7 +108,7 @@
       </LinearLayout>
 
 
-      <RadioGroup
+      <LinearLayout
           android:id="@+id/searchRadiusGroup"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -121,28 +121,31 @@
             android:text="검색 반경"
             android:textStyle="bold"
             android:textSize="16dp"
-            android:layout_marginEnd="38dp"/>
-        <RadioButton
-            android:id="@+id/searchRadius200"
+            android:layout_marginEnd="32dp"
+            android:layout_gravity="center_vertical"/>
+        <com.google.android.material.chip.ChipGroup
+            app:singleSelection="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+          >
+          <com.google.android.material.chip.Chip
+              style="@style/Widget.MaterialComponents.Chip.Choice"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginEnd="8dp"
+              android:id="@+id/searchRadius200"
             android:text="200m"
-            android:layout_marginEnd="32dp"/>
+              android:checked="true"/>
+          <com.google.android.material.chip.Chip
+              style="@style/Widget.MaterialComponents.Chip.Choice"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:id="@+id/searchRadius500"
+              android:text="500m"
+              android:checked="false"/>
 
-        <RadioButton
-            android:id="@+id/searchRadius500"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="500m"/>
-      </RadioGroup>
+        </com.google.android.material.chip.ChipGroup>
+      </LinearLayout>
 
 
 

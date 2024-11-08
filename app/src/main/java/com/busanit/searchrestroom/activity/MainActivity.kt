@@ -16,6 +16,7 @@ import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.DatabaseCopier
+import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
 import com.busanit.searchrestroom.databinding.SearchBarBinding
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -27,6 +28,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlin.math.cos
+import kotlin.math.sqrt
 
 class MainActivity : AppCompatActivity() {
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
@@ -45,7 +48,13 @@ class MainActivity : AppCompatActivity() {
 
   var googleMap: GoogleMap? = null
 
-  private lateinit var job : Job
+  private lateinit var job: Job
+
+  // 주변 화장실 좌표 리스트를 저장할 변수 (이름, 좌표)
+  var locations = mutableListOf<Restroom>()
+
+  // 기존 마커를 저장하는 리스트를 선언
+  private val markers = mutableListOf<com.google.android.gms.maps.model.Marker>()
 
 
 
@@ -68,9 +77,57 @@ class MainActivity : AppCompatActivity() {
       job.join()
     }
 
+    // 기본 검색 반경 설정
+    var filterDistance = 200.0
+    binding.searchRadius200.isChecked = true
+
     val db = DatabaseCopier.getAppDataBase(context = applicationContext)
     var restroom = db!!.restroomDao().getRestroomById(1)
     Log.d("test", "restroom: $restroom")
+
+    fun updateLocations() {
+      val distance = filterDistance
+      val latChange = distance / (111.32 * 1000)
+      val longChange = distance / (111.32 * 1000 * cos(Math.toRadians(getMyLocation().latitude)))
+
+      val minLat = getMyLocation().latitude - latChange
+      val maxLat = getMyLocation().latitude + latChange
+      val minLong = getMyLocation().longitude - longChange
+      val maxLong = getMyLocation().longitude + longChange
+
+      val db = DatabaseCopier.getAppDataBase(context = applicationContext)
+      val locationsList = db!!.restroomDao().getRestroomsWithinArea(minLat, maxLat, minLong, maxLong) as MutableList<Restroom>
+
+      // 필터링된 위치만 locations에 저장
+      locations.clear()
+      locations.addAll(locationsList.filter { restroom ->
+        val distanceToRestroom = calculateDistance(getMyLocation(), restroom)
+        distanceToRestroom <= filterDistance
+      })
+
+      // 업데이트된 locations를 화면에 표시
+      updateMapMarkers()
+    }
+
+    // 필터 반경이 변경될 때마다 업데이트
+    binding.searchRadius200.setOnCheckedChangeListener { _, isChecked ->
+      if (isChecked) {
+        filterDistance = 200.0
+        updateLocations()
+      }
+    }
+
+    binding.searchRadius500.setOnCheckedChangeListener { _, isChecked ->
+      if (isChecked) {
+        filterDistance = 500.0
+        updateLocations()
+      }
+    }
+
+    // 초기 위치 업데이트
+    updateLocations()
+
+
 
     if (checkPermissions()) {
       initMap()
@@ -99,7 +156,7 @@ class MainActivity : AppCompatActivity() {
     binding.menuCollapseButton.setOnClickListener {
       if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        }
+      }
     }
 
     binding.bottomNavigation.setOnItemSelectedListener {
@@ -109,7 +166,11 @@ class MainActivity : AppCompatActivity() {
   }
 
 
-  override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+  override fun onRequestPermissionsResult(
+    requestCode: Int,
+    permissions: Array<out String>,
+    grantResults: IntArray
+  ) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
     initMap()
@@ -118,7 +179,11 @@ class MainActivity : AppCompatActivity() {
   private fun checkPermissions(): Boolean {
 
     for (permission in PERMISSIONS) {
-      if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+      if (ActivityCompat.checkSelfPermission(
+          this,
+          permission
+        ) != PackageManager.PERMISSION_GRANTED
+      ) {
         return false
       }
     }
@@ -137,10 +202,31 @@ class MainActivity : AppCompatActivity() {
           it.isMyLocationEnabled = true
           it.moveCamera(CameraUpdateFactory.newLatLngZoom(getMyLocation(), DEFAULT_ZOOM_LEVEL))
         }
+
         else -> {
           it.moveCamera(CameraUpdateFactory.newLatLngZoom(CITY_HALL, DEFAULT_ZOOM_LEVEL))
         }
       }
+
+      updateMapMarkers()
+
+    }
+  }
+
+  // 마커를 업데이트하는 함수
+  fun updateMapMarkers() {
+    // 기존 마커 제거
+    markers.forEach { it.remove() }
+    markers.clear()
+
+    // locations 리스트에 있는 위치로 새 마커 추가
+    locations.forEach { location ->
+      val marker = googleMap?.addMarker(
+        com.google.android.gms.maps.model.MarkerOptions()
+          .position(LatLng(location.latitude!!, location.longitude!!))
+          .title(location.restroomName)
+      )
+      marker?.let { markers.add(it) }  // null 체크 후 리스트에 추가
     }
   }
 
@@ -165,9 +251,22 @@ class MainActivity : AppCompatActivity() {
       checkPermissions() -> googleMap?.moveCamera(
         CameraUpdateFactory.newLatLngZoom(getMyLocation(), DEFAULT_ZOOM_LEVEL)
       )
+
       else -> Toast.makeText(applicationContext, "위치사용권한 설정에 동의해주세요", Toast.LENGTH_LONG).show()
     }
   }
+
+  // 위치 간 거리 계산 함수
+  private fun calculateDistance(location1: LatLng, restroom: Restroom): Double {
+    val results = FloatArray(1)
+    Location.distanceBetween(
+      location1.latitude, location1.longitude,
+      restroom.latitude!!, restroom.longitude!!,
+      results
+    )
+    return results[0].toDouble()
+  }
+
 
   override fun onResume() {
     super.onResume()

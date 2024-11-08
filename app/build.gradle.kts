@@ -4,7 +4,6 @@ plugins {
   id("com.android.application")
   id("org.jetbrains.kotlin.android")
   id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
-  id("org.jetbrains.kotlin.kapt")
   id("com.google.devtools.ksp")
 }
 
@@ -59,8 +58,6 @@ dependencies {
   implementation("androidx.room:room-runtime:$room_version")
   annotationProcessor("androidx.room:room-compiler:$room_version")
 //
-  // To use Kotlin annotation processing tool (kapt)
-  kapt("androidx.room:room-compiler:$room_version")
   // To use Kotlin Symbol Processing (KSP)
   ksp("androidx.room:room-compiler:$room_version")
 

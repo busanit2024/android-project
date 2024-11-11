@@ -34,6 +34,7 @@ class MyPageActivity : AppCompatActivity() {
 
         binding.myRestroom.setOnClickListener {
             // 등록한 화장실 화면으로 이동
+            startActivity(Intent(this, MyToiletActivity::class.java))
         }
 
         binding.myFavorite.setOnClickListener {
@@ -41,7 +42,7 @@ class MyPageActivity : AppCompatActivity() {
         }
 
         binding.adminPage.setOnClickListener {
-            if (isLoggedIn() && sharedPreferences.getString("userRole", "") == "USER") {
+            if (isLoggedIn() && sharedPreferences.getString("userRole", "") == "ADMIN") {
                 // 관리자 페이지 이동 (관리자로 로그인한 경우에만 보이게 함)
 //                startActivity(Intent(this, AdminPageActivity::class.java))
             }
@@ -61,17 +62,21 @@ class MyPageActivity : AppCompatActivity() {
                 startActivity(Intent(this, EditInfoActivity::class.java))
             } else {
                 showToast("로그인이 필요합니다.")
+                // 로그인 화면으로 이동
 //                startActivity(Intent(this, LoginActivity::class.java))
             }
         }
 
         binding.editIcon.setOnClickListener {
-            if (isLoggedIn()) {
-                startActivity(Intent(this, EditInfoActivity::class.java))
-            } else {
-                showToast("로그인이 필요합니다.")
-//                startActivity(Intent(this, LoginActivity::class.java))
-            }
+//            if (isLoggedIn()) {
+//                startActivity(Intent(this, EditInfoActivity::class.java))
+//            } else {
+//                showToast("로그인이 필요합니다.")
+//             // 로그인 화면으로 이동
+////                startActivity(Intent(this, LoginActivity::class.java))
+//            }
+            val intent = Intent(this, EditInfoActivity::class.java)
+            startActivity(intent)
         }
 
         binding.deleteAccount.setOnClickListener {

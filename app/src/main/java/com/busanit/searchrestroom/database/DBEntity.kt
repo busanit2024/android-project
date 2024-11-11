@@ -29,18 +29,18 @@ data class Restroom(
 data class Member (
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "member_id")
-    val memberId: Int,
-    val email: String,
-    val nickname: String?,
-    val password: String,
+    var memberId: Int,
+    var email: String,
+    var nickname: String?,
+    var password: String,
     @ColumnInfo(name = "profile_pic")
-    val profilePic: String?,
+    var profilePic: String?,
     @ColumnInfo(name = "reg_time", defaultValue = "CURRENT_TIMESTAMP")
-    val regTime: String?,
+    var regTime: String?,
     @ColumnInfo(name = "update_time", defaultValue = "CURRENT_TIMESTAMP")
-    val updateTime: String?,
-    val social: Boolean = false,
-    val admin: Boolean = false
+    var updateTime: String?,
+    var social: Boolean = false,
+    var admin: Boolean = false
 )
 
 @Entity(
@@ -67,7 +67,7 @@ data class Review (
     val restroomId: Int?,
     @ColumnInfo(name = "member_id")
     val memberId: Int?,
-    val content: String?,
+    var content: String?,
     @ColumnInfo(name = "reg_time", defaultValue = "CURRENT_TIMESTAMP")
     val regTime: String?,
     @ColumnInfo(name = "update_time", defaultValue = "CURRENT_TIMESTAMP")

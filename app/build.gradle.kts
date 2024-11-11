@@ -9,7 +9,6 @@ plugins {
     id("com.google.devtools.ksp")
     // Add the Google services Gradle plugin
     id("com.google.gms.google-services")
-
 }
 
 val properties = Properties()

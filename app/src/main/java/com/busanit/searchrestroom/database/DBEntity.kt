@@ -29,7 +29,7 @@ data class Restroom (
 data class Member (
   @PrimaryKey(autoGenerate = true)
   @ColumnInfo(name = "member_id")
-  val memberId: Int,
+  val memberId: Int = 0,
   val email: String,
   val nickname: String?,
   val password: String,

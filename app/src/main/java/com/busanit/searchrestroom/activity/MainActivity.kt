@@ -12,6 +12,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -22,6 +24,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import com.busanit.searchrestroom.BuildConfig
+import com.busanit.searchrestroom.LoginActivity
+import com.busanit.searchrestroom.MenuHelper
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.database.Restroom
@@ -37,6 +41,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -95,8 +100,6 @@ class MainActivity : AppCompatActivity(){
     selectedPlace = getMyLocation()
     val searchBar = findViewById<View>(R.id.search_bar)
     val listButton = searchBar.findViewById<LinearLayout>(R.id.listButton)
-
-
 
 
     // DB 가져오기
@@ -188,10 +191,26 @@ class MainActivity : AppCompatActivity(){
       }
     }
 
-    binding.bottomNavigation.setOnItemSelectedListener {
-      //it.itemid에 따라 액티비티 이동
-      true
+    //메뉴바 아이템 연결
+    binding.bottomNavigation.setOnItemSelectedListener { item ->
+      when (item.itemId) {
+        R.id.menu_login -> {
+          val intent = Intent(this, LoginActivity::class.java)
+          startActivity(intent)
+          true
+        }
+
+        else -> false
+      }
+
     }
+  }
+
+  ///메뉴바 관련
+  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    menuInflater.inflate(R.menu.menu_bottom_nav, menu)
+    MenuHelper.updateMenuItems(menu!!, isLoggedIn)
+    return true
   }
 
 
@@ -408,6 +427,19 @@ class MainActivity : AppCompatActivity(){
       }
     })
   }
+
+  private var isLoggedIn = false
+
+  val authStateListener = FirebaseAuth.AuthStateListener {
+    auth ->
+      val currentUser = auth.currentUser
+    if (currentUser == null) {
+      isLoggedIn = false
+    } else {
+      isLoggedIn = true
+    }
+  }
+
 
 
   override fun onResume() {

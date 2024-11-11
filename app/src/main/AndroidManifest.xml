@@ -37,6 +37,17 @@
     <activity android:name=".LoginActivity" />
     <activity android:name=".RegisterActivity" />
     <activity android:name=".activity.MainActivity" />
+
+    <provider
+        android:authorities="com.busanit.searchrestroom.fileprovider"
+        android:name="androidx.core.content.FileProvider"
+      android:exported="false"
+      android:grantUriPermissions="true">
+      <meta-data
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/file_paths"></meta-data>
+    </provider>
+
   </application>
 
 </manifest>

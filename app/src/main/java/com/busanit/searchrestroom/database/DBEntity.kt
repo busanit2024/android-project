@@ -67,7 +67,7 @@ data class Review (
   val restroomId: Int?,
   @ColumnInfo(name = "member_id")
   val memberId: Int?,
-  val content: String?,
+  var content: String?,
   @ColumnInfo(name = "reg_time", defaultValue = "CURRENT_TIMESTAMP")
   val regTime: String?,
   @ColumnInfo(name = "update_time", defaultValue = "CURRENT_TIMESTAMP")

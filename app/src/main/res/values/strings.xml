@@ -12,4 +12,10 @@
   <string name="status_login">이미 로그인 되어있습니다</string>
   // 내 Auth2.0의 클라이언트 id에서 default_web_client_id를 확인해서 가져오면 됩니다!
   <string name="web_client_id"></string>
+  <string name="review_txt">리뷰</string>
+  <string name="review_rate">리뷰 등급</string>
+  <string name="review_opentime">개방 시간</string>
+  <string name="review_comfort">편의시설</string>
+  <string name="review_unisex">공용 유무</string>
+  <string name="etcTxt">기타 정보</string>
 </resources>

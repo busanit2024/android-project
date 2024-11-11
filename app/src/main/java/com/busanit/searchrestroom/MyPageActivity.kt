@@ -91,7 +91,7 @@ class MyPageActivity : AppCompatActivity() {
         // BottomNavigationView 설정
         findViewById<BottomNavigationView>(R.id.bottom_navigation).setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.activity_home -> {
+                R.id.menu_home -> {
                     startActivity(Intent(this, MainActivity::class.java))
                     true
                 }
@@ -99,7 +99,7 @@ class MyPageActivity : AppCompatActivity() {
                     startActivity(Intent(this, FavoriteActivity::class.java))
                     true
                 }
-                R.id.activity_mypage -> {
+                R.id.menu_mypage -> {
                     // 현재 페이지 유지(지금이 마이페이지)
                     true
                 }

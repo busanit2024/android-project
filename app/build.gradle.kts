@@ -119,6 +119,8 @@ dependencies {
   implementation("androidx.multidex:multidex:2.0.1")
 
   implementation("com.google.firebase:firebase-auth:23.1.0")
+
+  implementation("com.google.firebase:firebase-analytics:22.1.2")
 }
 
 secrets {

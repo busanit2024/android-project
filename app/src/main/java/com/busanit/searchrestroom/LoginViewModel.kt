@@ -3,6 +3,7 @@ package com.busanit.searchrestroom
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.auth.FirebaseUser
 
 class LoginViewModel(private val repository: UserRepository) : ViewModel() {
 
@@ -11,6 +12,12 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
     // 로그인 메서드
     fun loginUser(email: String, password: String) {
         repository.loginUser(email, password) { success, message ->
+            loginResult.postValue(Pair(success, message))
+        }
+    }
+    // 구글 로그인 메서드
+    fun loginGoogleUser(firebaseUser: FirebaseUser?) {
+        repository.loginGoogleUser(firebaseUser) { success, message ->
             loginResult.postValue(Pair(success, message))
         }
     }

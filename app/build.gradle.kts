@@ -8,6 +8,8 @@ plugins {
   id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
   id("com.google.devtools.ksp")
   id("kotlin-parcelize")
+  // Add the Google services Gradle plugin
+  id("com.google.gms.google-services")
 }
 
 val properties = Properties()
@@ -27,6 +29,7 @@ android {
     buildConfigField("String", "MAPS_API_KEY", properties.getProperty("MAPS_API_KEY") )
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    multiDexEnabled = true // 파이어베이스 인증, 플레이 서비스 인증 라이브러리 추가 및 앱 빌드 시 오류 막기 위해
   }
 
   buildTypes {
@@ -52,17 +55,25 @@ android {
   }
 
   viewBinding.isEnabled = true
+  dataBinding.isEnabled = true
+
 }
 
 dependencies {
 
+  implementation("androidx.activity:activity-ktx:1.7.0") // ViewModel을 사용하려면 이 KTX 라이브러리가 필요
+  implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0") // ViewModel 및 LiveData 관련 의존성
+  implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.0")
+
+  implementation("com.google.android.flexbox:flexbox:3.0.0")
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.appcompat)
   implementation(libs.material)
   implementation(libs.androidx.activity)
   implementation(libs.androidx.constraintlayout)
   implementation(libs.places)
-  testImplementation(libs.junit)
+    implementation(libs.androidx.databinding.runtime)
+    testImplementation(libs.junit)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
   implementation("com.google.android.gms:play-services-maps:19.0.0")
@@ -94,6 +105,20 @@ dependencies {
 
   // optional - Paging 3 Integration
   implementation("androidx.room:room-paging:$room_version")
+
+  // Import the Firebase BoM
+  implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+
+  // Add the dependency for the Firebase Authentication library
+  implementation("com.google.firebase:firebase-auth-ktx:23.1.0")
+
+  // Also add the dependency for the Google Play services library and specify its version
+  implementation("com.google.android.gms:play-services-auth:21.2.0")
+
+  // multidex
+  implementation("androidx.multidex:multidex:2.0.1")
+
+  implementation("com.google.firebase:firebase-auth:23.1.0")
 }
 
 secrets {

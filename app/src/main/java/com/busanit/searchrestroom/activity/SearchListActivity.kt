@@ -32,5 +32,7 @@ class SearchListActivity : AppCompatActivity() {
     adapter = RestroomAdapter(datas!!, currentLat, currentLong)
     binding.searchRecyclerView.adapter = adapter
     binding.searchRecyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
+
+
   }
 }

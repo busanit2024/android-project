@@ -2,6 +2,7 @@ package com.busanit.searchrestroom.restroomDetail
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import com.busanit.searchrestroom.dao.RestroomDao
@@ -20,22 +21,28 @@ class RestroomDetailActivity : AppCompatActivity() {
         val binding = ActivityRestroomDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // db 인스턴스 생성
-        val db = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java, "app_database"
-        ).build()
+        // 메인에서 인텐트로 class 받기
+        val restroom : Restroom? = intent.getParcelableExtra("restroom")
 
-        val dao = db.restroomDao()
+        restroom?.let{
+            binding.restroomName.text = it.restroomName
+            binding.location.text = it.location
+            binding.openTime.text = it.openTime
 
+            binding.unisexOrNot.apply {
+                text = if (restroom?.unisex == true) "남녀공용" else ""
+                visibility = if (text.isEmpty()) View.GONE else View.VISIBLE // 텍스트가 없으면 숨김
+            }
+            binding.comfort.apply {
+                text = if(it.diaper == true) "기저귀 교환대" else ""
+                visibility = if (text.isEmpty()) View.GONE else View.VISIBLE
+            }
+            binding.comfort.apply {
+                text  = if(it.accessible == true) "장애인 화장실" else ""
+                visibility = if (text.isEmpty()) View.GONE else View.VISIBLE
+            }
 
-
-        // 메인에서 인텐트로 id 받기
-
-
-
-        // 건물명 / 주소 불러오기
-        db.restroomDao()
+        }
 
         // 북마크 저장 여부에 따라 표시 변경
 

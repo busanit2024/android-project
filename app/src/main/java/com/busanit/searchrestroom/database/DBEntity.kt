@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
 
+
 @Parcelize
 @Entity(tableName = "restroom")
 data class Restroom (
@@ -27,7 +28,9 @@ data class Restroom (
   val diaper: Boolean?, // 기저귀 교환대 유무
   val accessible: Boolean?, // 장애인 화장실 유무
   val memo: String?
-) : Parcelable
+) : Parcelable {
+
+}
 
 @Entity(tableName = "member")
 data class Member (
@@ -122,6 +125,3 @@ data class Bookmark(
   @ColumnInfo(name = "member_id")
   val memberId: Int?
 )
-
-
-

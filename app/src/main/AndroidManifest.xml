@@ -25,8 +25,9 @@
       android:value="@integer/google_play_services_version"/>
     <uses-library android:name="org.apache.http.legacy"
       android:required="false"/>
+
     <activity
-        android:name=".restroomDetail.RestroomDetailActivity"
+        android:name=".activity.MainActivity"
         android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -34,10 +35,13 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
+    <activity android:name=".activity.SearchListActivity"
+      android:exported="true" >
+    </activity>
     <activity android:name=".LoginActivity" />
     <activity android:name=".RegisterActivity" />
     <activity android:name=".reviewReg.ReviewRegActivity" />
-    <activity android:name=".MainActivity" />
+    <activity android:name=".restroomDetail.RestroomDetailActivity" />
   </application>
 
 </manifest>

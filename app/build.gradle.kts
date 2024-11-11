@@ -61,7 +61,6 @@ android {
 
 dependencies {
 
-
   implementation("androidx.activity:activity-ktx:1.7.0") // ViewModel을 사용하려면 이 KTX 라이브러리가 필요
   implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0") // ViewModel 및 LiveData 관련 의존성
   implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.0")
@@ -73,8 +72,8 @@ dependencies {
   implementation(libs.androidx.activity)
   implementation(libs.androidx.constraintlayout)
   implementation(libs.places)
-    implementation(libs.androidx.databinding.runtime)
-    testImplementation(libs.junit)
+  implementation(libs.androidx.databinding.runtime)
+  testImplementation(libs.junit)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
   implementation("com.google.android.gms:play-services-maps:19.0.0")

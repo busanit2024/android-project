@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
   <item
-    android:id="@+id/activity_home"
+    android:id="@+id/menu_home"
     android:title="홈"
     android:icon="@drawable/icon_map"/>
   <item
-    android:id="@+id/activity_bookmark"
+    android:id="@+id/menu_bookmark"
     android:title="북마크"
     android:icon="@drawable/icon_star"/>
   <item
-    android:id="@+id/activity_mypage"
+    android:id="@+id/menu_mypage"
     android:title="마이페이지"
-    android:icon="@drawable/icon_person"/>
-
-
+    android:icon="@drawable/icon_person"
+      />
+  <item
+    android:id="@+id/menu_login"
+    android:title="로그인"
+    android:icon="@drawable/icon_person"
+      />
 </menu>

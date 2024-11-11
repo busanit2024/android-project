@@ -1,5 +1,6 @@
 package com.busanit.searchrestroom.activity
 
+import android.content.Intent
 import android.location.Location
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.SearchlistRecyclerviewBinding
+import com.busanit.searchrestroom.restroomDetail.ToiletDetailActivity
 
 
 class MyViewHolder(val binding: SearchlistRecyclerviewBinding) : RecyclerView.ViewHolder(binding.root)
@@ -38,6 +40,13 @@ class RestroomAdapter(val datas: MutableList<Restroom>?, val currentLat: Double,
 
     val distance = calculateDistance(currentLat, currentLong, datas[position].latitude!!, datas[position].longitude!!)
     binding.distance.text = "${distance.toInt()}m"
+
+    binding.itemRoot.setOnClickListener {
+      val intent = Intent(binding.root.context, ToiletDetailActivity::class.java)
+      intent.putExtra("restroom", datas[position])
+      binding.root.context.startActivity(intent)
+    }
+
   }
 
   private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {

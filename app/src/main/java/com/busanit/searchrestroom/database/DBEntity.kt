@@ -1,10 +1,14 @@
 package com.busanit.searchrestroom.database
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
+
+@Parcelize
 @Entity(tableName = "restroom")
 data class Restroom (
   @PrimaryKey(autoGenerate = true)
@@ -23,7 +27,7 @@ data class Restroom (
   val diaper: Boolean?, // 기저귀 교환대 유무
   val accessible: Boolean?, // 장애인 화장실 유무
   val memo: String?
-)
+) : Parcelable
 
 @Entity(tableName = "member")
 data class Member (

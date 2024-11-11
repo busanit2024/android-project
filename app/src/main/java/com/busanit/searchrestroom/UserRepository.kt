@@ -10,7 +10,20 @@ import java.util.Date
 
 class UserRepository(private val memberDao: MemberDao) {
 
-    // Firebase 회원가입 후 Room DB에 저장
+    // 이메일 중복 체크 기능
+    fun checkIfEmailExists(email: String, callback: (Boolean) -> Unit) {
+        FirebaseAuth.getInstance().fetchSignInMethodsForEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val signInMethods = task.result?.signInMethods ?: emptyList()
+                    callback(signInMethods.isNotEmpty())    // 이메일이 존재하면 true 반환
+                } else {
+                    callback(false) // 오류 발생 시 false 반환
+                }
+            }
+    }
+
+    // 일반 회원가입 : Firebase와 로컬 DB에 저장
     fun RegisterUser(email: String, password: String, nickname: String, onComplete: (Boolean, String?) -> Unit) {
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
@@ -52,12 +65,13 @@ class UserRepository(private val memberDao: MemberDao) {
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    val firebaseUser = FirebaseAuth.getInstance().currentUser
                     GlobalScope.launch {
                         val member = memberDao.getMemberByEmail(email)
-                        if (member != null) {
+                        if (member != null && firebaseUser?.uid == member.memberId.toString()) {
                             onComplete(true, null)  // 로컬 DB에 존재하면 로그인 성공
                         } else {
-                            onComplete(false, "해당 계정은 로컬 DB에 저장되어 있지 않습니다.")
+                            onComplete(false, "UID가 일치하지 않습니다.")
                         }
                     }
                 } else {

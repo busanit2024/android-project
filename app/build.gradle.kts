@@ -61,6 +61,7 @@ android {
 
 dependencies {
 
+
   implementation("androidx.activity:activity-ktx:1.7.0") // ViewModel을 사용하려면 이 KTX 라이브러리가 필요
   implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0") // ViewModel 및 LiveData 관련 의존성
   implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.0")

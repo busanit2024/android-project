@@ -26,8 +26,8 @@ class ReviewRegActivity : AppCompatActivity() {
 
         // ViewModel을 바인딩합니다.
         binding.apply {
-            //viewModel = this@ReviewRegActivity.viewModel // viewModel을 XML에 바인딩
-            var lifecycleOwner = this@ReviewRegActivity // LiveData와 연결하기 위한 lifecycleOwner 설정
+            viewModel = this@ReviewRegActivity.viewModel  // ViewModel을 XML에 연결
+            lifecycleOwner = this@ReviewRegActivity  // LiveData와 연결할 라이프사이클 소유자 설정
         }
 
         setFilterOptions()

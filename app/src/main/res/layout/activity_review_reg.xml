@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.busanit.searchrestroom.reviewReg.FilterViewModel" />
+    </data>
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
-
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -20,7 +25,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="리뷰 등록"
+                android:text="리뷰 작성하기"
                 android:textStyle="bold"
                 android:textSize="23sp"
                 android:textAlignment="center"
@@ -113,13 +118,13 @@
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/filter_question2_comfort"
-                        android:layout_width="348dp"
-                        android:layout_height="60dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:layout_marginEnd="30dp"
                         android:overScrollMode="never"
                         app:layoutManager="com.google.android.flexbox.FlexboxLayoutManager"
-                        tools:itemCount="2"
+                        tools:itemCount="4"
                         tools:listitem="@layout/review_filter_option" />
 
                     <TextView
@@ -173,3 +178,4 @@
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>
 </LinearLayout>
+</layout>

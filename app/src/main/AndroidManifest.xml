@@ -26,7 +26,7 @@
     <uses-library android:name="org.apache.http.legacy"
       android:required="false"/>
     <activity
-        android:name=".restroomDetail.ToiletDetailActivity"
+        android:name=".restroomDetail.RestroomDetailActivity"
         android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -36,6 +36,8 @@
     </activity>
     <activity android:name=".LoginActivity" />
     <activity android:name=".RegisterActivity" />
+    <activity android:name=".reviewReg.ReviewRegActivity" />
+    <activity android:name=".MainActivity" />
   </application>
 
 </manifest>

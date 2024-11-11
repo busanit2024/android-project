@@ -12,11 +12,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -30,11 +33,13 @@ import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
+import com.busanit.searchrestroom.restroomDetail.ToiletDetailActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -161,6 +166,8 @@ class MainActivity : AppCompatActivity(){
     updateLocations()
 
     setupSearchBar()
+
+
 
     searchViewModel.selectedLocation.observe(this, Observer { location ->
       val (latLng, name) = location
@@ -298,6 +305,33 @@ class MainActivity : AppCompatActivity(){
 
       updateMapMarkers()
 
+      googleMap!!.setInfoWindowAdapter(object : GoogleMap.InfoWindowAdapter {
+        override fun getInfoWindow(marker: Marker): View? {
+          return null
+        }
+
+        override fun getInfoContents(marker: Marker): View? {
+          val context = this@MainActivity
+
+          val view = LayoutInflater.from(context).inflate(R.layout.custom_info_window, null)
+
+          val titleTextView = view.findViewById<TextView>(R.id.title)
+          val detailsButton = view.findViewById<Button>(R.id.detailsButton)
+
+          titleTextView.text = marker.title
+          detailsButton.setOnClickListener {
+            Log.d("test", "detailsButton clicked")
+            val id = marker.tag as Int
+            val restroom = locations.find { it.restroomId == id }
+            val intent = Intent(context, ToiletDetailActivity::class.java)
+            intent.putExtra("restroom_id", id)
+            intent.putExtra("restroom", restroom)
+            startActivity(intent)
+          }
+          return view
+        }
+      })
+
       googleMap!!.setOnMapClickListener { latLng ->
         selectedPlace = latLng
         googleMap?.clear()
@@ -307,10 +341,8 @@ class MainActivity : AppCompatActivity(){
       }
 
       googleMap!!.setOnMarkerClickListener { marker ->
-        if (marker.tag != "selected") {
-          val id = marker.tag as Int
-          //TODO("마커 클릭했을 때 id에 해당하는 상세페이지로 이동")
-        }
+
+        marker.showInfoWindow()
         true
       }
 

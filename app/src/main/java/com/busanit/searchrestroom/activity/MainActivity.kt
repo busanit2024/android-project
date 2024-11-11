@@ -104,6 +104,7 @@ class MainActivity : AppCompatActivity(){
     setContentView(binding.root)
 
     FirebaseAuth.getInstance().addAuthStateListener(authStateListener)
+    auth = Firebase.auth
 
     if (checkPermissions()) {
       initMap()
@@ -116,8 +117,6 @@ class MainActivity : AppCompatActivity(){
     selectedPlace = getMyLocation()
     val searchBar = findViewById<View>(R.id.search_bar)
     val listButton = searchBar.findViewById<LinearLayout>(R.id.listButton)
-
-    auth = Firebase.auth
 
     // DB 가져오기
     job = CoroutineScope(Dispatchers.IO).launch {
@@ -366,6 +365,9 @@ class MainActivity : AppCompatActivity(){
 
             val titleTextView = customMarkerView.findViewById<TextView>(R.id.title)
             val detailsButton = customMarkerView.findViewById<Button>(R.id.detailsButton)
+            if (marker.tag == "selected") {
+              detailsButton?.visibility = View.GONE
+            }
 
             titleTextView?.text = marker.title
 
@@ -409,8 +411,17 @@ class MainActivity : AppCompatActivity(){
         true
       }
 
+      googleMap!!.setOnCameraMoveStartedListener {
+        if (::customMarkerView.isInitialized) {
+          val layout = findViewById<ConstraintLayout>(R.id.main)
+          layout.removeView(customMarkerView)
+          isCustomMarkerVisible = false
+        }
+      }
+
     }
   }
+
 
   private fun updateLocations() {
     val distance = filterDistance
@@ -448,7 +459,7 @@ class MainActivity : AppCompatActivity(){
     markers.clear()
 
     val iconBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_pin_bitmap)
-    val iconBitmapScaled = Bitmap.createScaledBitmap(iconBitmap, 100, 100, false)
+    val iconBitmapScaled = Bitmap.createScaledBitmap(iconBitmap, 120, 120, false)
     val markerIcon = BitmapDescriptorFactory.fromBitmap(iconBitmapScaled)
 
     // 선택한 위치에 마커 추가

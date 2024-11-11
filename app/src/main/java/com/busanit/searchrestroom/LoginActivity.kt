@@ -7,6 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.databinding.ActivityLoginBinding
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.auth.api.signin.GoogleSignInOptionsExtension
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -33,6 +40,12 @@ class LoginActivity : AppCompatActivity(){
 
             // 로그인 시도
             viewModel.loginUser(email, password)
+        }
+
+        binding.loginGoogle.setOnClickListener {
+            val intent = Intent(this, GoogleLogin::class.java)
+            startActivity(intent)
+            finish()
         }
 
         // 회원가입 버튼 클릭 시

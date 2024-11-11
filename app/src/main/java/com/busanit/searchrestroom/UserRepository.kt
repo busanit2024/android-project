@@ -31,9 +31,7 @@ class UserRepository(private val memberDao: MemberDao) {
                     val firebaseUser = FirebaseAuth.getInstance().currentUser
                     if (firebaseUser != null) {
                         // Firebase에서 UID 가져오기
-                        val uid = firebaseUser.uid  // Firebase에서 가져온 UID
                         val member = Member(
-//                            firebaseUid = uid,  // UID를 memberId로 저장
                             email = email,
                             password = password,
                             nickname = nickname,
@@ -73,39 +71,25 @@ class UserRepository(private val memberDao: MemberDao) {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     onComplete(true, null)  // UID가 일치하면 로그인 성공
-//                    val firebaseUser = FirebaseAuth.getInstance().currentUser
-//                    if (firebaseUser != null) {
-//                        val uid = firebaseUser.uid  // Firebase에서 가져온 UID
-//                        GlobalScope.launch {
-//                            val member = memberDao.getMemberByEmail(email)
-//                            if (member != null && member.firebaseUid == uid) {
-//                                onComplete(true, null)  // UID가 일치하면 로그인 성공
-//                            } else {
-//                                onComplete(false, "UID가 일치하지 않습니다.")    // UID가 다르면 로그인 실패
-//                            }
-//                        }
-//                    } else {
-//                        onComplete(false, "일반 회원 정보를 가져올 수 없습니다.")
-//                    }
+
                 } else {
                     onComplete(false, task.exception?.message)  // 로그인 실패
                 }
             }
     }
     // 소셜 로그인 : Firebase 인증 후, 로컬 DB에 정보가 없는 경우 저장
-    fun loginSocialUser(firebaseUser: FirebaseUser, onComplete: (Boolean, String?) -> Unit) {
+    fun loginGoogleUser(firebaseUser: FirebaseUser?, onComplete: (Boolean, String?) -> Unit) {
         GlobalScope.launch {
-            val email = firebaseUser.email ?: ""
+            val email = firebaseUser?.email ?: ""
             val existingMember = memberDao.getMemberByEmail(email)
 
             if (existingMember == null) {
                 // 로컬 DB에 정보가 없으므로 저장
                 val member = Member(
-//                    firebaseUid = "",
                     email = email,
                     password = "",  // 소셜 로그인은 비밀번호가 없으므로 빈 문자열로 저장
-                    nickname = firebaseUser.displayName ?: "",
-                    profilePic = firebaseUser.photoUrl?.toString(),
+                    nickname = firebaseUser?.displayName ?: "",
+                    profilePic = firebaseUser?.photoUrl?.toString(),
                     regTime = Date().toString(),
                     updateTime = null,
                     social = true,

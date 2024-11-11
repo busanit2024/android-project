@@ -41,7 +41,9 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -52,6 +54,7 @@ import kotlin.math.cos
 class MainActivity : AppCompatActivity(){
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
+  private lateinit var auth : FirebaseAuth
   // 지도 초기화
   private val PERMISSIONS = arrayOf(
     android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -89,6 +92,8 @@ class MainActivity : AppCompatActivity(){
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
 
+    FirebaseAuth.getInstance().addAuthStateListener(authStateListener)
+
     if (checkPermissions()) {
       initMap()
     } else {
@@ -101,6 +106,7 @@ class MainActivity : AppCompatActivity(){
     val searchBar = findViewById<View>(R.id.search_bar)
     val listButton = searchBar.findViewById<LinearLayout>(R.id.listButton)
 
+    auth = Firebase.auth
 
     // DB 가져오기
     job = CoroutineScope(Dispatchers.IO).launch {
@@ -191,6 +197,8 @@ class MainActivity : AppCompatActivity(){
       }
     }
 
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
+
     //메뉴바 아이템 연결
     binding.bottomNavigation.setOnItemSelectedListener { item ->
       when (item.itemId) {
@@ -199,19 +207,25 @@ class MainActivity : AppCompatActivity(){
           startActivity(intent)
           true
         }
-
+        ///다른 액티비티로 이동하는 코드 추가 필요
         else -> false
       }
-
     }
   }
 
-  ///메뉴바 관련
-  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-    menuInflater.inflate(R.menu.menu_bottom_nav, menu)
-    MenuHelper.updateMenuItems(menu!!, isLoggedIn)
-    return true
+  private var isLoggedIn = false
+
+  val authStateListener = FirebaseAuth.AuthStateListener {
+      auth ->
+    val currentUser = auth.currentUser
+    Log.d("test", "current user : $currentUser")
+    isLoggedIn = currentUser != null
+
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
+
+    binding.bottomNavigation.invalidate()
   }
+
 
 
   override fun onRequestPermissionsResult(
@@ -428,23 +442,20 @@ class MainActivity : AppCompatActivity(){
     })
   }
 
-  private var isLoggedIn = false
-
-  val authStateListener = FirebaseAuth.AuthStateListener {
-    auth ->
-      val currentUser = auth.currentUser
-    if (currentUser == null) {
-      isLoggedIn = false
-    } else {
-      isLoggedIn = true
-    }
+  override fun onStart() {
+    super.onStart()
+    auth.addAuthStateListener (authStateListener)
   }
 
-
+  override fun onStop() {
+    super.onStop()
+    auth.removeAuthStateListener (authStateListener)
+  }
 
   override fun onResume() {
     super.onResume()
     binding.mapView.onResume()
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
   }
 
   override fun onPause() {
@@ -456,6 +467,7 @@ class MainActivity : AppCompatActivity(){
     job.cancel()
     super.onDestroy()
     binding.mapView.onDestroy()
+    FirebaseAuth.getInstance().removeAuthStateListener(authStateListener)
 
   }
 

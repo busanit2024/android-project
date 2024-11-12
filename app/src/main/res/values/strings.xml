@@ -11,15 +11,34 @@
   <string name="success_logout">로그아웃에 성공했습니다</string>
   <string name="status_login">이미 로그인 되어있습니다</string>
   // 내 Auth2.0의 클라이언트 id에서 default_web_client_id를 확인해서 가져오면 됩니다!
-    <string name="etcTxt"> 화장실이 작아서 문을 열고 닫기가 불편하고
+  <string name="etcTxt"> 화장실이 작아서 문을 열고 닫기가 불편하고
   세면대 관리가 이루어지지 않아서 좀 더러운데
     그래도 급할 때는 쓸만함
     계단 타야해서 휠체어는 못 쓸 듯
   </string>
-    <string name="review_rate">화장실은 어땠나요?</string>
-    <string name="review_opentime">개방시간이 궁금해요</string>
-    <string name="review_comfort">편의시설이 궁금해요</string>
-    <string name="review_unisex">기타</string>
-    <string name="review_txt">사용하신 화장실의 후기를 남겨주시면 다음 이용자들에게도 도움이 됩니다.</string>
-    <string name="web_client_id">116311315882-e6c2v9kl8cfegibd79vfogouseg6jcfj.apps.googleusercontent.com</string>
+  <string name="review_rate">화장실은 어땠나요?</string>
+  <string name="review_opentime">개방시간이 궁금해요</string>
+  <string name="review_comfort">편의시설이 궁금해요</string>
+  <string name="review_unisex">기타</string>
+  <string name="review_txt">사용하신 화장실의 후기를 남겨주시면 다음 이용자들에게도 도움이 됩니다.</string>
+  <string name="web_client_id">116311315882-e6c2v9kl8cfegibd79vfogouseg6jcfj.apps.googleusercontent.com</string>
+  <string name="kakao_app_key">d7727a5bab2cc3b7b496c87da534ffc8</string>
+  <string name="scheme_kakao_app_key">kakaod7727a5bab2cc3b7b496c87da534ffc8</string>
+
+  <string name="fine_search">상세검색</string>
+  <string name="search_radius">검색 반경</string>
+  <string name="facilities">편의시설</string>
+  <string name="unisex">남여공용</string>
+  <string name="accessible">장애인용</string>
+  <string name="diaper">기저귀교환대</string>
+
+  <string name="search_result">검색 결과</string>
+  <string name="list_button">목록보기</string>
+
+  <string name="home">홈</string>
+  <string name="bookmark">북마크</string>
+  <string name="mypage">마이페이지</string>
+  <string name="login">로그인</string>
+
+  <string name="info_button">상세 페이지로</string>
 </resources>

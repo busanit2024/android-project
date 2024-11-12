@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom
+package com.busanit.searchrestroom.member
 
 import android.content.Intent
 import android.os.Bundle
@@ -25,7 +25,8 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val repository = UserRepository(AppDatabase.getDatabase(application).memberDao())
-        viewModel = ViewModelProvider(this, RegisterViewModelFactory(repository)).get(RegisterViewModel::class.java)
+        viewModel = ViewModelProvider(this, RegisterViewModelFactory(repository)).get(
+            RegisterViewModel::class.java)
 
         auth = Firebase.auth
 

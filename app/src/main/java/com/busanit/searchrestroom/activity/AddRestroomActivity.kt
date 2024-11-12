@@ -6,14 +6,13 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.LocationManager
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
+import com.busanit.searchrestroom.BuildConfig
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityAddRestroomBinding
@@ -22,6 +21,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.libraries.places.api.Places
 import kotlinx.coroutines.launch
 
 class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -40,31 +40,40 @@ class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAddRestroomBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        try {
+            binding = ActivityAddRestroomBinding.inflate(layoutInflater)
+            setContentView(binding.root)
 
-        if (!checkPermissions()) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSION_CODE)
-        }
+            // Places API 초기화
+            if (!Places.isInitialized()) {
+                Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
+            }
 
-        db = AppDatabase.getDatabase(this)
-        binding.mapViewRegister.onCreate(savedInstanceState)
-        binding.mapViewRegister.getMapAsync(this)
+            if (!checkPermissions()) {
+                ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSION_CODE)
+            }
 
-        setupLocationInput()
+            db = AppDatabase.getDatabase(this)
+            binding.mapViewRegister.onCreate(savedInstanceState)
+            binding.mapViewRegister.getMapAsync(this)
 
-        binding.btnRegister.setOnClickListener {
-            registerRestroom()
-        }
+            setupLocationInput()
 
-        binding.btnClose.setOnClickListener {
+            binding.btnRegister.setOnClickListener {
+                registerRestroom()
+            }
+
+            binding.btnClose.setOnClickListener {
+                finish()
+            }
+        } catch (e: Exception) {
+            Log.e("AddRestroomActivity", "Error in onCreate: ${e.message}")
+            Toast.makeText(this, "초기화 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
             finish()
         }
     }
 
     private fun setupLocationInput() {
-
-
         binding.editLocation.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 val address = binding.editLocation.text.toString()
@@ -102,35 +111,45 @@ class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun updateMapLocation(latLng: LatLng) {
-        map.clear()
-        map.addMarker(MarkerOptions().position(latLng))
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM_LEVEL))
+        try {
+            map.clear()
+            map.addMarker(MarkerOptions().position(latLng))
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM_LEVEL))
+        } catch (e: Exception) {
+            Log.e("AddRestroomActivity", "Error updating map location: ${e.message}")
+        }
     }
 
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
-        map = googleMap
-        map.setOnCameraMoveStartedListener { reason ->
-            if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-                binding.scrollView.requestDisallowInterceptTouchEvent(true)
+        try {
+            map = googleMap
+            map.setOnCameraMoveStartedListener { reason ->
+                if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                    binding.scrollView.requestDisallowInterceptTouchEvent(true)
+                }
             }
-        }
 
-        map.setOnCameraIdleListener {
-            binding.scrollView.requestDisallowInterceptTouchEvent(false)
-        }
+            map.setOnCameraIdleListener {
+                binding.scrollView.requestDisallowInterceptTouchEvent(false)
+            }
 
-        if (checkPermissions()) {
-            map.isMyLocationEnabled = true
-            updateMapLocation(getMyLocation())
-        } else {
-            updateMapLocation(DEFAULT_LOCATION)
-        }
+            if (checkPermissions()) {
+                map.isMyLocationEnabled = true
+                updateMapLocation(getMyLocation())
+            } else {
+                updateMapLocation(DEFAULT_LOCATION)
+            }
 
-        map.setOnMapClickListener { latLng ->
-            selectedLocation = latLng
-            updateMapLocation(latLng)
-            getAddressFromLocation(latLng)
+            map.setOnMapClickListener { latLng ->
+                selectedLocation = latLng
+                updateMapLocation(latLng)
+                getAddressFromLocation(latLng)
+            }
+        } catch (e: Exception) {
+            Log.e("AddRestroomActivity", "Error in onMapReady: ${e.message}")
+            Toast.makeText(this, "지도 초기화 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+            finish()
         }
     }
 
@@ -220,9 +239,14 @@ class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
         )
 
         lifecycleScope.launch {
-            db.restroomDao().insert(restroom)
-            Toast.makeText(this@AddRestroomActivity, "등록되었습니다", Toast.LENGTH_SHORT).show()
-            finish()
+            try {
+                db.restroomDao().insert(restroom)
+                Toast.makeText(this@AddRestroomActivity, "등록되었습니다", Toast.LENGTH_SHORT).show()
+                finish()
+            } catch (e: Exception) {
+                Log.e("AddRestroomActivity", "Error registering restroom: ${e.message}")
+                Toast.makeText(this@AddRestroomActivity, "등록 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

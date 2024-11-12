@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
+import com.busanit.searchrestroom.FirebaseAuthHelper
 import com.busanit.searchrestroom.BuildConfig
 import com.busanit.searchrestroom.LoginActivity
 import com.busanit.searchrestroom.MenuHelper
@@ -31,6 +32,8 @@ import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
+import com.busanit.searchrestroom.myPage.FavoriteActivity
+import com.busanit.searchrestroom.myPage.MyPageActivity
 import com.busanit.searchrestroom.restroomDetail.ToiletDetailActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -44,9 +47,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -57,7 +58,7 @@ import kotlin.math.cos
 class MainActivity : AppCompatActivity(){
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
-  private lateinit var auth : FirebaseAuth
+  private lateinit var firebaseAuthHelper: FirebaseAuthHelper
   // 지도 초기화
   private val PERMISSIONS = arrayOf(
     android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -100,8 +101,11 @@ class MainActivity : AppCompatActivity(){
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
 
-    FirebaseAuth.getInstance().addAuthStateListener(authStateListener)
-    auth = Firebase.auth
+    firebaseAuthHelper = FirebaseAuthHelper(FirebaseAuth.getInstance())
+    firebaseAuthHelper.setAuthStateListener { isLoggedIn ->
+      MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
+      binding.bottomNavigation.invalidate()
+    }
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -232,34 +236,34 @@ class MainActivity : AppCompatActivity(){
       binding.menuCollapseButton.setImageResource(R.drawable.icon_up)
     }
 
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, firebaseAuthHelper.isLoggedIn())
 
     //메뉴바 아이템 연결
     binding.bottomNavigation.setOnItemSelectedListener { item ->
       when (item.itemId) {
+        R.id.menu_home -> {
+          true
+        }
         R.id.menu_login -> {
           val intent = Intent(this, LoginActivity::class.java)
           startActivity(intent)
           true
         }
-        ///다른 액티비티로 이동하는 코드 추가 필요
+        R.id.menu_mypage -> {
+          val intent = Intent(this, MyPageActivity::class.java)
+          startActivity(intent)
+          true
+        }
+        R.id.menu_bookmark -> {
+          val intent = Intent(this, FavoriteActivity::class.java)
+          startActivity(intent)
+          true
+        }
         else -> false
       }
     }
   }
 
-  private var isLoggedIn = false
-
-  val authStateListener = FirebaseAuth.AuthStateListener {
-      auth ->
-    val currentUser = auth.currentUser
-    Log.d("test", "current user : $currentUser")
-    isLoggedIn = currentUser != null
-
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
-
-    binding.bottomNavigation.invalidate()
-  }
 
 
 
@@ -567,20 +571,16 @@ class MainActivity : AppCompatActivity(){
     })
   }
 
-  override fun onStart() {
-    super.onStart()
-    auth.addAuthStateListener (authStateListener)
-  }
 
   override fun onStop() {
     super.onStop()
-    auth.removeAuthStateListener (authStateListener)
+    firebaseAuthHelper.removeAuthStateListener()
   }
 
   override fun onResume() {
     super.onResume()
     binding.mapView.onResume()
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, firebaseAuthHelper.isLoggedIn())
   }
 
   override fun onPause() {
@@ -592,7 +592,7 @@ class MainActivity : AppCompatActivity(){
     job.cancel()
     super.onDestroy()
     binding.mapView.onDestroy()
-    FirebaseAuth.getInstance().removeAuthStateListener(authStateListener)
+    firebaseAuthHelper.removeAuthStateListener()
 
   }
 

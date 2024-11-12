@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.busanit.searchrestroom.R
+import com.busanit.searchrestroom.activity.MainActivity
 import com.busanit.searchrestroom.databinding.ActivityMypageBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 

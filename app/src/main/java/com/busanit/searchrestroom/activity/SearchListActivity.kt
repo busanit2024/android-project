@@ -5,29 +5,31 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.busanit.searchrestroom.FirebaseAuthHelper
-import com.busanit.searchrestroom.LoginActivity
+import com.busanit.searchrestroom.AuthHelper
+import com.busanit.searchrestroom.member.LoginActivity
 import com.busanit.searchrestroom.MenuHelper
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivitySearchlistBinding
 import com.busanit.searchrestroom.myPage.FavoriteActivity
 import com.busanit.searchrestroom.myPage.MyPageActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 
 class SearchListActivity : AppCompatActivity() {
   lateinit var binding : ActivitySearchlistBinding
   var datas : MutableList<Restroom>? = null
   lateinit var adapter : RestroomAdapter
-  lateinit var firebaseAuthHelper: FirebaseAuthHelper
+  lateinit var authHelper: AuthHelper
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding = ActivitySearchlistBinding.inflate(layoutInflater)
     setContentView(binding.root)
 
-    firebaseAuthHelper = FirebaseAuthHelper(FirebaseAuth.getInstance())
-    firebaseAuthHelper.setAuthStateListener { isLoggedIn ->
+    authHelper = AuthHelper(FirebaseAuth.getInstance(), GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN))
+    authHelper.setAuthStateListener { isLoggedIn ->
       MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
       binding.bottomNavigation.invalidate()
     }
@@ -46,7 +48,7 @@ class SearchListActivity : AppCompatActivity() {
     binding.searchRecyclerView.adapter = adapter
     binding.searchRecyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
 
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, firebaseAuthHelper.isLoggedIn())
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, authHelper.isLoggedIn())
 
     //메뉴바 아이템 연결
     binding.bottomNavigation.setOnItemSelectedListener { item ->
@@ -77,7 +79,7 @@ class SearchListActivity : AppCompatActivity() {
 
   override fun onDestroy() {
     super.onDestroy()
-    firebaseAuthHelper.removeAuthStateListener()
+    authHelper.removeAuthStateListener()
 
   }
 }

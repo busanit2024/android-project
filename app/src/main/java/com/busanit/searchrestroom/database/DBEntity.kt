@@ -4,7 +4,9 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.busanit.searchrestroom.reviewReg.FilterOptionState
 import kotlinx.parcelize.Parcelize
 
 
@@ -75,7 +77,9 @@ data class Review (
     @ColumnInfo(name = "reg_time", defaultValue = "CURRENT_TIMESTAMP")
   val regTime: String?,
     @ColumnInfo(name = "update_time", defaultValue = "CURRENT_TIMESTAMP")
-  val updateTime: String?
+  val updateTime: String?,
+    @Ignore
+  var selectedOptions: List<FilterOptionState> = emptyList()
 )
 
 @Entity(

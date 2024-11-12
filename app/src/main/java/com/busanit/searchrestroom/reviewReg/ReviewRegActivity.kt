@@ -60,8 +60,6 @@ class ReviewRegActivity : AppCompatActivity() {
         }
     }
 
-
-
     private fun setFilterOptions() {
         // FilterOption을 FilterType 순서대로 정렬
         val filterOptionList = FilterOption.getOptionsSortedByFilterType() // FilterType에 따라 옵션 정렬
@@ -117,6 +115,9 @@ class ReviewRegActivity : AppCompatActivity() {
             updateTime = System.currentTimeMillis().toString(),
 
         )
+
+        // 선택된 필터옵션을 리스트로 저장해서 리뷰에 추가
+        review.selectedOptions = selectedOptions
 
         viewModel.insertReview(review)
 

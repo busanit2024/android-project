@@ -1,6 +1,8 @@
 package com.busanit.searchrestroom
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -54,5 +56,7 @@ class LoginActivity : AppCompatActivity(){
                 Toast.makeText(this, "로그인 실패: $message", Toast.LENGTH_SHORT).show()
             }
         }
+
     }
+
 }

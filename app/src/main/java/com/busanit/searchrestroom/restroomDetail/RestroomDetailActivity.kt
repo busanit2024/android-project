@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
+import com.busanit.searchrestroom.dao.BookmarkDao
 import com.busanit.searchrestroom.dao.RestroomDao
 import com.busanit.searchrestroom.database.AppDatabase
+import com.busanit.searchrestroom.database.Bookmark
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityRestroomDetailBinding
 import com.busanit.searchrestroom.reviewReg.ReviewRegActivity
@@ -15,7 +17,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
+
 class RestroomDetailActivity : AppCompatActivity() {
+
+    private lateinit var bookmarkDao: BookmarkDao
+    private var memberId: Int = 0
+    private var restroomId: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityRestroomDetailBinding.inflate(layoutInflater)
@@ -42,11 +50,18 @@ class RestroomDetailActivity : AppCompatActivity() {
                 visibility = if (text.isEmpty()) View.GONE else View.VISIBLE
             }
 
+            restroomId = it.restroomId
+            memberId = user?.uid
         }
 
-        // 북마크 저장 여부에 따라 표시 변경
+        // 북마크 체크박스 상태 초기화
+        setBookmarkState(binding.restroomBookmark)
 
-        // 화장실 정보 불러오기
+        // 북마크 체크박스 클릭 이벤트 처리
+        binding.restroomBookmark.setOnCheckedChangeListener { _, isChecked ->
+            onBookmarkCheckedChanged(isChecked)
+        }
+
 
         //정보 수정 버튼 클릭 이벤트
         binding.rewriteInfo.setOnClickListener{
@@ -72,7 +87,35 @@ class RestroomDetailActivity : AppCompatActivity() {
         // 댓글 내용 불러오기
 
 
+    }
+    // 북마크 체크박스 상태가 변경되었을 때 처리
+    private fun onBookmarkCheckedChanged(isChecked: Boolean) {
+        val bookmark = Bookmark(
+            bookmarkId = 0,  // 자동 증가
+            restroomId = restroomId,
+            memberId = memberId
+        )
 
+        if (isChecked) {
+            // 북마크 추가
+            addBookmark(bookmark)
+        } else {
+            // 북마크 삭제
+            removeBookmark(bookmark)
+        }
+    }
 
+    // 북마크 추가
+    private fun addBookmark(bookmark: Bookmark) {
+        CoroutineScope(Dispatchers.IO).launch {
+            bookmarkDao.insert(bookmark)
+        }
+    }
+
+    // 북마크 삭제
+    private fun removeBookmark(bookmark: Bookmark) {
+        CoroutineScope(Dispatchers.IO).launch {
+            bookmarkDao.delete(bookmark)
+        }
     }
 }

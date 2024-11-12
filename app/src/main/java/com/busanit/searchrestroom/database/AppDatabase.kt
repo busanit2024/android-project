@@ -38,7 +38,6 @@ abstract class AppDatabase : RoomDatabase() {
       }
     }
 
-
     // getDatabase 메서드 추가
     fun getDatabase(context: Context): AppDatabase {
       return INSTANCE ?: synchronized(this) {

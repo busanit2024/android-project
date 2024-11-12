@@ -100,4 +100,17 @@ class UserRepository(private val memberDao: MemberDao) {
             onComplete(true, null)
         }
     }
+
+    private fun Member(
+        email: String,
+        password: String,
+        nickname: String,
+        profilePic: String?,
+        regTime: String,
+        updateTime: Nothing?,
+        social: Boolean,
+        admin: Boolean
+    ): Member {
+        TODO("Not yet implemented")
+    }
 }

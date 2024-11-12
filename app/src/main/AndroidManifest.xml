@@ -25,27 +25,40 @@
       android:value="@integer/google_play_services_version"/>
     <uses-library android:name="org.apache.http.legacy"
       android:required="false"/>
-
     <activity
-        android:name=".activity.MainActivity"
+        android:name=".member.LoginActivity"
         android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
-
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
-    <activity android:name=".activity.SearchListActivity"
-      android:exported="true" >
+    <activity
+        android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data
+          android:host="oauth"
+          android:scheme="@string/scheme_kakao_app_key" />
+      </intent-filter>
     </activity>
-    <activity android:name=".LoginActivity" />
-    <activity android:name=".RegisterActivity" />
-    <activity android:name=".reviewReg.ReviewRegActivity" />
-    <activity android:name=".restroomDetail.RestroomDetailActivity" />
-    <activity android:name=".restroomDetail.RestroomUpdateActivity"
-        tools:ignore="Instantiatable" />
-    <activity android:name=".GoogleLogin" />
-
+    <activity android:name=".activity.SearchListActivity"/>
+    <activity android:name=".activity.MainActivity" />
+    <activity android:name=".member.RegisterActivity" />
+    <activity android:name=".member.GoogleLogin" />
+    <activity android:name=".restroomDetail.ToiletDetailActivity" />
+    <activity android:name=".myPage.MyPageActivity"/>
+    <activity android:name=".myPage.FavoriteActivity"/>
+    <activity android:name=".myPage.EditInfoActivity"/>
+    <activity android:name=".myPage.MyReviewActivity"/>
+    <activity android:name=".myPage.MyToiletActivity"/>
+    <activity
+        android:name=".activity.AddRestroomActivity"
+        android:exported="false"
+        android:screenOrientation="portrait" />
   </application>
 
 </manifest>

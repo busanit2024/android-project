@@ -2,22 +2,35 @@ package com.busanit.searchrestroom.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.busanit.searchrestroom.FirebaseAuthHelper
+import com.busanit.searchrestroom.MenuHelper
+import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivitySearchlistBinding
+import com.busanit.searchrestroom.member.LoginActivity
+import com.busanit.searchrestroom.myPage.FavoriteActivity
+import com.busanit.searchrestroom.myPage.MyPageActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class SearchListActivity : AppCompatActivity() {
   lateinit var binding : ActivitySearchlistBinding
   var datas : MutableList<Restroom>? = null
   lateinit var adapter : RestroomAdapter
+  lateinit var firebaseAuthHelper: FirebaseAuthHelper
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding = ActivitySearchlistBinding.inflate(layoutInflater)
     setContentView(binding.root)
+
+    firebaseAuthHelper = FirebaseAuthHelper(FirebaseAuth.getInstance())
+    firebaseAuthHelper.setAuthStateListener { isLoggedIn ->
+      MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
+      binding.bottomNavigation.invalidate()
+    }
 
     binding.backButton.setOnClickListener {
       finish()
@@ -33,6 +46,38 @@ class SearchListActivity : AppCompatActivity() {
     binding.searchRecyclerView.adapter = adapter
     binding.searchRecyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
 
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, firebaseAuthHelper.isLoggedIn())
+
+    //메뉴바 아이템 연결
+    binding.bottomNavigation.setOnItemSelectedListener { item ->
+      when (item.itemId) {
+        R.id.menu_home -> {
+          true
+        }
+        R.id.menu_login -> {
+          val intent = Intent(this, LoginActivity::class.java)
+          startActivity(intent)
+          true
+        }
+        R.id.menu_mypage -> {
+          val intent = Intent(this, MyPageActivity::class.java)
+          startActivity(intent)
+          true
+        }
+        R.id.menu_bookmark -> {
+          val intent = Intent(this, FavoriteActivity::class.java)
+          startActivity(intent)
+          true
+        }
+        else -> false
+      }
+    }
+
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    firebaseAuthHelper.removeAuthStateListener()
 
   }
 }

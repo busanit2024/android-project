@@ -1,9 +1,10 @@
-package com.busanit.searchrestroom
+package com.busanit.searchrestroom.member
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.auth.FirebaseUser
+import com.kakao.sdk.user.model.User
 
 class LoginViewModel(private val repository: UserRepository) : ViewModel() {
 
@@ -18,6 +19,12 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
     // 구글 로그인 메서드
     fun loginGoogleUser(firebaseUser: FirebaseUser?) {
         repository.loginGoogleUser(firebaseUser) { success, message ->
+            loginResult.postValue(Pair(success, message))
+        }
+    }
+    // 소셜 로그인 메서드
+    fun loginKakaoUser(kakaoUser: User) {
+        repository.loginKakaoUser(kakaoUser) { success, message ->
             loginResult.postValue(Pair(success, message))
         }
     }

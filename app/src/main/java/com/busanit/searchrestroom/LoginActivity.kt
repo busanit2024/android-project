@@ -1,8 +1,6 @@
 package com.busanit.searchrestroom
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -69,13 +67,5 @@ class LoginActivity : AppCompatActivity(){
                 Toast.makeText(this, "로그인 실패: $message", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    // memberId를 SharedPreferences에 저장하는 함수
-    private fun saveMemberId(memberId: Int) {
-        val sharedPreferences = getSharedPreferences("MemberIdPrefs", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putInt("memberId", memberId)
-        editor.apply()
     }
 }

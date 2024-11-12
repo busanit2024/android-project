@@ -17,7 +17,6 @@ import com.busanit.searchrestroom.database.Member
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.database.Review
 import com.busanit.searchrestroom.database.ReviewImage
-import kotlin.concurrent.Volatile
 
 @Database(entities = [Restroom::class, Member::class, Bookmark::class, Review::class, ReviewImage::class ], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {

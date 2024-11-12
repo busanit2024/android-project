@@ -3,20 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
   <item
     android:id="@+id/menu_home"
-    android:title="홈"
+    android:title="@string/home"
     android:icon="@drawable/icon_map"/>
   <item
     android:id="@+id/menu_bookmark"
-    android:title="북마크"
+    android:title="@string/bookmark"
     android:icon="@drawable/icon_star"/>
   <item
     android:id="@+id/menu_mypage"
-    android:title="마이페이지"
+    android:title="@string/mypage"
     android:icon="@drawable/icon_person"
       />
   <item
     android:id="@+id/menu_login"
-    android:title="로그인"
+    android:title="@string/login"
     android:icon="@drawable/icon_person"
       />
 </menu>

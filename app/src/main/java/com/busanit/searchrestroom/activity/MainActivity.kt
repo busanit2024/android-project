@@ -1,65 +1,64 @@
 package com.busanit.searchrestroom.activity
 
+import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.location.Location
-import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
+import com.busanit.searchrestroom.FirebaseAuthHelper
+import com.busanit.searchrestroom.BuildConfig
 import com.busanit.searchrestroom.LoginActivity
 import com.busanit.searchrestroom.MenuHelper
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
+import com.busanit.searchrestroom.myPage.FavoriteActivity
+import com.busanit.searchrestroom.myPage.MyPageActivity
 import com.busanit.searchrestroom.restroomDetail.ToiletDetailActivity
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.math.cos
-import com.busanit.searchrestroom.BuildConfig
 
 class MainActivity : AppCompatActivity(){
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
-  private lateinit var auth : FirebaseAuth
+  private lateinit var firebaseAuthHelper: FirebaseAuthHelper
   // 지도 초기화
   private val PERMISSIONS = arrayOf(
     android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -70,9 +69,11 @@ class MainActivity : AppCompatActivity(){
 
   val DEFAULT_ZOOM_LEVEL = 17f
 
-  val CITY_HALL = LatLng(37.5662952, 126.97794509999994)
+  val SEOMYEON = LatLng(35.157696, 129.059116)
 
   var googleMap: GoogleMap? = null
+
+  lateinit var fusedLocationClient: FusedLocationProviderClient
 
   private lateinit var job: Job
 
@@ -84,6 +85,9 @@ class MainActivity : AppCompatActivity(){
   private var filterUnisex = false
   private var filterAccessible = false
   private var filterDiaper = false
+
+  private lateinit var customMarkerView: View
+  private var isCustomMarkerVisible = false
 
   // 주변 화장실 좌표 리스트를 저장할 변수 (이름, 좌표)
   var locations = mutableListOf<Restroom>()
@@ -97,21 +101,29 @@ class MainActivity : AppCompatActivity(){
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
 
-    FirebaseAuth.getInstance().addAuthStateListener(authStateListener)
+    firebaseAuthHelper = FirebaseAuthHelper(FirebaseAuth.getInstance())
+    firebaseAuthHelper.setAuthStateListener { isLoggedIn ->
+      MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
+      binding.bottomNavigation.invalidate()
+    }
+
+    fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
     if (checkPermissions()) {
       initMap()
+      getMyLocation { location ->
+        location?.let {
+          selectedPlace = it
+        }
+      }
     } else {
       ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSION_CODE)
     }
 
     binding.mapView.onCreate(savedInstanceState)
 
-    selectedPlace = getMyLocation()
     val searchBar = findViewById<View>(R.id.search_bar)
     val listButton = searchBar.findViewById<LinearLayout>(R.id.listButton)
-
-    auth = Firebase.auth
 
     // DB 가져오기
     job = CoroutineScope(Dispatchers.IO).launch {
@@ -162,8 +174,6 @@ class MainActivity : AppCompatActivity(){
       updateLocations()
     }
 
-    // 초기 위치 업데이트
-    updateLocations()
 
     setupSearchBar()
 
@@ -197,41 +207,63 @@ class MainActivity : AppCompatActivity(){
     binding.menuCollapseButton.setOnClickListener {
       if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        binding.menuCollapseButton.setImageResource(R.drawable.icon_up)
       } else {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        binding.menuCollapseButton.setImageResource(R.drawable.icon_down)
       }
     }
 
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
+    bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+      override fun onStateChanged(bottomSheet: View, newState: Int) {
+        when (newState) {
+          BottomSheetBehavior.STATE_EXPANDED -> {
+            binding.menuCollapseButton.setImageResource(R.drawable.icon_down)
+          }
+          BottomSheetBehavior.STATE_COLLAPSED -> {
+            binding.menuCollapseButton.setImageResource(R.drawable.icon_up)
+          }
+        }
+      }
+
+      override fun onSlide(bottomSheet: View, slideOffset: Float) {
+        //
+      }
+    })
+
+
+    if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+      binding.menuCollapseButton.setImageResource(R.drawable.icon_down)
+    } else {
+      binding.menuCollapseButton.setImageResource(R.drawable.icon_up)
+    }
+
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, firebaseAuthHelper.isLoggedIn())
 
     //메뉴바 아이템 연결
     binding.bottomNavigation.setOnItemSelectedListener { item ->
       when (item.itemId) {
+        R.id.menu_home -> {
+          true
+        }
         R.id.menu_login -> {
           val intent = Intent(this, LoginActivity::class.java)
           startActivity(intent)
           true
         }
-        ///다른 액티비티로 이동하는 코드 추가 필요
+        R.id.menu_mypage -> {
+          val intent = Intent(this, MyPageActivity::class.java)
+          startActivity(intent)
+          true
+        }
+        R.id.menu_bookmark -> {
+          val intent = Intent(this, FavoriteActivity::class.java)
+          startActivity(intent)
+          true
+        }
         else -> false
       }
     }
   }
 
-  private var isLoggedIn = false
-
-  val authStateListener = FirebaseAuth.AuthStateListener {
-      auth ->
-    val currentUser = auth.currentUser
-    Log.d("test", "current user : $currentUser")
-    isLoggedIn = currentUser != null
-
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
-
-    binding.bottomNavigation.invalidate()
-  }
 
 
 
@@ -295,61 +327,115 @@ class MainActivity : AppCompatActivity(){
       when {
         checkPermissions() -> {
           it.isMyLocationEnabled = true
-          it.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedPlace, DEFAULT_ZOOM_LEVEL))
+          getMyLocation { location ->
+            location?.let {
+              selectedPlace = it
+              googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedPlace, DEFAULT_ZOOM_LEVEL))
+            }
+          }
+
         }
 
         else -> {
-          it.moveCamera(CameraUpdateFactory.newLatLngZoom(CITY_HALL, DEFAULT_ZOOM_LEVEL))
+          it.moveCamera(CameraUpdateFactory.newLatLngZoom(SEOMYEON, DEFAULT_ZOOM_LEVEL))
         }
       }
 
       updateMapMarkers()
 
-      googleMap!!.setInfoWindowAdapter(object : GoogleMap.InfoWindowAdapter {
-        override fun getInfoWindow(marker: Marker): View? {
-          return null
-        }
-
-        override fun getInfoContents(marker: Marker): View? {
-          val context = this@MainActivity
-
-          val view = LayoutInflater.from(context).inflate(R.layout.custom_info_window, null)
-
-          val titleTextView = view.findViewById<TextView>(R.id.title)
-          val detailsButton = view.findViewById<Button>(R.id.detailsButton)
-
-          titleTextView.text = marker.title
-          detailsButton.setOnClickListener {
-            Log.d("test", "detailsButton clicked")
-            val id = marker.tag as Int
-            val restroom = locations.find { it.restroomId == id }
-            val intent = Intent(context, ToiletDetailActivity::class.java)
-            intent.putExtra("restroom_id", id)
-            intent.putExtra("restroom", restroom)
-            startActivity(intent)
-          }
-          return view
-        }
-      })
 
       googleMap!!.setOnMapClickListener { latLng ->
-        selectedPlace = latLng
-        googleMap?.clear()
-        googleMap?.addMarker(MarkerOptions().position(latLng))
-        updateLocations()
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM_LEVEL))
+        if (isCustomMarkerVisible) {
+          val layout = findViewById<ConstraintLayout>(R.id.main)
+          layout.removeView(customMarkerView)
+          isCustomMarkerVisible = false
+        } else {
+          selectedPlace = latLng
+          googleMap?.clear()
+          googleMap?.addMarker(MarkerOptions().position(latLng))
+          updateLocations()
+          googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM_LEVEL))
+        }
       }
 
       googleMap!!.setOnMarkerClickListener { marker ->
 
-        marker.showInfoWindow()
+        // 기존에 표시된 커스텀 뷰가 있다면 제거
+        if (::customMarkerView.isInitialized) {
+          val layout = findViewById<ConstraintLayout>(R.id.main)
+          layout.removeView(customMarkerView)
+        }
+
+        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(marker.position, DEFAULT_ZOOM_LEVEL)
+        googleMap?.animateCamera(cameraUpdate, object : GoogleMap.CancelableCallback {
+          override fun onFinish() {
+            val context = this@MainActivity
+            customMarkerView = LayoutInflater.from(context).inflate(R.layout.custom_info_window, null)
+
+            val titleTextView = customMarkerView.findViewById<TextView>(R.id.title)
+            val detailsButton = customMarkerView.findViewById<Button>(R.id.detailsButton)
+            if (marker.tag == "selected") {
+              detailsButton?.visibility = View.GONE
+            }
+
+            titleTextView?.text = marker.title
+
+            detailsButton?.setOnClickListener {
+              Log.d("test", "detailsButton clicked")
+              val id = marker.tag as Int
+              val restroom = locations.find { it.restroomId == id }
+              val intent = Intent(context, ToiletDetailActivity::class.java)
+              intent.putExtra("restroom_id", id)
+              intent.putExtra("restroom", restroom)
+              startActivity(intent)
+            }
+
+            val markerPosition = marker.position
+            val projection = googleMap?.projection
+            val markerLocation = projection?.toScreenLocation(markerPosition)
+
+            val layoutParams = ConstraintLayout.LayoutParams(
+              ViewGroup.LayoutParams.WRAP_CONTENT,
+              ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+
+            if (markerLocation != null) {
+              layoutParams.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+              layoutParams.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+              layoutParams.rightMargin = customMarkerView.width / 2
+              layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+              layoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+              layoutParams.bottomMargin = 500
+            }
+
+            val layout = findViewById<ConstraintLayout>(R.id.main)
+            layout.addView(customMarkerView, layoutParams)
+            isCustomMarkerVisible = true
+          }
+
+          override fun onCancel() {
+            //
+          }
+        })
         true
+      }
+
+      googleMap!!.setOnCameraMoveStartedListener {
+        if (::customMarkerView.isInitialized) {
+          val layout = findViewById<ConstraintLayout>(R.id.main)
+          layout.removeView(customMarkerView)
+          isCustomMarkerVisible = false
+        }
       }
 
     }
   }
 
+
   private fun updateLocations() {
+    if (!::selectedPlace.isInitialized) {
+      return
+    }
     val distance = filterDistance
     val latChange = distance / (111.32 * 1000)
     val longChange = distance / (111.32 * 1000 * cos(Math.toRadians(selectedPlace.latitude)))
@@ -378,6 +464,9 @@ class MainActivity : AppCompatActivity(){
 
   // 마커를 업데이트하는 함수
   private fun updateMapMarkers() {
+    if (!::selectedPlace.isInitialized) {
+      return
+    }
 
     googleMap?.clear()
     // 기존 마커 제거
@@ -385,11 +474,11 @@ class MainActivity : AppCompatActivity(){
     markers.clear()
 
     val iconBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_pin_bitmap)
-    val iconBitmapScaled = Bitmap.createScaledBitmap(iconBitmap, 100, 100, false)
+    val iconBitmapScaled = Bitmap.createScaledBitmap(iconBitmap, 120, 120, false)
     val markerIcon = BitmapDescriptorFactory.fromBitmap(iconBitmapScaled)
 
     // 선택한 위치에 마커 추가
-    selectedPlace?.let { latLng ->
+    selectedPlace.let { latLng ->
       val selectedMarker = googleMap?.addMarker(
         MarkerOptions()
           .position(latLng)
@@ -412,24 +501,27 @@ class MainActivity : AppCompatActivity(){
   }
 
   @SuppressLint("MissingPermission")
-  fun getMyLocation(): LatLng {
-
-    val locationProvider: String = LocationManager.GPS_PROVIDER
-
-    val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-    val lastKnownLocation: Location? = locationManager.getLastKnownLocation(locationProvider)
-
-    return if (lastKnownLocation != null) {
-      LatLng(lastKnownLocation.latitude, lastKnownLocation.longitude)
+  fun getMyLocation(callback: (LatLng?) -> Unit) {
+    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+      fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+        if (location != null) {
+          val currentLatLng = LatLng(location.latitude, location.longitude)
+          callback(currentLatLng) // 위치 성공 시 콜백에 전달
+        } else {
+          Log.e("Location", "현재 위치를 얻지 못했습니다.")
+          callback(SEOMYEON)
+        }
+        updateLocations()
+      }
     } else {
-      LatLng(35.157696, 129.059116)
+      Log.e("Permission", "위치 권한이 필요합니다.")
+      callback(null)
     }
   }
 
   private fun onAddRestroomButtonClick() {
     // 로그인 상태 확인
-    if (!isLoggedIn) {
+    if (!firebaseAuthHelper.isLoggedIn()) {
       Toast.makeText(this, "로그인이 필요한 서비스입니다", Toast.LENGTH_SHORT).show()
       return
     }
@@ -442,10 +534,15 @@ class MainActivity : AppCompatActivity(){
   private fun onMyLocationButtonClick() {
     when {
       checkPermissions() -> {
-        selectedPlace = getMyLocation()
-        googleMap?.moveCamera(
-          CameraUpdateFactory.newLatLngZoom(selectedPlace, DEFAULT_ZOOM_LEVEL)
-        )
+        getMyLocation { location ->
+          location?.let {
+            selectedPlace = it
+            googleMap?.moveCamera(
+              CameraUpdateFactory.newLatLngZoom(selectedPlace, DEFAULT_ZOOM_LEVEL)
+            )
+          }
+        }
+
       }
 
       else -> Toast.makeText(applicationContext, "위치사용권한 설정에 동의해주세요", Toast.LENGTH_LONG).show()
@@ -486,20 +583,16 @@ class MainActivity : AppCompatActivity(){
     })
   }
 
-  override fun onStart() {
-    super.onStart()
-    auth.addAuthStateListener (authStateListener)
-  }
 
   override fun onStop() {
     super.onStop()
-    auth.removeAuthStateListener (authStateListener)
+    firebaseAuthHelper.removeAuthStateListener()
   }
 
   override fun onResume() {
     super.onResume()
     binding.mapView.onResume()
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, firebaseAuthHelper.isLoggedIn())
   }
 
   override fun onPause() {
@@ -511,7 +604,7 @@ class MainActivity : AppCompatActivity(){
     job.cancel()
     super.onDestroy()
     binding.mapView.onDestroy()
-    FirebaseAuth.getInstance().removeAuthStateListener(authStateListener)
+    firebaseAuthHelper.removeAuthStateListener()
 
   }
 

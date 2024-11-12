@@ -66,21 +66,21 @@
         app:chipCornerRadius="99dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="장애인용"/>
+        android:text="@string/accessible"/>
     <com.google.android.material.chip.Chip
         android:id="@+id/chipDiaper"
         android:checkable="false"
         app:chipCornerRadius="99dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="기저귀교환대"/>
+        android:text="@string/diaper"/>
     <com.google.android.material.chip.Chip
         android:id="@+id/chipUnisex"
         android:checkable="false"
         app:chipCornerRadius="99dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="남여공용"/>
+        android:text="@string/unisex"/>
   </com.google.android.material.chip.ChipGroup>
 
 

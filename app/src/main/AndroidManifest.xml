@@ -26,15 +26,27 @@
     <uses-library android:name="org.apache.http.legacy"
       android:required="false"/>
     <activity
-        android:name=".activity.MainActivity"
+        android:name=".LoginActivity"
         android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
+    <activity
+        android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data
+          android:host="oauth"
+          android:scheme="@string/scheme_kakao_app_key" />
+      </intent-filter>
+    </activity>
     <activity android:name=".activity.SearchListActivity"/>
-    <activity android:name=".LoginActivity" />
+    <activity android:name=".activity.MainActivity" />
     <activity android:name=".RegisterActivity" />
     <activity android:name=".GoogleLogin" />
     <activity android:name=".restroomDetail.ToiletDetailActivity" />

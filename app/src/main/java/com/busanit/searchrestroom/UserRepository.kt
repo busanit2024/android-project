@@ -4,6 +4,7 @@ import com.busanit.searchrestroom.dao.MemberDao
 import com.busanit.searchrestroom.database.Member
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.kakao.sdk.user.model.User
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -90,6 +91,28 @@ class UserRepository(private val memberDao: MemberDao) {
                     password = "",  // 소셜 로그인은 비밀번호가 없으므로 빈 문자열로 저장
                     nickname = firebaseUser?.displayName ?: "",
                     profilePic = firebaseUser?.photoUrl?.toString(),
+                    regTime = Date().toString(),
+                    updateTime = null,
+                    social = true,
+                    admin = false
+                )
+                memberDao.insert(member)
+            }
+            onComplete(true, null)
+        }
+    }
+    fun loginKakaoUser(kakaoUser: User, onComplete: (Boolean, String?) -> Unit) {
+        GlobalScope.launch {
+            val email = kakaoUser.kakaoAccount?.email ?: ""
+            val existingMember = memberDao.getMemberByEmail(email)
+
+            if (existingMember == null) {
+                // 로컬 DB에 정보가 없으므로 저장
+                val member = Member(
+                    email = email,
+                    password = "",  // 소셜 로그인은 비밀번호가 없으므로 빈 문자열로 저장
+                    nickname = kakaoUser.kakaoAccount?.profile?.nickname ?: "",
+                    profilePic = kakaoUser.kakaoAccount?.profile?.profileImageUrl,
                     regTime = Date().toString(),
                     updateTime = null,
                     social = true,

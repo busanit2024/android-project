@@ -26,7 +26,7 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import com.busanit.searchrestroom.FirebaseAuthHelper
 import com.busanit.searchrestroom.BuildConfig
-import com.busanit.searchrestroom.LoginActivity
+import com.busanit.searchrestroom.member.LoginActivity
 import com.busanit.searchrestroom.MenuHelper
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.DatabaseCopier

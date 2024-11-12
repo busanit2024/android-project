@@ -27,24 +27,8 @@ abstract class AppDatabase : RoomDatabase() {
   abstract fun reviewImageDao(): ReviewImageDao
 
   companion object {
-      @Volatile
-      private var INSTANCE: AppDatabase? = null
-
-      fun getDatabase(context: Context): AppDatabase {
-        return INSTANCE ?: synchronized(this) {
-          val instance = Room.databaseBuilder(
-            context.applicationContext,
-            AppDatabase::class.java,
-            "search-restroom"
-          )
-            .addMigrations(MIGRATION_1_2)
-            .allowMainThreadQueries()
-            .build()
-          INSTANCE = instance
-          instance
-        }
-      }
-
+    @Volatile
+    private var INSTANCE: AppDatabase? = null
 
     @JvmField
     val MIGRATION_1_2 : Migration = object : Migration(1, 2) {
@@ -52,6 +36,21 @@ abstract class AppDatabase : RoomDatabase() {
         Log.d("test", "migrate")
       }
     }
-  }
 
+
+    // getDatabase 메서드 추가
+    fun getDatabase(context: Context): AppDatabase {
+      return INSTANCE ?: synchronized(this) {
+        val instance = Room.databaseBuilder(
+          context.applicationContext,
+          AppDatabase::class.java,
+          "app_database"
+        )
+          .addMigrations(MIGRATION_1_2) // 마이그레이션 적용
+          .build()
+        INSTANCE = instance
+        instance
+      }
+    }
+  }
 }

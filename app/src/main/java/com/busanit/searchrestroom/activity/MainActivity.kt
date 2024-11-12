@@ -178,8 +178,8 @@ class MainActivity : AppCompatActivity(){
 
     binding.myLocationButton.setOnClickListener { onMyLocationButtonClick() }
 
-    binding.addRestroomButton.setOnClickListener {
-      // TODO: 화장실 추가 액티비티로 이동
+    binding.addRestroomButton.setOnClickListener { onAddRestroomButtonClick()
+
     }
 
     //상세검색 메뉴 관련
@@ -425,6 +425,18 @@ class MainActivity : AppCompatActivity(){
     } else {
       LatLng(35.157696, 129.059116)
     }
+  }
+
+  private fun onAddRestroomButtonClick() {
+    // 로그인 상태 확인
+    if (!isLoggedIn) {
+      Toast.makeText(this, "로그인이 필요한 서비스입니다", Toast.LENGTH_SHORT).show()
+      return
+    }
+
+    // AddRestroomActivity로 이동
+    val intent = Intent(this, AddRestroomActivity::class.java)
+    startActivity(intent)
   }
 
   private fun onMyLocationButtonClick() {

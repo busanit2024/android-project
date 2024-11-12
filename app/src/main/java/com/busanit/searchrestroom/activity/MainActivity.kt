@@ -13,11 +13,8 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -27,7 +24,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import com.busanit.searchrestroom.BuildConfig
-import com.busanit.searchrestroom.LoginActivity
+import com.busanit.searchrestroom.member.LoginActivity
 import com.busanit.searchrestroom.MenuHelper
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.DatabaseCopier
@@ -36,7 +33,6 @@ import com.busanit.searchrestroom.databinding.ActivityMainBinding
 import com.busanit.searchrestroom.restroomDetail.ToiletDetailActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker

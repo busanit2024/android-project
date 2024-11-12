@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom
+package com.busanit.searchrestroom.member
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

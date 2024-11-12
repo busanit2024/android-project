@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom
+package com.busanit.searchrestroom.member
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.activity.MainActivity
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.databinding.ActivityLoginBinding

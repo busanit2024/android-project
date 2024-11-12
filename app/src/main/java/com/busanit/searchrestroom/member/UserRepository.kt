@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom
+package com.busanit.searchrestroom.member
 
 import com.busanit.searchrestroom.dao.MemberDao
 import com.busanit.searchrestroom.database.Member

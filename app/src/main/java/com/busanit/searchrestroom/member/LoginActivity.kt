@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom
+package com.busanit.searchrestroom.member
 
 import android.content.ContentValues.TAG
 import android.content.Intent

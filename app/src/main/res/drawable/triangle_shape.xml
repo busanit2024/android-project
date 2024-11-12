@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-  <solid android:color="@color/white" /> <!-- 말풍선 색상 -->
-  <size android:width="16dp" android:height="16dp" />
-  <path
-      android:fillColor="@color/white"
-      android:pathData="M 0,0 L 8,16 L 16,0 Z" /> <!-- 아래쪽으로 향하는 삼각형 -->
-</shape>

@@ -16,9 +16,7 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -26,7 +24,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import com.busanit.searchrestroom.BuildConfig
@@ -88,9 +85,6 @@ class MainActivity : AppCompatActivity(){
   private var filterAccessible = false
   private var filterDiaper = false
 
-  private lateinit var customMarkerView: View
-  private var isCustomMarkerVisible = false
-
   // 주변 화장실 좌표 리스트를 저장할 변수 (이름, 좌표)
   var locations = mutableListOf<Restroom>()
 
@@ -104,7 +98,6 @@ class MainActivity : AppCompatActivity(){
     setContentView(binding.root)
 
     FirebaseAuth.getInstance().addAuthStateListener(authStateListener)
-    auth = Firebase.auth
 
     if (checkPermissions()) {
       initMap()
@@ -117,6 +110,8 @@ class MainActivity : AppCompatActivity(){
     selectedPlace = getMyLocation()
     val searchBar = findViewById<View>(R.id.search_bar)
     val listButton = searchBar.findViewById<LinearLayout>(R.id.listButton)
+
+    auth = Firebase.auth
 
     // DB 가져오기
     job = CoroutineScope(Dispatchers.IO).launch {
@@ -202,33 +197,11 @@ class MainActivity : AppCompatActivity(){
     binding.menuCollapseButton.setOnClickListener {
       if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        binding.menuCollapseButton.setImageResource(R.drawable.icon_up)
       } else {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        binding.menuCollapseButton.setImageResource(R.drawable.icon_down)
       }
-    }
-
-    bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-      override fun onStateChanged(bottomSheet: View, newState: Int) {
-        when (newState) {
-          BottomSheetBehavior.STATE_EXPANDED -> {
-            binding.menuCollapseButton.setImageResource(R.drawable.icon_down)
-          }
-          BottomSheetBehavior.STATE_COLLAPSED -> {
-            binding.menuCollapseButton.setImageResource(R.drawable.icon_up)
-          }
-        }
-      }
-
-      override fun onSlide(bottomSheet: View, slideOffset: Float) {
-        //
-      }
-    })
-
-
-    if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-      binding.menuCollapseButton.setImageResource(R.drawable.icon_down)
-    } else {
-      binding.menuCollapseButton.setImageResource(R.drawable.icon_up)
     }
 
     MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
@@ -312,8 +285,6 @@ class MainActivity : AppCompatActivity(){
     return true
   }
 
-
-
   @SuppressLint("MissingPermission")
   fun initMap() {
     binding.mapView.getMapAsync {
@@ -334,94 +305,49 @@ class MainActivity : AppCompatActivity(){
 
       updateMapMarkers()
 
+      googleMap!!.setInfoWindowAdapter(object : GoogleMap.InfoWindowAdapter {
+        override fun getInfoWindow(marker: Marker): View? {
+          return null
+        }
+
+        override fun getInfoContents(marker: Marker): View? {
+          val context = this@MainActivity
+
+          val view = LayoutInflater.from(context).inflate(R.layout.custom_info_window, null)
+
+          val titleTextView = view.findViewById<TextView>(R.id.title)
+          val detailsButton = view.findViewById<Button>(R.id.detailsButton)
+
+          titleTextView.text = marker.title
+          detailsButton.setOnClickListener {
+            Log.d("test", "detailsButton clicked")
+            val id = marker.tag as Int
+            val restroom = locations.find { it.restroomId == id }
+            val intent = Intent(context, ToiletDetailActivity::class.java)
+            intent.putExtra("restroom_id", id)
+            intent.putExtra("restroom", restroom)
+            startActivity(intent)
+          }
+          return view
+        }
+      })
 
       googleMap!!.setOnMapClickListener { latLng ->
-        if (isCustomMarkerVisible) {
-          val layout = findViewById<ConstraintLayout>(R.id.main)
-          layout.removeView(customMarkerView)
-          isCustomMarkerVisible = false
-        } else {
-          selectedPlace = latLng
-          googleMap?.clear()
-          googleMap?.addMarker(MarkerOptions().position(latLng))
-          updateLocations()
-          googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM_LEVEL))
-        }
+        selectedPlace = latLng
+        googleMap?.clear()
+        googleMap?.addMarker(MarkerOptions().position(latLng))
+        updateLocations()
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM_LEVEL))
       }
 
       googleMap!!.setOnMarkerClickListener { marker ->
 
-        // 기존에 표시된 커스텀 뷰가 있다면 제거
-        if (::customMarkerView.isInitialized) {
-          val layout = findViewById<ConstraintLayout>(R.id.main)
-          layout.removeView(customMarkerView)
-        }
-
-        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(marker.position, DEFAULT_ZOOM_LEVEL)
-        googleMap?.animateCamera(cameraUpdate, object : GoogleMap.CancelableCallback {
-          override fun onFinish() {
-            val context = this@MainActivity
-            customMarkerView = LayoutInflater.from(context).inflate(R.layout.custom_info_window, null)
-
-            val titleTextView = customMarkerView.findViewById<TextView>(R.id.title)
-            val detailsButton = customMarkerView.findViewById<Button>(R.id.detailsButton)
-            if (marker.tag == "selected") {
-              detailsButton?.visibility = View.GONE
-            }
-
-            titleTextView?.text = marker.title
-
-            detailsButton?.setOnClickListener {
-              Log.d("test", "detailsButton clicked")
-              val id = marker.tag as Int
-              val restroom = locations.find { it.restroomId == id }
-              val intent = Intent(context, ToiletDetailActivity::class.java)
-              intent.putExtra("restroom_id", id)
-              intent.putExtra("restroom", restroom)
-              startActivity(intent)
-            }
-
-            val markerPosition = marker.position
-            val projection = googleMap?.projection
-            val markerLocation = projection?.toScreenLocation(markerPosition)
-
-            val layoutParams = ConstraintLayout.LayoutParams(
-              ViewGroup.LayoutParams.WRAP_CONTENT,
-              ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-
-            if (markerLocation != null) {
-              layoutParams.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-              layoutParams.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-              layoutParams.rightMargin = customMarkerView.width / 2
-              layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-              layoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-              layoutParams.bottomMargin = 500
-            }
-
-            val layout = findViewById<ConstraintLayout>(R.id.main)
-            layout.addView(customMarkerView, layoutParams)
-            isCustomMarkerVisible = true
-          }
-
-          override fun onCancel() {
-            //
-          }
-        })
+        marker.showInfoWindow()
         true
-      }
-
-      googleMap!!.setOnCameraMoveStartedListener {
-        if (::customMarkerView.isInitialized) {
-          val layout = findViewById<ConstraintLayout>(R.id.main)
-          layout.removeView(customMarkerView)
-          isCustomMarkerVisible = false
-        }
       }
 
     }
   }
-
 
   private fun updateLocations() {
     val distance = filterDistance
@@ -459,7 +385,7 @@ class MainActivity : AppCompatActivity(){
     markers.clear()
 
     val iconBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_pin_bitmap)
-    val iconBitmapScaled = Bitmap.createScaledBitmap(iconBitmap, 120, 120, false)
+    val iconBitmapScaled = Bitmap.createScaledBitmap(iconBitmap, 100, 100, false)
     val markerIcon = BitmapDescriptorFactory.fromBitmap(iconBitmapScaled)
 
     // 선택한 위치에 마커 추가

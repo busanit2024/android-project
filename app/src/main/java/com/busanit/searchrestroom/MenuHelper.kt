@@ -12,8 +12,14 @@ object MenuHelper {
     val loginItem = menu.findItem(R.id.menu_login)
     val mypageItem = menu.findItem(R.id.menu_mypage)
 
+    // Only update visibility if the item is not currently being handled
+    if (loginItem.itemId != currentlyHandledItemId) {
+      loginItem.isVisible = !isLoggedIn
+    }
+    if (mypageItem.itemId != currentlyHandledItemId) {
       mypageItem.isVisible = isLoggedIn
-    loginItem.isVisible = !isLoggedIn
-
+    }
   }
+
+  var currentlyHandledItemId = -1
 }

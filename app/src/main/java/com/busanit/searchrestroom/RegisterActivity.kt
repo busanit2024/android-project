@@ -1,42 +1,40 @@
 package com.busanit.searchrestroom
 
-import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.busanit.searchrestroom.dao.MemberDao
 import com.busanit.searchrestroom.database.AppDatabase
+import com.busanit.searchrestroom.database.Member
 import com.busanit.searchrestroom.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.auth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 lateinit var auth: FirebaseAuth
 
-class RegisterActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityRegisterBinding
-    private lateinit var viewModel: RegisterViewModel
+class RegisterActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityRegisterBinding.inflate(layoutInflater)
+        val binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        val repository = UserRepository(AppDatabase.getDatabase(application).memberDao())
-        viewModel = ViewModelProvider(this, RegisterViewModelFactory(repository)).get(RegisterViewModel::class.java)
 
         auth = Firebase.auth
 
-        // 이메일 중복 체크 결과 관찰
-        viewModel.emailCheckResult.observe(this) { exists ->
-            if (exists) {
-                Toast.makeText(this, "이미 존재하는 이메일입니다.", Toast.LENGTH_SHORT).show()
-            } else {
-                registerUser()
-            }
-        }
 
         // 회원가입 버튼 클릭 시
         binding.registerBtn.setOnClickListener {
@@ -45,40 +43,25 @@ class RegisterActivity : AppCompatActivity() {
             val password_check = binding.registerPasswordCheck.text.toString()
             val nickname = binding.registerNickname.text.toString()
 
-            // 입력란 공란 체크
-            if (email.isBlank() || password.isBlank() || password_check.isBlank() || nickname.isBlank()) {
-                Toast.makeText(this, "모든 정보를 입력해주세요.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // 비밀번호 재확인
-            if (password != password_check) {
+            // 회원가입 시 입력 공란으로 두지 않게
+            if (email == "" || password == "" || password_check == "" || nickname == "")
+                Toast.makeText(this, "정보를 입력해주세요.", Toast.LENGTH_SHORT).show()
+            else if (password != password_check){
+                // 비밀번호가 일치하지 않는 경우
                 Toast.makeText(this, "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+                } else {
+                    // Firebase 회원가입 요청
+                auth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this) { task ->
+                        if (task.isSuccessful) {
 
-            // 이메일 중복 체크
-            viewModel.checkEmailExists(email)
+                            Toast.makeText(this, "회원가입 완료", Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(this, "회원가입 실패", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
         }
 
-        // 회원가입 결과 관찰
-        viewModel.registerResult.observe(this) { (success, message) ->
-            if (success) {
-                Toast.makeText(this, "회원가입 완료", Toast.LENGTH_LONG).show()
-                // 회원가입 성공 시, 로그인 화면으로 이동
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
-                finish() // 현재 액티비티 종료
-            } else {
-                Toast.makeText(this, "회원가입 실패: $message", Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-
-    private fun registerUser() {
-        val email = binding.registerEmail.text.toString()
-        val password = binding.registerPassword.text.toString()
-        val nickname = binding.registerNickname.text.toString()
-        viewModel.registerUser(email, password, nickname)
     }
 }

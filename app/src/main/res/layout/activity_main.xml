@@ -10,14 +10,14 @@
 
 
   <include
-    android:id="@+id/search_bar"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="12dp"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    layout="@layout/search_bar"/>
+      android:id="@+id/search_bar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_margin="12dp"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      layout="@layout/search_bar"/>
 
   <com.google.android.gms.maps.MapView
       android:id="@+id/mapView"
@@ -119,14 +119,14 @@
             app:singleSelection="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-          >
+            >
           <com.google.android.material.chip.Chip
               style="@style/Widget.MaterialComponents.Chip.Choice"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_marginEnd="8dp"
               android:id="@+id/searchRadius200"
-            android:text="200m"
+              android:text="200m"
               android:checked="true"/>
           <com.google.android.material.chip.Chip
               style="@style/Widget.MaterialComponents.Chip.Choice"
@@ -157,21 +157,21 @@
         <com.google.android.material.chip.ChipGroup
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-            <com.google.android.material.chip.Chip
-                android:id="@+id/checkUnisex"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="남여공용"
-                app:chipCornerRadius="99dp"
-                android:layout_marginEnd="8dp"/>
-            <com.google.android.material.chip.Chip
-                android:id="@+id/checkAccessible"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="장애인용"
-                app:chipCornerRadius="99dp"/>
+          <com.google.android.material.chip.Chip
+              android:id="@+id/checkUnisex"
+              style="@style/Widget.MaterialComponents.Chip.Filter"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="남여공용"
+              app:chipCornerRadius="99dp"
+              android:layout_marginEnd="8dp"/>
+          <com.google.android.material.chip.Chip
+              android:id="@+id/checkAccessible"
+              style="@style/Widget.MaterialComponents.Chip.Filter"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="장애인용"
+              app:chipCornerRadius="99dp"/>
           <com.google.android.material.chip.Chip
               android:id="@+id/checkDiaper"
               style="@style/Widget.MaterialComponents.Chip.Filter"

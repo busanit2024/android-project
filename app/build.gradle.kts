@@ -7,9 +7,9 @@ plugins {
   id("org.jetbrains.kotlin.android")
   id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
   id("com.google.devtools.ksp")
-  id("kotlin-parcelize")
   // Add the Google services Gradle plugin
   id("com.google.gms.google-services")
+
 }
 
 val properties = Properties()

@@ -14,6 +14,10 @@ interface RestroomDao {
   @Query("select * from restroom where restroom_id = :id")
   fun getRestroomById(id: Int): Restroom
 
+  @Query("SELECT * FROM restroom WHERE latitude BETWEEN :minLat AND :maxLat AND longitude BETWEEN :minLong AND :maxLong")
+  fun getRestroomsWithinArea(minLat: Double, maxLat: Double, minLong: Double, maxLong: Double): List<Restroom>
+
+
   @Insert
   fun insert(vararg restroom: Restroom)
 

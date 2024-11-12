@@ -88,7 +88,7 @@ class GoogleLogin : AppCompatActivity() {
                         Toast.makeText(applicationContext, "성공했습니다.(구글 로그인)", Toast.LENGTH_LONG).show()
                         val user: FirebaseUser? = mAuth.currentUser
                         viewModel.loginGoogleUser(user)
-                        val intent = Intent(this, MainActivity::class.java)
+                        val intent = Intent(this, com.busanit.searchrestroom.activity.MainActivity::class.java)
                         startActivity(intent)
                     } else {
                         // 로그인 실패

@@ -313,8 +313,6 @@ class MainActivity : AppCompatActivity(){
     return true
   }
 
-
-
   @SuppressLint("MissingPermission")
   fun initMap() {
     binding.mapView.getMapAsync {
@@ -515,18 +513,6 @@ class MainActivity : AppCompatActivity(){
       Log.e("Permission", "위치 권한이 필요합니다.")
       callback(null)
     }
-//
-//    val locationProvider: String = LocationManager.GPS_PROVIDER
-//
-//    val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-//
-//    val lastKnownLocation: Location? = locationManager.getLastKnownLocation(locationProvider)
-//
-//    return if (lastKnownLocation != null) {
-//      LatLng(lastKnownLocation.latitude, lastKnownLocation.longitude)
-//    } else {
-//      LatLng(35.157696, 129.059116)
-//    }
   }
 
   private fun onMyLocationButtonClick() {

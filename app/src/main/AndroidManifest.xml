@@ -55,6 +55,9 @@
     <activity android:name=".myPage.EditInfoActivity"/>
     <activity android:name=".myPage.MyReviewActivity"/>
     <activity android:name=".myPage.MyToiletActivity"/>
+    <activity android:name=".activity.AddRestroomActivity"
+      android:exported="false"
+      android:screenOrientation="portrait" />
 
     <provider
         android:authorities="com.busanit.searchrestroom.fileprovider"

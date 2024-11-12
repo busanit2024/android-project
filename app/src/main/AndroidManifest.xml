@@ -50,6 +50,11 @@
     <activity android:name=".member.RegisterActivity" />
     <activity android:name=".member.GoogleLogin" />
     <activity android:name=".restroomDetail.ToiletDetailActivity" />
+    <activity android:name=".myPage.MyPageActivity"/>
+    <activity android:name=".myPage.FavoriteActivity"/>
+    <activity android:name=".myPage.EditInfoActivity"/>
+    <activity android:name=".myPage.MyReviewActivity"/>
+    <activity android:name=".myPage.MyToiletActivity"/>
   </application>
 
 </manifest>

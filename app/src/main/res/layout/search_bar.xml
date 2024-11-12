@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:cardCornerRadius="4dp">
-
+<!--테스트-->
   <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
       android:layout_height="match_parent"
@@ -32,7 +32,7 @@
       <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-        android:text="목록보기"
+        android:text="@string/list_button"
         android:textSize="8dp"
           android:layout_gravity="center_horizontal"/>
     </LinearLayout>

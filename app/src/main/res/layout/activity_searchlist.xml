@@ -30,7 +30,7 @@
       <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="검색 결과"
+          android:text="@string/search_result"
           android:layout_gravity="center_vertical"
           android:textSize="20dp"/>
     </LinearLayout>

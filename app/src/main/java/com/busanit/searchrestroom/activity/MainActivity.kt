@@ -521,7 +521,7 @@ class MainActivity : AppCompatActivity(){
 
   private fun onAddRestroomButtonClick() {
     // 로그인 상태 확인
-    if (!isLoggedIn) {
+    if (!firebaseAuthHelper.isLoggedIn()) {
       Toast.makeText(this, "로그인이 필요한 서비스입니다", Toast.LENGTH_SHORT).show()
       return
     }

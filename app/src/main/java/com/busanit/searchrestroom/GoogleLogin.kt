@@ -20,7 +20,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.busanit.searchrestroom.activity.MainActivity
 
 class GoogleLogin : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding

@@ -55,6 +55,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.math.cos
 import com.busanit.searchrestroom.BuildConfig
+import com.busanit.searchrestroom.myPage.FavoriteActivity
+import com.busanit.searchrestroom.myPage.MyPageActivity
 
 class MainActivity : AppCompatActivity(){
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
@@ -214,7 +216,16 @@ class MainActivity : AppCompatActivity(){
           startActivity(intent)
           true
         }
-        ///다른 액티비티로 이동하는 코드 추가 필요
+        R.id.menu_bookmark -> {
+          val intent = Intent(this, FavoriteActivity::class.java)
+          startActivity(intent)
+          true
+        }
+        R.id.menu_mypage -> {
+          val intent = Intent(this, MyPageActivity::class.java)
+          startActivity(intent)
+          true
+        }
         else -> false
       }
     }

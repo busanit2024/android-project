@@ -46,6 +46,9 @@ android {
   buildFeatures {
     buildConfig = true
   }
+  composeOptions {
+    kotlinCompilerExtensionVersion = "1.4.5"
+  }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
@@ -72,8 +75,9 @@ dependencies {
   implementation(libs.androidx.activity)
   implementation(libs.androidx.constraintlayout)
   implementation(libs.places)
-    implementation(libs.androidx.databinding.runtime)
-    testImplementation(libs.junit)
+  implementation(libs.androidx.databinding.runtime)
+  implementation(libs.firebase.common.ktx)
+  testImplementation(libs.junit)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
   implementation("com.google.android.gms:play-services-maps:19.0.0")

@@ -35,6 +35,7 @@
     </activity>
     <activity android:name=".activity.SearchListActivity"/>
     <activity android:name=".LoginActivity" />
+    <activity android:name=".activity.AddRestroomActivity"/>
     <activity android:name=".RegisterActivity" />
     <activity android:name=".GoogleLogin" />
     <activity android:name=".restroomDetail.ToiletDetailActivity" />

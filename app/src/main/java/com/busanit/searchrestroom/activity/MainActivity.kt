@@ -1,25 +1,20 @@
 package com.busanit.searchrestroom.activity
 
+import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.location.Location
-import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -37,12 +32,12 @@ import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
 import com.busanit.searchrestroom.restroomDetail.ToiletDetailActivity
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -73,9 +68,11 @@ class MainActivity : AppCompatActivity(){
 
   val DEFAULT_ZOOM_LEVEL = 17f
 
-  val CITY_HALL = LatLng(37.5662952, 126.97794509999994)
+  val SEOMYEON = LatLng(35.157696, 129.059116)
 
   var googleMap: GoogleMap? = null
+
+  lateinit var fusedLocationClient: FusedLocationProviderClient
 
   private lateinit var job: Job
 
@@ -106,15 +103,21 @@ class MainActivity : AppCompatActivity(){
     FirebaseAuth.getInstance().addAuthStateListener(authStateListener)
     auth = Firebase.auth
 
+    fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
     if (checkPermissions()) {
       initMap()
+      getMyLocation { location ->
+        location?.let {
+          selectedPlace = it
+        }
+      }
     } else {
       ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSION_CODE)
     }
 
     binding.mapView.onCreate(savedInstanceState)
 
-    selectedPlace = getMyLocation()
     val searchBar = findViewById<View>(R.id.search_bar)
     val listButton = searchBar.findViewById<LinearLayout>(R.id.listButton)
 
@@ -167,8 +170,6 @@ class MainActivity : AppCompatActivity(){
       updateLocations()
     }
 
-    // 초기 위치 업데이트
-    updateLocations()
 
     setupSearchBar()
 
@@ -324,11 +325,17 @@ class MainActivity : AppCompatActivity(){
       when {
         checkPermissions() -> {
           it.isMyLocationEnabled = true
-          it.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedPlace, DEFAULT_ZOOM_LEVEL))
+          getMyLocation { location ->
+            location?.let {
+              selectedPlace = it
+              googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedPlace, DEFAULT_ZOOM_LEVEL))
+            }
+          }
+
         }
 
         else -> {
-          it.moveCamera(CameraUpdateFactory.newLatLngZoom(CITY_HALL, DEFAULT_ZOOM_LEVEL))
+          it.moveCamera(CameraUpdateFactory.newLatLngZoom(SEOMYEON, DEFAULT_ZOOM_LEVEL))
         }
       }
 
@@ -424,6 +431,9 @@ class MainActivity : AppCompatActivity(){
 
 
   private fun updateLocations() {
+    if (!::selectedPlace.isInitialized) {
+      return
+    }
     val distance = filterDistance
     val latChange = distance / (111.32 * 1000)
     val longChange = distance / (111.32 * 1000 * cos(Math.toRadians(selectedPlace.latitude)))
@@ -452,6 +462,9 @@ class MainActivity : AppCompatActivity(){
 
   // 마커를 업데이트하는 함수
   private fun updateMapMarkers() {
+    if (!::selectedPlace.isInitialized) {
+      return
+    }
 
     googleMap?.clear()
     // 기존 마커 제거
@@ -463,7 +476,7 @@ class MainActivity : AppCompatActivity(){
     val markerIcon = BitmapDescriptorFactory.fromBitmap(iconBitmapScaled)
 
     // 선택한 위치에 마커 추가
-    selectedPlace?.let { latLng ->
+    selectedPlace.let { latLng ->
       val selectedMarker = googleMap?.addMarker(
         MarkerOptions()
           .position(latLng)
@@ -486,28 +499,48 @@ class MainActivity : AppCompatActivity(){
   }
 
   @SuppressLint("MissingPermission")
-  fun getMyLocation(): LatLng {
-
-    val locationProvider: String = LocationManager.GPS_PROVIDER
-
-    val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-    val lastKnownLocation: Location? = locationManager.getLastKnownLocation(locationProvider)
-
-    return if (lastKnownLocation != null) {
-      LatLng(lastKnownLocation.latitude, lastKnownLocation.longitude)
+  fun getMyLocation(callback: (LatLng?) -> Unit) {
+    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+      fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+        if (location != null) {
+          val currentLatLng = LatLng(location.latitude, location.longitude)
+          callback(currentLatLng) // 위치 성공 시 콜백에 전달
+        } else {
+          Log.e("Location", "현재 위치를 얻지 못했습니다.")
+          callback(SEOMYEON)
+        }
+        updateLocations()
+      }
     } else {
-      LatLng(35.157696, 129.059116)
+      Log.e("Permission", "위치 권한이 필요합니다.")
+      callback(null)
     }
+//
+//    val locationProvider: String = LocationManager.GPS_PROVIDER
+//
+//    val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+//
+//    val lastKnownLocation: Location? = locationManager.getLastKnownLocation(locationProvider)
+//
+//    return if (lastKnownLocation != null) {
+//      LatLng(lastKnownLocation.latitude, lastKnownLocation.longitude)
+//    } else {
+//      LatLng(35.157696, 129.059116)
+//    }
   }
 
   private fun onMyLocationButtonClick() {
     when {
       checkPermissions() -> {
-        selectedPlace = getMyLocation()
-        googleMap?.moveCamera(
-          CameraUpdateFactory.newLatLngZoom(selectedPlace, DEFAULT_ZOOM_LEVEL)
-        )
+        getMyLocation { location ->
+          location?.let {
+            selectedPlace = it
+            googleMap?.moveCamera(
+              CameraUpdateFactory.newLatLngZoom(selectedPlace, DEFAULT_ZOOM_LEVEL)
+            )
+          }
+        }
+
       }
 
       else -> Toast.makeText(applicationContext, "위치사용권한 설정에 동의해주세요", Toast.LENGTH_LONG).show()

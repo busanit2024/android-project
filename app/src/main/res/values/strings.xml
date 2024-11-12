@@ -11,4 +11,21 @@
   <string name="review_unisex">기타</string>
   <string name="review_txt">사용하신 화장실의 후기를 남겨주시면 다음 이용자들에게도 도움이 됩니다.</string>
   <string name="web_client_id">116311315882-e6c2v9kl8cfegibd79vfogouseg6jcfj.apps.googleusercontent.com</string>
+
+  <string name="fine_search">상세검색</string>
+  <string name="search_radius">검색 반경</string>
+  <string name="facilities">편의시설</string>
+  <string name="unisex">남여공용</string>
+  <string name="accessible">장애인용</string>
+  <string name="diaper">기저귀교환대</string>
+
+  <string name="search_result">검색 결과</string>
+  <string name="list_button">목록보기</string>
+
+  <string name="home">홈</string>
+  <string name="bookmark">북마크</string>
+  <string name="mypage">마이페이지</string>
+  <string name="login">로그인</string>
+
+  <string name="info_button">상세 페이지로</string>
 </resources>

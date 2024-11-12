@@ -85,7 +85,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="상세검색"
+            android:text="@string/fine_search"
             android:textSize="20dp"
             android:textStyle="bold"
             android:layout_weight="1"
@@ -110,7 +110,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="검색 반경"
+            android:text="@string/search_radius"
             android:textStyle="bold"
             android:textSize="16dp"
             android:layout_marginEnd="32dp"
@@ -148,7 +148,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="편의시설"
+            android:text="@string/facilities"
             android:textStyle="bold"
             android:textSize="16dp"
             android:layout_marginVertical="10dp"
@@ -162,7 +162,7 @@
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="남여공용"
+                android:text="@string/unisex"
                 app:chipCornerRadius="99dp"
                 android:layout_marginEnd="8dp"/>
             <com.google.android.material.chip.Chip
@@ -170,14 +170,14 @@
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="장애인용"
+                android:text="@string/accessible"
                 app:chipCornerRadius="99dp"/>
           <com.google.android.material.chip.Chip
               android:id="@+id/checkDiaper"
               style="@style/Widget.MaterialComponents.Chip.Filter"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:text="기저귀교환대"
+              android:text="@string/diaper"
               app:chipCornerRadius="99dp"/>
         </com.google.android.material.chip.ChipGroup>
 

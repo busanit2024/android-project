@@ -1,12 +1,10 @@
-package com.busanit.searchrestroom
+package com.busanit.searchrestroom.myPage
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.databinding.ActivityFavoriteBinding
-import com.busanit.searchrestroom.FavoriteItem
 
 class FavoriteActivity : AppCompatActivity() {
 

@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom
+package com.busanit.searchrestroom.myPage
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +7,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.busanit.searchrestroom.R
-import com.busanit.searchrestroom.FavoriteItem
 
 class FavoriteAdapter(
     private val favoriteList: List<FavoriteItem>
@@ -22,7 +21,7 @@ class FavoriteAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): FavoriteAdapter.FavoriteViewHolder {
+    ): FavoriteViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_favorite, parent, false)
         return FavoriteViewHolder(view)
     }

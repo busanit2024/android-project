@@ -53,20 +53,6 @@ class UserRepository(private val memberDao: MemberDao) {
                 }
             }
     }
-
-    private fun Member(
-        email: String,
-        password: String,
-        nickname: String,
-        profilePic: Nothing?,
-        regTime: String,
-        updateTime: Nothing?,
-        social: Boolean,
-        admin: Boolean
-    ): Member {
-
-    }
-
     // 소셜 회원가입 : Firebase에만 가입
     fun registerSocialUser(email: String, onComplete: (Boolean, String?) -> Unit) {
         // 소셜 회원가입의 경우 Firebase에만 정보 저장 (로컬 DB에 저장 X)
@@ -92,19 +78,18 @@ class UserRepository(private val memberDao: MemberDao) {
             }
     }
     // 소셜 로그인 : Firebase 인증 후, 로컬 DB에 정보가 없는 경우 저장
-    fun loginSocialUser(firebaseUser: FirebaseUser, onComplete: (Boolean, String?) -> Unit) {
+    fun loginGoogleUser(firebaseUser: FirebaseUser?, onComplete: (Boolean, String?) -> Unit) {
         GlobalScope.launch {
-            val email = firebaseUser.email ?: ""
+            val email = firebaseUser?.email ?: ""
             val existingMember = memberDao.getMemberByEmail(email)
 
             if (existingMember == null) {
                 // 로컬 DB에 정보가 없으므로 저장
                 val member = Member(
-//                    firebaseUid = "",
                     email = email,
                     password = "",  // 소셜 로그인은 비밀번호가 없으므로 빈 문자열로 저장
-                    nickname = firebaseUser.displayName ?: "",
-                    profilePic = firebaseUser.photoUrl?.toString(),
+                    nickname = firebaseUser?.displayName ?: "",
+                    profilePic = firebaseUser?.photoUrl?.toString(),
                     regTime = Date().toString(),
                     updateTime = null,
                     social = true,
@@ -114,5 +99,18 @@ class UserRepository(private val memberDao: MemberDao) {
             }
             onComplete(true, null)
         }
+    }
+
+    private fun Member(
+        email: String,
+        password: String,
+        nickname: String,
+        profilePic: String?,
+        regTime: String,
+        updateTime: Nothing?,
+        social: Boolean,
+        admin: Boolean
+    ): Member {
+        TODO("Not yet implemented")
     }
 }

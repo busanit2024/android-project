@@ -12,11 +12,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -30,18 +33,22 @@ import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
+import com.busanit.searchrestroom.restroomDetail.ToiletDetailActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -52,6 +59,7 @@ import kotlin.math.cos
 class MainActivity : AppCompatActivity(){
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
+  private lateinit var auth : FirebaseAuth
   // 지도 초기화
   private val PERMISSIONS = arrayOf(
     android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -89,6 +97,8 @@ class MainActivity : AppCompatActivity(){
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
 
+    FirebaseAuth.getInstance().addAuthStateListener(authStateListener)
+
     if (checkPermissions()) {
       initMap()
     } else {
@@ -101,6 +111,7 @@ class MainActivity : AppCompatActivity(){
     val searchBar = findViewById<View>(R.id.search_bar)
     val listButton = searchBar.findViewById<LinearLayout>(R.id.listButton)
 
+    auth = Firebase.auth
 
     // DB 가져오기
     job = CoroutineScope(Dispatchers.IO).launch {
@@ -156,6 +167,8 @@ class MainActivity : AppCompatActivity(){
 
     setupSearchBar()
 
+
+
     searchViewModel.selectedLocation.observe(this, Observer { location ->
       val (latLng, name) = location
       googleMap?.addMarker(MarkerOptions().position(latLng).title(name))
@@ -191,6 +204,8 @@ class MainActivity : AppCompatActivity(){
       }
     }
 
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
+
     //메뉴바 아이템 연결
     binding.bottomNavigation.setOnItemSelectedListener { item ->
       when (item.itemId) {
@@ -199,19 +214,25 @@ class MainActivity : AppCompatActivity(){
           startActivity(intent)
           true
         }
-
+        ///다른 액티비티로 이동하는 코드 추가 필요
         else -> false
       }
-
     }
   }
 
-  ///메뉴바 관련
-  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-    menuInflater.inflate(R.menu.menu_bottom_nav, menu)
-    MenuHelper.updateMenuItems(menu!!, isLoggedIn)
-    return true
+  private var isLoggedIn = false
+
+  val authStateListener = FirebaseAuth.AuthStateListener {
+      auth ->
+    val currentUser = auth.currentUser
+    Log.d("test", "current user : $currentUser")
+    isLoggedIn = currentUser != null
+
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
+
+    binding.bottomNavigation.invalidate()
   }
+
 
 
   override fun onRequestPermissionsResult(
@@ -284,6 +305,33 @@ class MainActivity : AppCompatActivity(){
 
       updateMapMarkers()
 
+      googleMap!!.setInfoWindowAdapter(object : GoogleMap.InfoWindowAdapter {
+        override fun getInfoWindow(marker: Marker): View? {
+          return null
+        }
+
+        override fun getInfoContents(marker: Marker): View? {
+          val context = this@MainActivity
+
+          val view = LayoutInflater.from(context).inflate(R.layout.custom_info_window, null)
+
+          val titleTextView = view.findViewById<TextView>(R.id.title)
+          val detailsButton = view.findViewById<Button>(R.id.detailsButton)
+
+          titleTextView.text = marker.title
+          detailsButton.setOnClickListener {
+            Log.d("test", "detailsButton clicked")
+            val id = marker.tag as Int
+            val restroom = locations.find { it.restroomId == id }
+            val intent = Intent(context, ToiletDetailActivity::class.java)
+            intent.putExtra("restroom_id", id)
+            intent.putExtra("restroom", restroom)
+            startActivity(intent)
+          }
+          return view
+        }
+      })
+
       googleMap!!.setOnMapClickListener { latLng ->
         selectedPlace = latLng
         googleMap?.clear()
@@ -293,10 +341,8 @@ class MainActivity : AppCompatActivity(){
       }
 
       googleMap!!.setOnMarkerClickListener { marker ->
-        if (marker.tag != "selected") {
-          val id = marker.tag as Int
-          //TODO("마커 클릭했을 때 id에 해당하는 상세페이지로 이동")
-        }
+
+        marker.showInfoWindow()
         true
       }
 
@@ -428,23 +474,20 @@ class MainActivity : AppCompatActivity(){
     })
   }
 
-  private var isLoggedIn = false
-
-  val authStateListener = FirebaseAuth.AuthStateListener {
-    auth ->
-      val currentUser = auth.currentUser
-    if (currentUser == null) {
-      isLoggedIn = false
-    } else {
-      isLoggedIn = true
-    }
+  override fun onStart() {
+    super.onStart()
+    auth.addAuthStateListener (authStateListener)
   }
 
-
+  override fun onStop() {
+    super.onStop()
+    auth.removeAuthStateListener (authStateListener)
+  }
 
   override fun onResume() {
     super.onResume()
     binding.mapView.onResume()
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
   }
 
   override fun onPause() {
@@ -456,6 +499,7 @@ class MainActivity : AppCompatActivity(){
     job.cancel()
     super.onDestroy()
     binding.mapView.onDestroy()
+    FirebaseAuth.getInstance().removeAuthStateListener(authStateListener)
 
   }
 

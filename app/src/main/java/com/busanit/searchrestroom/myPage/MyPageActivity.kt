@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom
+package com.busanit.searchrestroom.myPage
 
 import android.content.Intent
 import android.content.SharedPreferences
@@ -6,10 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.busanit.searchrestroom.EditInfoActivity
-import com.busanit.searchrestroom.FavoriteActivity
-import com.busanit.searchrestroom.MainActivity
-import com.busanit.searchrestroom.MyReviewActivity
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.databinding.ActivityMypageBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView

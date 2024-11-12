@@ -1,23 +1,17 @@
-package com.busanit.searchrestroom
+package com.busanit.searchrestroom.myPage
 
-import android.content.Intent
 import android.os.Bundle
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.databinding.ActivityMyReviewBinding
-import com.busanit.searchrestroom.MyReview
-import com.busanit.searchrestroom.ReviewAdapter
 import com.busanit.searchrestroom.database.AppDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.w3c.dom.Text
 import java.sql.Timestamp
 
 class MyReviewActivity : AppCompatActivity() {

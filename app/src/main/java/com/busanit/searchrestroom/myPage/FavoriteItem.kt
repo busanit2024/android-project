@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom
+package com.busanit.searchrestroom.myPage
 
 data class FavoriteItem(
     val iconResId: Int,

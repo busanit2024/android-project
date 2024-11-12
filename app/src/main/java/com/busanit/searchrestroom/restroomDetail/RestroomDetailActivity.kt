@@ -3,6 +3,7 @@ package com.busanit.searchrestroom.restroomDetail
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import com.busanit.searchrestroom.dao.BookmarkDao
@@ -12,10 +13,11 @@ import com.busanit.searchrestroom.database.Bookmark
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityRestroomDetailBinding
 import com.busanit.searchrestroom.reviewReg.ReviewRegActivity
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.withContext
 
 
 class RestroomDetailActivity : AppCompatActivity() {
@@ -51,11 +53,11 @@ class RestroomDetailActivity : AppCompatActivity() {
             }
 
             restroomId = it.restroomId
-            memberId = user?.uid
+            //memberId = user?.uid
         }
 
         // 북마크 체크박스 상태 초기화
-        setBookmarkState(binding.restroomBookmark)
+        //setBookmarkState(binding.restroomBookmark)
 
         // 북마크 체크박스 클릭 이벤트 처리
         binding.restroomBookmark.setOnCheckedChangeListener { _, isChecked ->
@@ -72,6 +74,8 @@ class RestroomDetailActivity : AppCompatActivity() {
         // 리뷰작성 버튼 클릭 이벤트
         binding.writeReview.setOnClickListener {
             val intent = Intent(this, ReviewRegActivity::class.java)
+            intent.putExtra("restroomId", restroomId)
+            intent.putExtra("restroom", restroom)
             startActivity(intent)
         }
 
@@ -88,6 +92,8 @@ class RestroomDetailActivity : AppCompatActivity() {
 
 
     }
+
+    // 멤버 불러와야함
     // 북마크 체크박스 상태가 변경되었을 때 처리
     private fun onBookmarkCheckedChanged(isChecked: Boolean) {
         val bookmark = Bookmark(

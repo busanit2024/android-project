@@ -1,9 +1,11 @@
 package com.busanit.searchrestroom.reviewReg
 
+import android.os.Parcelable
+
 data class FilterOptionState(
     val option: FilterOption,
     val selected: Boolean = false
-) {
+) : Parcelable {
     val name: String
         get() = option.optionName
 

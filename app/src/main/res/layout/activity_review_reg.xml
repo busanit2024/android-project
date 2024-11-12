@@ -48,12 +48,14 @@
             android:layout_marginTop="16dp">
 
             <TextView
+                android:id="@+id/UdpateRestroomName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="건물명"
                 android:textSize="21sp"
                 android:textStyle="bold"/>
             <TextView
+                android:id="@+id/UpdateRestroomLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="상세주소"
@@ -165,11 +167,13 @@
                         android:layout_marginBottom="10dp"
                         android:scaleType="centerInside"/>
                     <EditText
+                        android:id="@+id/reviewContent"
                         android:layout_width="match_parent"
                         android:layout_height="100dp"
                         android:hint="@string/review_txt"
                         android:background="@drawable/review_border"/>
                     <Button
+                        android:id="@+id/writeReviewButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="작성완료" />

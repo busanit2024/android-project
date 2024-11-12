@@ -1,12 +1,12 @@
 package com.busanit.searchrestroom.reviewReg
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.RecyclerView
-import com.busanit.searchrestroom.R
+import com.busanit.searchrestroom.database.Restroom
+import com.busanit.searchrestroom.database.Review
 import com.busanit.searchrestroom.databinding.ActivityReviewRegBinding
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
@@ -16,14 +16,24 @@ class ReviewRegActivity : AppCompatActivity() {
     private lateinit var binding: ActivityReviewRegBinding
     private val viewModel: FilterViewModel by viewModels() // ViewModel 연결
 
+    private var restroom: Restroom? = null
+
     private lateinit var adapterList: List<ReviewFilterOptionAdapter>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //binding = DataBindingUtil.setContentView(this, R.layout.activity_review_reg)
         binding = ActivityReviewRegBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // 건물 정보 출력
+        restroom = intent.getParcelableExtra<Restroom>("restroom")
+
+        restroom?.let {
+            binding.UdpateRestroomName.text = it.restroomName
+            binding.UpdateRestroomLocation.text = it.location
+        }
+
+        // 옵션 화면출력
         // ViewModel을 바인딩합니다.
         binding.apply {
             viewModel = this@ReviewRegActivity.viewModel  // ViewModel을 XML에 연결
@@ -41,7 +51,13 @@ class ReviewRegActivity : AppCompatActivity() {
                 adapter.addOption(filterOptionStates.filter { it.option.filterType == filterType })
             }
         })
+
+        binding.writeReviewButton.setOnClickListener {
+            onWriteReviewClicked() // 별도 함수로 분리하여 호출
+        }
     }
+
+
 
     private fun setFilterOptions() {
         // FilterOption을 FilterType 순서대로 정렬
@@ -73,6 +89,31 @@ class ReviewRegActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun onWriteReviewClicked() {
+        val selectedOptions = mutableListOf<FilterOptionState>()
+        viewModel.filterOptions.value?.forEach { optionState ->
+            if (optionState.selected) {
+                selectedOptions.add(optionState)
+            }
+        }
+
+        val reviewContent = binding.reviewContent.text.toString()
+
+        val review = Review(
+            reviewId = 0,
+            restroomId = restroom?.restroomId,
+            memberId = 0, // member 연결해야함
+            content = reviewContent,
+            regTime = System.currentTimeMillis().toString(),
+            updateTime = System.currentTimeMillis().toString(),
+            filterOptionState = selectedOptions.joinToString(",") { it.option.optionName }
+        )
+
+        viewModel.insertReview(review)
+
+        Toast.makeText(this, "리뷰가 저장되었습니다.", Toast.LENGTH_SHORT).show()
     }
 }
 

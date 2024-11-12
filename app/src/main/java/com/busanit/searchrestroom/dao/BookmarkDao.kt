@@ -25,7 +25,4 @@ interface BookmarkDao {
 
   @Delete
   fun delete(bookmark: Bookmark)
-
-  }
-
 }

@@ -1,12 +1,16 @@
 package com.busanit.searchrestroom.reviewReg
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 enum class FilterType(val order: Int) {
     open_time(0),       // 상시개방 여부
     unisex(1),          // 공용화장실 여부
     comfort(2)          // 편의시설
 }
 
-enum class FilterOption(val filterType: FilterType, val optionName: String) {
+@Parcelize
+enum class FilterOption(val filterType: FilterType, val optionName: String) : Parcelable {
     open_always(FilterType.open_time,"상시 개방"),
 
     unisex_yes(FilterType.unisex, "남녀공용"),

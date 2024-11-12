@@ -2,11 +2,9 @@ package com.busanit.searchrestroom.database
 
 import android.content.Context
 import android.util.Log
-import androidx.databinding.adapters.Converters
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.busanit.searchrestroom.dao.BookmarkDao
@@ -22,7 +20,6 @@ import com.busanit.searchrestroom.database.ReviewImage
 import kotlin.concurrent.Volatile
 
 @Database(entities = [Restroom::class, Member::class, Bookmark::class, Review::class, ReviewImage::class ], version = 2, exportSchema = false)
-@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
   abstract fun restroomDao(): RestroomDao
   abstract fun memberDao(): MemberDao

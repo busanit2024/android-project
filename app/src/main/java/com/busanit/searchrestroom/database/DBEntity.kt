@@ -4,10 +4,8 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
-
 
 
 @Parcelize
@@ -29,9 +27,7 @@ data class Restroom (
   val diaper: Boolean?, // 기저귀 교환대 유무
   val accessible: Boolean?, // 장애인 화장실 유무
   val memo: String?
-) : Parcelable {
-
-}
+) : Parcelable
 
 @Entity(tableName = "member")
 data class Member (
@@ -60,41 +56,26 @@ data class Member (
       parentColumns = ["restroom_id"],
       childColumns = ["restroom_id"],
       onDelete = ForeignKey.CASCADE
-    ),
-    ForeignKey(
+    ), ForeignKey(
       entity = Member::class,
       parentColumns = ["member_id"],
       childColumns = ["member_id"],
       onDelete = ForeignKey.SET_NULL
-    )
-  ],
-  indices = [
-    Index(value = ["restroom_id"]),
-    Index(value = ["member_id"]),
-    Index(value = ["review_id"]) // 여기에서 review_id에 대해 인덱스를 추가
-  ]
+    )]
 )
-data class Review(
+data class Review (
   @PrimaryKey(autoGenerate = true)
   @ColumnInfo(name = "review_id")
   val reviewId: Int,
-
   @ColumnInfo(name = "restroom_id")
   val restroomId: Int?,
-
   @ColumnInfo(name = "member_id")
   val memberId: Int?,
-
-  val content: String?,
-
+  var content: String?,
   @ColumnInfo(name = "reg_time", defaultValue = "CURRENT_TIMESTAMP")
   val regTime: String?,
-
   @ColumnInfo(name = "update_time", defaultValue = "CURRENT_TIMESTAMP")
-  val updateTime: String?,
-
-  @ColumnInfo(name = "filter_option_state")
-  val filterOptionState: String? // JSON 형식으로 필터 옵션 상태를 저장
+  val updateTime: String?
 )
 
 @Entity(
@@ -124,19 +105,12 @@ data class ReviewImage (
       entity = Restroom::class,
       parentColumns = ["restroom_id"],
       childColumns = ["restroom_id"],
-      onDelete = ForeignKey.SET_NULL
-    ),
+      onDelete = ForeignKey.SET_NULL),
     ForeignKey(
       entity = Member::class,
       parentColumns = ["member_id"],
       childColumns = ["member_id"],
-      onDelete = ForeignKey.CASCADE
-    )
-  ],
-  indices = [
-    Index(value = ["restroom_id"]),
-    Index(value = ["member_id"]),
-    Index(value = ["bookmark_id"]) // 인덱스 추가
+      onDelete = ForeignKey.CASCADE)
   ]
 )
 data class Bookmark(

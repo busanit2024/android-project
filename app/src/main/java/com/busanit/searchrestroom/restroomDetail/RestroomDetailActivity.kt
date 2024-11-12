@@ -3,21 +3,15 @@ package com.busanit.searchrestroom.restroomDetail
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.room.Room
 import com.busanit.searchrestroom.dao.BookmarkDao
-import com.busanit.searchrestroom.dao.RestroomDao
-import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.database.Bookmark
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityRestroomDetailBinding
 import com.busanit.searchrestroom.reviewReg.ReviewRegActivity
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class RestroomDetailActivity : AppCompatActivity() {
@@ -67,7 +61,7 @@ class RestroomDetailActivity : AppCompatActivity() {
 
         //정보 수정 버튼 클릭 이벤트
         binding.rewriteInfo.setOnClickListener{
-            val intent = Intent(this, RestrooomUpdateActivity::class.java)
+            val intent = Intent(this, RestroomUpdateActivity::class.java)
             startActivity(intent)
         }
 

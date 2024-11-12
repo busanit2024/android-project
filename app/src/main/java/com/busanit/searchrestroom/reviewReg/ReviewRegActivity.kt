@@ -1,13 +1,16 @@
 package com.busanit.searchrestroom.reviewReg
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import com.busanit.searchrestroom.activity.MainActivity
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.database.Review
 import com.busanit.searchrestroom.databinding.ActivityReviewRegBinding
+import com.busanit.searchrestroom.restroomDetail.RestroomDetailActivity
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -34,7 +37,7 @@ class ReviewRegActivity : AppCompatActivity() {
         }
 
         // 옵션 화면출력
-        // ViewModel을 바인딩합니다.
+        // ViewModel 바인딩
         binding.apply {
             viewModel = this@ReviewRegActivity.viewModel  // ViewModel을 XML에 연결
             lifecycleOwner = this@ReviewRegActivity  // LiveData와 연결할 라이프사이클 소유자 설정
@@ -101,19 +104,26 @@ class ReviewRegActivity : AppCompatActivity() {
 
         val reviewContent = binding.reviewContent.text.toString()
 
+        // sharedPreferences로 memberId 가져오기
+        val sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        val memberId = sharedPreferences.getInt("memberId", 0) // 로그인한 사용자의 ID
+
         val review = Review(
             reviewId = 0,
             restroomId = restroom?.restroomId,
-            memberId = 0, // member 연결해야함
+            memberId = memberId, // member 연결해야함
             content = reviewContent,
             regTime = System.currentTimeMillis().toString(),
             updateTime = System.currentTimeMillis().toString(),
-            filterOptionState = selectedOptions.joinToString(",") { it.option.optionName }
+
         )
 
         viewModel.insertReview(review)
 
         Toast.makeText(this, "리뷰가 저장되었습니다.", Toast.LENGTH_SHORT).show()
+
+        val intent = Intent(this, RestroomDetailActivity::class.java)
+        startActivity(intent)
     }
 }
 

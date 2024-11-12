@@ -1,6 +1,6 @@
 package com.busanit.searchrestroom.restroomDetail
 
-class RestrooomUpdateActivity {
+class RestroomUpdateActivity {
 
     // Detail에서 받은 정보 보여주기
 

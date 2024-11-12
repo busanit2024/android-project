@@ -46,6 +46,10 @@ android {
   buildFeatures {
     buildConfig = true
   }
+  composeOptions {
+    kotlinCompilerExtensionVersion = "1.4.5"
+  }
+
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
@@ -63,7 +67,6 @@ dependencies {
 
 
   implementation ("com.google.code.gson:gson:2.8.8")     // Gson 의존성
-  ksp("com.google.devtools.ksp:symbol-processing-api:1.0.0")
 
   implementation("androidx.activity:activity-ktx:1.7.0") // ViewModel을 사용하려면 이 KTX 라이브러리가 필요
   implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0") // ViewModel 및 LiveData 관련 의존성

@@ -42,6 +42,8 @@
     <activity android:name=".RegisterActivity" />
     <activity android:name=".reviewReg.ReviewRegActivity" />
     <activity android:name=".restroomDetail.RestroomDetailActivity" />
+    <activity android:name=".restroomDetail.RestroomUpdateActivity"
+        tools:ignore="Instantiatable" />
     <activity android:name=".GoogleLogin" />
 
   </application>

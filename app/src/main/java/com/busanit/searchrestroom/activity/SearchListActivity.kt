@@ -11,7 +11,6 @@ import com.busanit.searchrestroom.MenuHelper
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivitySearchlistBinding
-import com.busanit.searchrestroom.member.LoginActivity
 import com.busanit.searchrestroom.myPage.FavoriteActivity
 import com.busanit.searchrestroom.myPage.MyPageActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn

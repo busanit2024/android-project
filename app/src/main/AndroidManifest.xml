@@ -26,7 +26,7 @@
     <uses-library android:name="org.apache.http.legacy"
       android:required="false"/>
     <activity
-        android:name=".activity.MainActivity"
+        android:name=".admin.AdminActivity"
         android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -55,6 +55,8 @@
     <activity android:name=".myPage.EditInfoActivity"/>
     <activity android:name=".myPage.MyReviewActivity"/>
     <activity android:name=".myPage.MyToiletActivity"/>
+    <activity android:name=".activity.MainActivity"/>
+    <activity android:name=".admin.AdminDeleteActivity"/>
 
     <provider
         android:authorities="com.busanit.searchrestroom.fileprovider"

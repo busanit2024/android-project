@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.activity.MainActivity
 import com.busanit.searchrestroom.databinding.ActivityMypageBinding
+import com.busanit.searchrestroom.member.LoginActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MyPageActivity : AppCompatActivity() {
@@ -50,7 +51,7 @@ class MyPageActivity : AppCompatActivity() {
                 logout()  // 로그아웃 처리
             } else {
                 showToast("로그인 화면으로 이동합니다.")
-//                startActivity(Intent(this, LoginActivity::class.java))  // 로그인 화면으로 이동
+                startActivity(Intent(this, LoginActivity::class.java))  // 로그인 화면으로 이동
             }
         }
 

@@ -17,10 +17,12 @@ interface BookmarkDao {
   @Query("select * from bookmark where member_id = :memberId")
   fun getBookmarkByMemberId(memberId: Int): List<Bookmark>
 
+  @Query("SELECT * FROM bookmark WHERE restroom_id = :restroomId AND member_id = :memberId LIMIT 1")
+  fun getBookmarkByRestroomIdAndMemberId(restroomId: Int, memberId: Int): Bookmark?
+
   @Insert
   fun insert(vararg bookmark: Bookmark)
 
   @Delete
   fun delete(bookmark: Bookmark)
-
 }

@@ -27,7 +27,7 @@ class MyReviewActivity : AppCompatActivity() {
         appDatabase = Room.databaseBuilder(
             applicationContext,
             AppDatabase::class.java,
-            "app_database"
+            "search-restroom"
         ).build()
 
         // 샘플 데이터

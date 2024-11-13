@@ -17,9 +17,9 @@
     계단 타야해서 휠체어는 못 쓸 듯
   </string>
   <string name="review_rate">화장실은 어땠나요?</string>
-  <string name="review_opentime">개방시간이 궁금해요</string>
-  <string name="review_comfort">편의시설이 궁금해요</string>
-  <string name="review_unisex">기타</string>
+  <string name="review_toilet_paper">화장실에 휴지가 있나요?</string>
+  <string name="review_how_many">화장실에 몇 칸이 있나요?</string>
+  <string name="review_cleanliness">화장실이 깨끗한가요?</string>
   <string name="review_txt">사용하신 화장실의 후기를 남겨주시면 다음 이용자들에게도 도움이 됩니다.</string>
 
   <string name="web_client_id">116311315882-e6c2v9kl8cfegibd79vfogouseg6jcfj.apps.googleusercontent.com</string>

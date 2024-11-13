@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.BuildConfig
 import com.busanit.searchrestroom.member.LoginActivity
@@ -61,6 +62,7 @@ import kotlinx.coroutines.withContext
 import kotlin.math.cos
 
 class MainActivity : AppCompatActivity(){
+
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
   // 지도 초기화
   private val PERMISSIONS = arrayOf(

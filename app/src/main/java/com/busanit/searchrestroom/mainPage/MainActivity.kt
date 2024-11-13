@@ -20,6 +20,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -27,14 +28,17 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.lifecycleScope
 import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.BuildConfig
 import com.busanit.searchrestroom.member.LoginActivity
 import com.busanit.searchrestroom.MenuHelper
 import com.busanit.searchrestroom.R
+import com.busanit.searchrestroom.activity.SearchListActivity
 import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
+import com.busanit.searchrestroom.mainPage.SearchViewModel
 import com.busanit.searchrestroom.myPage.FavoriteActivity
 import com.busanit.searchrestroom.myPage.MyPageActivity
 import com.busanit.searchrestroom.restroomDetail.ToiletDetailActivity
@@ -58,6 +62,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withContext
 import kotlin.math.cos
 
@@ -99,6 +104,9 @@ class MainActivity : AppCompatActivity(){
 
   // 기존 마커를 저장하는 리스트를 선언
   private val markers = mutableListOf<com.google.android.gms.maps.model.Marker>()
+
+  private var backPressedTime: Long = 0
+  private var backPressedToast: Toast? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -269,6 +277,20 @@ class MainActivity : AppCompatActivity(){
         else -> false
       }
     }
+
+    onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+      override fun handleOnBackPressed() {
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
+          isEnabled = false
+          finish()
+        } else {
+          backPressedToast?.cancel()
+          backPressedToast = Toast.makeText(this@MainActivity, "'뒤로' 버튼을 한 번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT)
+          backPressedToast?.show()
+        }
+        backPressedTime = System.currentTimeMillis()
+      }
+    })
   }
 
 
@@ -412,7 +434,7 @@ class MainActivity : AppCompatActivity(){
               layoutParams.rightMargin = customMarkerView.width / 2
               layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
               layoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-              layoutParams.bottomMargin = 500
+              layoutParams.bottomMargin = if (marker.tag == "selected") 600 else 700
             }
 
             val layout = findViewById<ConstraintLayout>(R.id.main)

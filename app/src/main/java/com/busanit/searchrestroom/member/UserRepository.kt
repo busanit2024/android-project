@@ -11,7 +11,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.Date
 
-class UserRepository(private val memberDao: MemberDao, private val context: Context) {
+class UserRepository(val memberDao: MemberDao, private val context: Context) {
 
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
 

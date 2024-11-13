@@ -21,7 +21,7 @@ import com.busanit.searchrestroom.database.Review
 import com.busanit.searchrestroom.database.ReviewImage
 import com.busanit.searchrestroom.reviewReg.Converters
 
-@Database(entities = [Restroom::class, Member::class, Bookmark::class, Review::class, ReviewImage::class, ReviewFilterOption::class ], version = 3, exportSchema = false)
+@Database(entities = [Restroom::class, Member::class, Bookmark::class, Review::class, ReviewImage::class, ReviewFilterOption::class, DeleteRequest::class ], version = 4, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
   abstract fun restroomDao(): RestroomDao
@@ -36,14 +36,7 @@ abstract class AppDatabase : RoomDatabase() {
     private var INSTANCE: AppDatabase? = null
 
     @JvmField
-    val MIGRATION_1_2 : Migration = object : Migration(1, 2) {
-      override fun migrate(db: SupportSQLiteDatabase) {
-        Log.d("test", "migrate")
-      }
-    }
-
-    @JvmField
-    val MIGRATION_2_3 : Migration = object : Migration(2, 3) {
+    val MIGRATION_3_4 : Migration = object : Migration(3, 4) {
       override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("""
         CREATE TABLE review_filter_option (
@@ -55,7 +48,14 @@ abstract class AppDatabase : RoomDatabase() {
                 ON DELETE CASCADE
                 ON UPDATE NO ACTION )
     """)
-        db.execSQL("create table if not exists delete_request (request_id integer primary key autoincrement not null, member_id integer null, request_message text null, reg_time text null DEFAULT CURRENT_TIMESTAMP, restroom_id integer null, foreign key(member_id) references member(member_id) on delete set null, foreign key(restroom_id) references restroom(restroom_id) on delete cascade)")
+        db.execSQL("""create table if not exists delete_request (
+          request_id integer primary key autoincrement not null, 
+          member_id integer null, request_message text null, 
+          reg_time text null DEFAULT CURRENT_TIMESTAMP, 
+          restroom_id integer null, 
+          foreign key(member_id) references member(member_id) on delete set null, 
+          foreign key(restroom_id) references restroom(restroom_id) on delete cascade)
+          """)
       }
     }
 
@@ -69,7 +69,8 @@ abstract class AppDatabase : RoomDatabase() {
             context,
             AppDatabase::class.java,
             "search-restroom"
-          ).addMigrations(MIGRATION_2_3)
+          )
+            .addMigrations(MIGRATION_3_4)
             .allowMainThreadQueries()
             .build()
         }

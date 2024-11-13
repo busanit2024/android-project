@@ -69,19 +69,20 @@ data class Member (
     )]
 )
 data class Review (
-    @PrimaryKey(autoGenerate = true)
+  @PrimaryKey(autoGenerate = true)
   @ColumnInfo(name = "review_id")
-  val reviewId: Int,
+  var reviewId: Int,
     @ColumnInfo(name = "restroom_id")
-  val restroomId: Int?,
+  var restroomId: Int?,
     @ColumnInfo(name = "member_id")
-  val memberId: Int?,
+  var memberId: Int?,
     var content: String?,
     @ColumnInfo(name = "reg_time", defaultValue = "CURRENT_TIMESTAMP")
-  val regTime: String?,
+  var regTime: String?,
     @ColumnInfo(name = "update_time", defaultValue = "CURRENT_TIMESTAMP")
   var updateTime: String?,
-    @Ignore
+
+  @Ignore
   var selectedOptions: List<FilterOptionState> = emptyList()
 ){
   constructor(): this(0, 0, 0, "", "", null)

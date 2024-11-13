@@ -13,6 +13,9 @@ interface DeleteRequestDao {
   @Query("select * from delete_request")
   fun getAll(): List<DeleteRequest>
 
+  @Query("select count(*) from delete_request")
+  fun getCount() : Int
+
   @Transaction
   @Query("select * from delete_request")
   suspend fun getDeleteRequestWithRestroom(): List<DeleteRequestWithRestroom>

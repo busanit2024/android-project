@@ -37,7 +37,7 @@ class RestroomDetailActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // onCreate에서 reviewDao 초기화
-        reviewDao = AppDatabase.getDatabase(application).reviewDao()
+        reviewDao = AppDatabase.getDatabase(application)!!.reviewDao()
 
         // 메인에서 인텐트로 class 받기
         val restroom : Restroom? = intent.getParcelableExtra("restroom")

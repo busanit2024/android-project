@@ -1,13 +1,16 @@
 package com.busanit.searchrestroom.reviewReg
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.RecyclerView
-import com.busanit.searchrestroom.R
+import com.busanit.searchrestroom.activity.MainActivity
+import com.busanit.searchrestroom.database.Restroom
+import com.busanit.searchrestroom.database.Review
 import com.busanit.searchrestroom.databinding.ActivityReviewRegBinding
+import com.busanit.searchrestroom.restroomDetail.RestroomDetailActivity
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -16,18 +19,28 @@ class ReviewRegActivity : AppCompatActivity() {
     private lateinit var binding: ActivityReviewRegBinding
     private val viewModel: FilterViewModel by viewModels() // ViewModel 연결
 
+    private var restroom: Restroom? = null
+
     private lateinit var adapterList: List<ReviewFilterOptionAdapter>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //binding = DataBindingUtil.setContentView(this, R.layout.activity_review_reg)
         binding = ActivityReviewRegBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // ViewModel을 바인딩합니다.
+        // 건물 정보 출력
+        restroom = intent.getParcelableExtra<Restroom>("restroom")
+
+        restroom?.let {
+            binding.UdpateRestroomName.text = it.restroomName
+            binding.UpdateRestroomLocation.text = it.location
+        }
+
+        // 옵션 화면출력
+        // ViewModel 바인딩
         binding.apply {
-            //viewModel = this@ReviewRegActivity.viewModel // viewModel을 XML에 바인딩
-            var lifecycleOwner = this@ReviewRegActivity // LiveData와 연결하기 위한 lifecycleOwner 설정
+            viewModel = this@ReviewRegActivity.viewModel  // ViewModel을 XML에 연결
+            lifecycleOwner = this@ReviewRegActivity  // LiveData와 연결할 라이프사이클 소유자 설정
         }
 
         setFilterOptions()
@@ -41,6 +54,10 @@ class ReviewRegActivity : AppCompatActivity() {
                 adapter.addOption(filterOptionStates.filter { it.option.filterType == filterType })
             }
         })
+
+        binding.writeReviewButton.setOnClickListener {
+            onWriteReviewClicked() // 별도 함수로 분리하여 호출
+        }
     }
 
     private fun setFilterOptions() {
@@ -57,9 +74,9 @@ class ReviewRegActivity : AppCompatActivity() {
         binding.apply {
             // 각 RecyclerView와 Adapter를 연결
             val recyclerViewList = listOf(
-                filterQuestion1OpenTime,
-                filterQuestion2Comfort,
-                filterQuestion3Unisex
+                filterQuestion1ToiletPaper,
+                filterQuestion2HowMany,
+                filterQuestion3Cleanliness
             )
 
             // RecyclerView에 각각 Adapter 설정
@@ -74,6 +91,33 @@ class ReviewRegActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun onWriteReviewClicked() {
+        val selectedOptions = viewModel.filterOptions.value?.filter { it.selected } ?: emptyList()
+        val reviewContent = binding.reviewContent.text.toString()
+
+        val sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        val memberId = sharedPreferences.getInt("memberId", 0)
+
+        val review = Review(
+            reviewId = 0,
+            restroomId = restroom?.restroomId,
+            memberId = memberId,
+            content = reviewContent,
+            regTime = System.currentTimeMillis().toString(),
+            updateTime = System.currentTimeMillis().toString()
+        )
+
+        viewModel.insertReviewWithOptions(review, selectedOptions) // 리뷰와 옵션 함께 저장
+
+        Toast.makeText(this, "리뷰가 저장되었습니다.", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, RestroomDetailActivity::class.java).apply {
+            putExtra("reviewContent", reviewContent)
+            putExtra("restroomId", restroom?.restroomId)
+        }
+        startActivity(intent)
+    }
+
 }
 
 

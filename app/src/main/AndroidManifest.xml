@@ -51,12 +51,16 @@
     <activity android:name=".member.LoginActivity" />
     <activity android:name=".member.RegisterActivity" />
     <activity android:name=".member.GoogleLogin" />
-    <activity android:name=".restroomDetail.ToiletDetailActivity" />
+    <activity android:name=".restroomDetail.RestroomDetailActivity" />
     <activity android:name=".myPage.MyPageActivity"/>
     <activity android:name=".myPage.FavoriteActivity"/>
     <activity android:name=".myPage.EditInfoActivity"/>
     <activity android:name=".myPage.MyReviewActivity"/>
     <activity android:name=".myPage.MyToiletActivity"/>
+    <activity android:name=".reviewReg.ReviewRegActivity" />
+    <activity android:name=".restroomDetail.RestroomUpdateActivity"
+        tools:ignore="Instantiatable" />
+
 
     <provider
         android:authorities="com.busanit.searchrestroom.fileprovider"

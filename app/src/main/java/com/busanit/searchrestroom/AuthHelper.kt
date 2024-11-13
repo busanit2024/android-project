@@ -1,51 +1,30 @@
 package com.busanit.searchrestroom
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.kakao.sdk.user.UserApiClient
 
-class AuthHelper(private val auth: FirebaseAuth, private val googleSignInClient: GoogleSignInClient) {
+object AuthHelper {
+  private lateinit var preferences: SharedPreferences
+  private lateinit var googleSignInClient: GoogleSignInClient
+  private lateinit var auth: FirebaseAuth
+
   private var isFirebaseLoggedIn = false
   private var isKakaoLoggedIn = false
-  private var authStateListener: FirebaseAuth.AuthStateListener? = null
 
-  fun setAuthStateListener(onAuthStateChanged: (Boolean) -> Unit) {
-    authStateListener = FirebaseAuth.AuthStateListener { auth ->
-      val currentUser = auth.currentUser
-      isFirebaseLoggedIn = currentUser != null
-      checkLoginStatus(onAuthStateChanged)
-    }
-    auth.addAuthStateListener(authStateListener!!)
 
-    UserApiClient.instance.accessTokenInfo { tokenInfo, error ->
-      isKakaoLoggedIn = (error == null && tokenInfo != null)
-      checkLoginStatus(onAuthStateChanged)
-    }
+  fun initialize(context: Context, googleSignInClient: GoogleSignInClient) {
+    preferences = context.applicationContext.getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
+    auth = FirebaseAuth.getInstance()
+    this.googleSignInClient = googleSignInClient
   }
 
-  private fun checkLoginStatus(onAuthStateChanged: (Boolean) -> Unit) {
-    // Firebase와 카카오 로그인 상태를 OR 연산하여 현재 로그인 여부를 결정
-    val isLoggedIn = isFirebaseLoggedIn || isKakaoLoggedIn
-    onAuthStateChanged(isLoggedIn)
-  }
-
-  fun removeAuthStateListener() {
-    authStateListener?.let { auth.removeAuthStateListener(it) }
-  }
 
   fun isLoggedIn(): Boolean {
-    var loggedIn = false
-    // Firebase 로그인 상태
-    isFirebaseLoggedIn = auth.currentUser != null
-
-    // 카카오 로그인 상태 확인
-    UserApiClient.instance.accessTokenInfo { tokenInfo, error ->
-      isKakaoLoggedIn = error == null && tokenInfo != null
-    }
-
-    loggedIn = isFirebaseLoggedIn || isKakaoLoggedIn
-    return loggedIn
+    return preferences.getInt("member_id", -1) != -1
   }
 
   fun logoutKakao() {
@@ -71,10 +50,30 @@ class AuthHelper(private val auth: FirebaseAuth, private val googleSignInClient:
     isFirebaseLoggedIn = false
   }
 
-  fun getUserEmail(): String? {
-    val currentUser = auth.currentUser
-    Log.i("authHelper", "getUserEmail: ${currentUser?.email}")
-    return currentUser?.email
+  fun logout() {
+    logoutFirebase()
+    logoutKakao()
+    logoutGmail()
+    preferences.edit().apply {
+      remove("member_id")
+      remove("email")
+      remove("nickname")
+      apply()
+    }
+    Log.i("authHelper", "로그아웃 완료")
+  }
+
+  fun saveUserInfoToPreferences(memberId: Int, email: String, nickname: String) {
+    preferences.edit().apply {
+      putInt("member_id", memberId)
+      putString("email", email)
+      putString("nickname", nickname)
+      apply()
+    }
+  }
+
+  fun getMemberId() : Int {
+    return preferences.getInt("member_id", -1)
   }
 
 }

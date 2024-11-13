@@ -6,9 +6,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.mainPage.MainActivity
 import com.busanit.searchrestroom.databinding.ActivityMypageBinding
+import com.busanit.searchrestroom.member.UserRepository
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MyPageActivity : AppCompatActivity() {
@@ -21,7 +23,7 @@ class MyPageActivity : AppCompatActivity() {
         binding = ActivityMypageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
         updateUI()
 
         // 각 버튼의 클릭 리스너 설정
@@ -39,15 +41,16 @@ class MyPageActivity : AppCompatActivity() {
         }
 
         binding.adminPage.setOnClickListener {
-            if (isLoggedIn() && sharedPreferences.getString("userRole", "") == "ADMIN") {
+            if (AuthHelper.isLoggedIn() && sharedPreferences.getString("userRole", "") == "ADMIN") {
                 // 관리자 페이지 이동 (관리자로 로그인한 경우에만 보이게 함)
 //                startActivity(Intent(this, AdminPageActivity::class.java))
             }
         }
 
         binding.logout.setOnClickListener {
-            if (isLoggedIn()) {
+            if (AuthHelper.isLoggedIn()) {
                 logout()  // 로그아웃 처리
+                showToast("로그아웃 되었습니다.")
             } else {
                 showToast("로그인 화면으로 이동합니다.")
 //                startActivity(Intent(this, LoginActivity::class.java))  // 로그인 화면으로 이동
@@ -55,7 +58,7 @@ class MyPageActivity : AppCompatActivity() {
         }
 
         binding.editInfo.setOnClickListener {
-            if (isLoggedIn()) {
+            if (AuthHelper.isLoggedIn()) {
                 startActivity(Intent(this, EditInfoActivity::class.java))
             } else {
                 showToast("로그인이 필요합니다.")
@@ -77,7 +80,7 @@ class MyPageActivity : AppCompatActivity() {
         }
 
         binding.deleteAccount.setOnClickListener {
-            if (isLoggedIn()) {
+            if (AuthHelper.isLoggedIn()) {
                 // 회원 탈퇴 처리
                 deleteAccount()
             } else {
@@ -107,7 +110,7 @@ class MyPageActivity : AppCompatActivity() {
 
     private fun updateUI() {
         val isAdmin = sharedPreferences.getString("userRole", "") == "ADMIN"
-        val isLoggedIn = isLoggedIn()
+        val isLoggedIn = AuthHelper.isLoggedIn()
 
         binding.logout.text = if (isLoggedIn) "로그아웃" else "로그인"
         binding.deleteAccount.text = if (isLoggedIn) "회원탈퇴" else "회원가입"
@@ -115,15 +118,8 @@ class MyPageActivity : AppCompatActivity() {
         binding.adminPage.visibility = if (isLoggedIn && isAdmin) View.VISIBLE else View.GONE
     }
 
-    private fun isLoggedIn(): Boolean {
-        return sharedPreferences.getBoolean("isLoggedIn", false)
-    }
-
     private fun logout() {
-        with(sharedPreferences.edit()) {
-            putBoolean("isLoggedIn", false)
-            apply()
-        }
+        AuthHelper.logout()
         updateUI()
     }
 

@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom.mainPage
+package com.busanit.searchrestroom.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +11,7 @@ import com.busanit.searchrestroom.MenuHelper
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivitySearchlistBinding
+import com.busanit.searchrestroom.mainPage.RestroomAdapter
 import com.busanit.searchrestroom.myPage.FavoriteActivity
 import com.busanit.searchrestroom.myPage.MyPageActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn

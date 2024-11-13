@@ -27,6 +27,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.lifecycleScope
 import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.BuildConfig
 import com.busanit.searchrestroom.member.LoginActivity
@@ -60,9 +62,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withContext
+import java.util.Collections
 import kotlin.math.cos
 
 class MainActivity : AppCompatActivity(){
+
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
   // 지도 초기화
   private val PERMISSIONS = arrayOf(
@@ -95,11 +101,10 @@ class MainActivity : AppCompatActivity(){
   private var isCustomMarkerVisible = false
 
   // 주변 화장실 좌표 리스트를 저장할 변수 (이름, 좌표)
-  var locations = mutableListOf<Restroom>()
+  private val locations = Collections.synchronizedList(mutableListOf<Restroom>())
 
   // 기존 마커를 저장하는 리스트를 선언
-  private val markers = mutableListOf<com.google.android.gms.maps.model.Marker>()
-
+  private val markers = Collections.synchronizedList(mutableListOf<com.google.android.gms.maps.model.Marker>())
   private var backPressedTime: Long = 0
   private var backPressedToast: Toast? = null
 
@@ -144,6 +149,19 @@ class MainActivity : AppCompatActivity(){
     binding.checkDiaper.isChecked = filterDiaper
     binding.checkAccessible.isChecked = filterAccessible
     binding.checkUnisex.isChecked = filterUnisex
+
+    val db = DatabaseCopier.getAppDataBase(context = applicationContext)
+    lifecycleScope.launch {
+      try {
+        val db = DatabaseCopier.getAppDataBase(context = applicationContext)
+        withContext(Dispatchers.IO) {
+          val restroom = db!!.restroomDao().getRestroomById(1)
+          Log.d("test", "restroom: $restroom")
+        }
+      } catch (e: Exception) {
+        Log.e("MainActivity", "Error getting restroom: ${e.message}")
+      }
+    }
 
     // 필터 반경이 변경될 때마다 업데이트
     binding.searchRadius200.setOnCheckedChangeListener { _, isChecked ->
@@ -456,21 +474,31 @@ class MainActivity : AppCompatActivity(){
     val minLong = selectedPlace.longitude - longChange
     val maxLong = selectedPlace.longitude + longChange
 
-    val db = DatabaseCopier.getAppDataBase(context = applicationContext)
-    val locationsList = db!!.restroomDao().getRestroomsWithinArea(minLat, maxLat, minLong, maxLong) as MutableList<Restroom>
+    lifecycleScope.launch {
+      try {
+        val db = DatabaseCopier.getAppDataBase(context = applicationContext)
+        val locationsList = withContext(Dispatchers.IO) {
+          db!!.restroomDao().getRestroomsWithinArea(minLat, maxLat, minLong, maxLong)
+        }
 
-    // 필터링된 위치만 locations에 저장
-    locations.clear()
-    locations.addAll(locationsList.filter { restroom ->
-      val distanceToRestroom = calculateDistance(selectedPlace, restroom)
-      val matchesUisex = !filterUnisex || (restroom.unisex ?: false)
-      val matchesAccessible = !filterAccessible || (restroom.accessible ?: false)
-      val matchesDiaper = !filterDiaper || (restroom.diaper ?: false)
-      distanceToRestroom <= filterDistance && matchesUisex && matchesAccessible && matchesDiaper
-    })
+        synchronized(locations) {
+          locations.clear()
+          locations.addAll(locationsList.filter { restroom ->
+            val distanceToRestroom = calculateDistance(selectedPlace, restroom)
+            val matchesUisex = !filterUnisex || (restroom.unisex ?: false)
+            val matchesAccessible = !filterAccessible || (restroom.accessible ?: false)
+            val matchesDiaper = !filterDiaper || (restroom.diaper ?: false)
+            distanceToRestroom <= filterDistance && matchesUisex && matchesAccessible && matchesDiaper
+          })
+        }
 
-    // 업데이트된 locations를 화면에 표시
-    updateMapMarkers()
+        withContext(Dispatchers.Main) {
+          updateMapMarkers()
+        }
+      } catch (e: Exception) {
+        Log.e("MainActivity", "Error updating locations: ${e.message}")
+      }
+    }
   }
 
   // 마커를 업데이트하는 함수
@@ -480,34 +508,38 @@ class MainActivity : AppCompatActivity(){
     }
 
     googleMap?.clear()
-    // 기존 마커 제거
-    markers.forEach { it.remove() }
-    markers.clear()
 
-    val iconBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_pin_bitmap)
-    val iconBitmapScaled = Bitmap.createScaledBitmap(iconBitmap, 120, 120, false)
-    val markerIcon = BitmapDescriptorFactory.fromBitmap(iconBitmapScaled)
+    synchronized(markers) {
+      markers.forEach { it.remove() }
+      markers.clear()
 
-    // 선택한 위치에 마커 추가
-    selectedPlace.let { latLng ->
-      val selectedMarker = googleMap?.addMarker(
-        MarkerOptions()
-          .position(latLng)
-          .title("선택한 위치")
-      )
-      selectedMarker?.tag = "selected"
-    }
+      val iconBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_pin_bitmap)
+      val iconBitmapScaled = Bitmap.createScaledBitmap(iconBitmap, 120, 120, false)
+      val markerIcon = BitmapDescriptorFactory.fromBitmap(iconBitmapScaled)
 
-    // locations 리스트에 있는 위치로 새 마커 추가
-    locations.forEach { location ->
-      val marker = googleMap?.addMarker(
-        com.google.android.gms.maps.model.MarkerOptions()
-          .position(LatLng(location.latitude!!, location.longitude!!))
-          .title(location.restroomName)
-          .icon(markerIcon)
-      )
-      marker?.tag = location.restroomId
-      marker?.let { markers.add(it) }  // null 체크 후 리스트에 추가
+      // 선택한 위치에 마커 추가
+      selectedPlace.let { latLng ->
+        val selectedMarker = googleMap?.addMarker(
+          MarkerOptions()
+            .position(latLng)
+            .title("선택한 위치")
+        )
+        selectedMarker?.tag = "selected"
+      }
+
+      // locations 리스트에 있는 위치로 새 마커 추가
+      synchronized(locations) {
+        locations.forEach { location ->
+          val marker = googleMap?.addMarker(
+            MarkerOptions()
+              .position(LatLng(location.latitude!!, location.longitude!!))
+              .title(location.restroomName)
+              .icon(markerIcon)
+          )
+          marker?.tag = location.restroomId
+          marker?.let { markers.add(it) }
+        }
+      }
     }
   }
 

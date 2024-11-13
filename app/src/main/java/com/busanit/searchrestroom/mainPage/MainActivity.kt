@@ -214,7 +214,8 @@ class MainActivity : AppCompatActivity(){
 
     listButton.setOnClickListener {
       val intent = Intent(this, SearchListActivity::class.java)
-      intent.putParcelableArrayListExtra("locations", locations as ArrayList<Restroom>)
+      val locationsList = ArrayList(locations)  // 새로운 ArrayList 생성
+      intent.putParcelableArrayListExtra("locations", locationsList)
       intent.putExtra("currentLat", selectedPlace.latitude)
       intent.putExtra("currentLong", selectedPlace.longitude)
       startActivity(intent)

@@ -35,6 +35,7 @@ import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
+import com.busanit.searchrestroom.mainPage.SearchViewModel
 import com.busanit.searchrestroom.myPage.FavoriteActivity
 import com.busanit.searchrestroom.myPage.MyPageActivity
 import com.busanit.searchrestroom.restroomDetail.ToiletDetailActivity
@@ -591,7 +592,6 @@ class MainActivity : AppCompatActivity(){
       }
     })
   }
-
 
 
   override fun onStop() {

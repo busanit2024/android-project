@@ -37,7 +37,7 @@ class GoogleLogin : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val repository = UserRepository(AppDatabase.getDatabase(application).memberDao())
+        val repository = UserRepository(AppDatabase.getDatabase(application).memberDao(), this)
         viewModel = ViewModelProvider(this, LoginViewModelFactory(repository)).get(LoginViewModel::class.java)
 
         // FirebaseAuth 초기화

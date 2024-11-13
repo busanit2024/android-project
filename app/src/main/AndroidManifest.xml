@@ -55,10 +55,22 @@
     <activity android:name=".myPage.EditInfoActivity"/>
     <activity android:name=".myPage.MyReviewActivity"/>
     <activity android:name=".myPage.MyToiletActivity"/>
+
+    <provider
+        android:authorities="com.busanit.searchrestroom.fileprovider"
+        android:name="androidx.core.content.FileProvider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+      <meta-data
+          android:name="android.support.FILE_PROVIDER_PATHS"
+          android:resource="@xml/file_paths" />
+    </provider>
+
     <activity
         android:name=".mainPage.AddRestroomActivity"
         android:exported="false"
         android:screenOrientation="portrait" />
+    
   </application>
 
 </manifest>

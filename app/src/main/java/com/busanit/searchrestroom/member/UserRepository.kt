@@ -86,10 +86,23 @@ class UserRepository(private val memberDao: MemberDao, private val context: Cont
                 if (task.isSuccessful) {
                     // 파이어베이스 로그인 성공 후, 로컬 DB에 있는 사용자 정보를 조회하여 member_id를 저장
                     GlobalScope.launch {
-                        val member = memberDao.getMemberByEmail(email)
-                        member?.let {
-                            saveUserInfoToPreferences(it.memberId, it.email, it.nickname ?: "")  // member_id, email, nickname 저장
+                        var member = memberDao.getMemberByEmail(email)
+                        if (member == null) {
+                            // 로컬 DB에 사용자가 없으면 새롭게 저장
+                            member = Member(
+                                email = email,
+                                password = password,
+                                nickname = "Unknown", // 닉네임이 없는 경우 임시로 설정
+                                profilePic = null,
+                                regTime = Date().toString(),
+                                updateTime = null,
+                                social = false,
+                                admin = false
+                            )
+                            memberDao.insert(member)
                         }
+                        saveUserInfoToPreferences(member.memberId, member.email, member.nickname ?: "")  // member_id, email, nickname 저장
+
                         onComplete(true, null)  // UID가 일치하면 로그인 성공
                     }
                 } else {

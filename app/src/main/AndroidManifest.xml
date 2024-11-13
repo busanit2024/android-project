@@ -26,7 +26,7 @@
     <uses-library android:name="org.apache.http.legacy"
       android:required="false"/>
     <activity
-        android:name=".admin.AdminActivity"
+        android:name=".mainPage.MainActivity"
         android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -45,7 +45,7 @@
           android:scheme="@string/scheme_kakao_app_key" />
       </intent-filter>
     </activity>
-    <activity android:name=".activity.SearchListActivity"/>
+    <activity android:name=".mainPage.SearchListActivity"/>
     <activity android:name=".member.LoginActivity" />
     <activity android:name=".member.RegisterActivity" />
     <activity android:name=".member.GoogleLogin" />
@@ -55,7 +55,7 @@
     <activity android:name=".myPage.EditInfoActivity"/>
     <activity android:name=".myPage.MyReviewActivity"/>
     <activity android:name=".myPage.MyToiletActivity"/>
-    <activity android:name=".activity.MainActivity"/>
+    <activity android:name=".admin.AdminActivity"/>
     <activity android:name=".admin.AdminDeleteActivity"/>
 
     <provider
@@ -69,7 +69,7 @@
     </provider>
 
     <activity
-        android:name=".activity.AddRestroomActivity"
+        android:name=".mainPage.AddRestroomActivity"
         android:exported="false"
         android:screenOrientation="portrait" />
     

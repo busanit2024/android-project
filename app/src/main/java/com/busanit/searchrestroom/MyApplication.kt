@@ -1,12 +1,15 @@
 package com.busanit.searchrestroom
 
 import android.app.Application
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.libraries.places.api.Places
 import com.kakao.sdk.common.KakaoSdk
 
 class MyApplication : Application() {
   override fun onCreate() {
     super.onCreate()
+    AuthHelper.initialize(this, GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN))
     if (!Places.isInitialized()) {
       Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
     }

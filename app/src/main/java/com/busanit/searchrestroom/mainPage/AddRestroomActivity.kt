@@ -347,9 +347,9 @@ class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onDestroy() {
+        binding.mapViewRegister.onDestroy()  // 먼저 mapView destroy
         super.onDestroy()
-        _binding = null
-        binding.mapViewRegister.onDestroy()
+        _binding = null  // 마지막에 binding null 처리
     }
 
     override fun onLowMemory() {

@@ -20,6 +20,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -34,6 +35,7 @@ import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
+import com.busanit.searchrestroom.mainPage.SearchViewModel
 import com.busanit.searchrestroom.myPage.FavoriteActivity
 import com.busanit.searchrestroom.myPage.MyPageActivity
 import com.busanit.searchrestroom.restroomDetail.ToiletDetailActivity
@@ -97,6 +99,9 @@ class MainActivity : AppCompatActivity(){
   // 기존 마커를 저장하는 리스트를 선언
   private val markers = mutableListOf<com.google.android.gms.maps.model.Marker>()
 
+  private var backPressedTime: Long = 0
+  private var backPressedToast: Toast? = null
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
@@ -138,10 +143,6 @@ class MainActivity : AppCompatActivity(){
     binding.checkDiaper.isChecked = filterDiaper
     binding.checkAccessible.isChecked = filterAccessible
     binding.checkUnisex.isChecked = filterUnisex
-
-    val db = DatabaseCopier.getAppDataBase(context = applicationContext)
-    var restroom = db!!.restroomDao().getRestroomById(1)
-    Log.d("test", "restroom: $restroom")
 
     // 필터 반경이 변경될 때마다 업데이트
     binding.searchRadius200.setOnCheckedChangeListener { _, isChecked ->
@@ -257,6 +258,20 @@ class MainActivity : AppCompatActivity(){
         else -> false
       }
     }
+
+    onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+      override fun handleOnBackPressed() {
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
+          isEnabled = false
+          finish()
+        } else {
+          backPressedToast?.cancel()
+          backPressedToast = Toast.makeText(this@MainActivity, "'뒤로' 버튼을 한 번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT)
+          backPressedToast?.show()
+        }
+        backPressedTime = System.currentTimeMillis()
+      }
+    })
   }
 
 
@@ -400,7 +415,7 @@ class MainActivity : AppCompatActivity(){
               layoutParams.rightMargin = customMarkerView.width / 2
               layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
               layoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-              layoutParams.bottomMargin = 500
+              layoutParams.bottomMargin = if (marker.tag == "selected") 600 else 700
             }
 
             val layout = findViewById<ConstraintLayout>(R.id.main)

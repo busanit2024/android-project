@@ -34,6 +34,7 @@ class LoginActivity : AppCompatActivity(){
         auth = Firebase.auth
 
         // 로그인 버튼 클릭 시
+
         binding.loginBtn.setOnClickListener {
             val email = binding.loginEmail.text.toString()
             val password = binding.loginPassword.text.toString()
@@ -75,7 +76,7 @@ class LoginActivity : AppCompatActivity(){
                 loginWithKaKaoAccount()
             }
         }
-
+        
         // 로그인 결과 관찰
         viewModel.loginResult.observe(this) { (success, message) ->
             if (success) {

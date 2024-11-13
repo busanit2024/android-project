@@ -55,7 +55,8 @@
     <activity android:name=".myPage.EditInfoActivity"/>
     <activity android:name=".myPage.MyReviewActivity"/>
     <activity android:name=".myPage.MyToiletActivity"/>
-
+    <activity android:name=".admin.AdminDeleteActivity"/>
+    <activity android:name=".admin.AdminActivity"/>
     <provider
         android:authorities="com.busanit.searchrestroom.fileprovider"
         android:name="androidx.core.content.FileProvider"

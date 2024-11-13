@@ -20,6 +20,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -96,6 +97,9 @@ class MainActivity : AppCompatActivity(){
 
   // 기존 마커를 저장하는 리스트를 선언
   private val markers = mutableListOf<com.google.android.gms.maps.model.Marker>()
+
+  private var backPressedTime: Long = 0
+  private var backPressedToast: Toast? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -257,6 +261,20 @@ class MainActivity : AppCompatActivity(){
         else -> false
       }
     }
+
+    onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+      override fun handleOnBackPressed() {
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
+          isEnabled = false
+          finish()
+        } else {
+          backPressedToast?.cancel()
+          backPressedToast = Toast.makeText(this@MainActivity, "'뒤로' 버튼을 한 번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT)
+          backPressedToast?.show()
+        }
+        backPressedTime = System.currentTimeMillis()
+      }
+    })
   }
 
 
@@ -577,6 +595,7 @@ class MainActivity : AppCompatActivity(){
       }
     })
   }
+
 
 
   override fun onStop() {

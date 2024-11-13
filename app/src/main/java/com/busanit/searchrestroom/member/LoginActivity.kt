@@ -4,9 +4,11 @@ import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.activity.MainActivity
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.databinding.ActivityLoginBinding
@@ -27,12 +29,13 @@ class LoginActivity : AppCompatActivity(){
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val repository = UserRepository(AppDatabase.getDatabase(application).memberDao())
+        val repository = UserRepository(AppDatabase.getDatabase(application).memberDao(), this)
         viewModel = ViewModelProvider(this, LoginViewModelFactory(repository)).get(LoginViewModel::class.java)
 
         auth = Firebase.auth
 
         // 로그인 버튼 클릭 시
+
         binding.loginBtn.setOnClickListener {
             val email = binding.loginEmail.text.toString()
             val password = binding.loginPassword.text.toString()
@@ -41,6 +44,8 @@ class LoginActivity : AppCompatActivity(){
             viewModel.loginUser(email, password)
         }
 
+
+        // 구글 버튼 클릭 시
         binding.loginGoogle.setOnClickListener {
             val intent = Intent(this, GoogleLogin::class.java)
             startActivity(intent)
@@ -72,7 +77,7 @@ class LoginActivity : AppCompatActivity(){
                 loginWithKaKaoAccount()
             }
         }
-
+        
         // 로그인 결과 관찰
         viewModel.loginResult.observe(this) { (success, message) ->
             if (success) {

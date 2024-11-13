@@ -2,7 +2,9 @@ package com.busanit.searchrestroom.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -96,8 +98,6 @@ class MainActivity : AppCompatActivity(){
 
   // 기존 마커를 저장하는 리스트를 선언
   private val markers = mutableListOf<com.google.android.gms.maps.model.Marker>()
-
-
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

@@ -1,5 +1,7 @@
 package com.busanit.searchrestroom.member
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.busanit.searchrestroom.dao.MemberDao
 import com.busanit.searchrestroom.database.Member
 import com.google.firebase.auth.FirebaseAuth
@@ -9,7 +11,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.Date
 
-class UserRepository(private val memberDao: MemberDao) {
+class UserRepository(private val memberDao: MemberDao, private val context: Context) {
+
+    private val sharedPreferences: SharedPreferences = context.getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
 
     // 이메일 중복 체크 기능
     fun checkIfEmailExists(email: String, callback: (Boolean) -> Unit) {
@@ -66,13 +70,28 @@ class UserRepository(private val memberDao: MemberDao) {
                 }
             }
     }
+    // 로그인 성공 시 member_id를 SharedPreferences에 저장하는 메서드
+    private fun saveUserInfoToPreferences(memberId: Int, email: String, nickname: String) {
+        sharedPreferences.edit().apply {
+            putInt("member_id", memberId)
+            putString("email", email)
+            putString("nickname", nickname)
+            apply()
+        }
+    }
     // 일반 로그인 : Firebase 인증 후 로컬 DB에 존재하는지 확인
     fun loginUser(email: String, password: String, onComplete: (Boolean, String?) -> Unit) {
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    onComplete(true, null)  // UID가 일치하면 로그인 성공
-
+                    // 파이어베이스 로그인 성공 후, 로컬 DB에 있는 사용자 정보를 조회하여 member_id를 저장
+                    GlobalScope.launch {
+                        val member = memberDao.getMemberByEmail(email)
+                        member?.let {
+                            saveUserInfoToPreferences(it.memberId, it.email, it.nickname ?: "")  // member_id, email, nickname 저장
+                        }
+                        onComplete(true, null)  // UID가 일치하면 로그인 성공
+                    }
                 } else {
                     onComplete(false, task.exception?.message)  // 로그인 실패
                 }
@@ -83,7 +102,6 @@ class UserRepository(private val memberDao: MemberDao) {
         GlobalScope.launch {
             val email = firebaseUser?.email ?: ""
             val existingMember = memberDao.getMemberByEmail(email)
-
             if (existingMember == null) {
                 // 로컬 DB에 정보가 없으므로 저장
                 val member = Member(
@@ -97,6 +115,12 @@ class UserRepository(private val memberDao: MemberDao) {
                     admin = false
                 )
                 memberDao.insert(member)
+                val searchMember = memberDao.getMemberByEmail(email)
+                if (searchMember != null) {
+                    saveUserInfoToPreferences(searchMember.memberId, email, member.nickname ?: "")
+                }
+            } else {
+                saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "")
             }
             onComplete(true, null)
         }
@@ -105,7 +129,6 @@ class UserRepository(private val memberDao: MemberDao) {
         GlobalScope.launch {
             val email = kakaoUser.kakaoAccount?.email ?: ""
             val existingMember = memberDao.getMemberByEmail(email)
-
             if (existingMember == null) {
                 // 로컬 DB에 정보가 없으므로 저장
                 val member = Member(
@@ -119,6 +142,12 @@ class UserRepository(private val memberDao: MemberDao) {
                     admin = false
                 )
                 memberDao.insert(member)
+                val searchMember = memberDao.getMemberByEmail(email)
+                if (searchMember != null) {
+                    saveUserInfoToPreferences(searchMember.memberId, email, member.nickname ?: "")
+                }
+            } else {
+                saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "")
             }
             onComplete(true, null)
         }

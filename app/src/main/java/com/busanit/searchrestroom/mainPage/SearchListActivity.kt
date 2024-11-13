@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom.activity
+package com.busanit.searchrestroom.mainPage
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,7 +11,6 @@ import com.busanit.searchrestroom.MenuHelper
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivitySearchlistBinding
-import com.busanit.searchrestroom.member.LoginActivity
 import com.busanit.searchrestroom.myPage.FavoriteActivity
 import com.busanit.searchrestroom.myPage.MyPageActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -22,18 +21,14 @@ class SearchListActivity : AppCompatActivity() {
   lateinit var binding : ActivitySearchlistBinding
   var datas : MutableList<Restroom>? = null
   lateinit var adapter : RestroomAdapter
-  lateinit var authHelper: AuthHelper
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding = ActivitySearchlistBinding.inflate(layoutInflater)
     setContentView(binding.root)
 
-    authHelper = AuthHelper(FirebaseAuth.getInstance(), GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN))
-    authHelper.setAuthStateListener { isLoggedIn ->
-      MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
+      MenuHelper.updateMenuItems(binding.bottomNavigation.menu, AuthHelper.isLoggedIn())
       binding.bottomNavigation.invalidate()
-    }
 
     binding.backButton.setOnClickListener {
       finish()
@@ -48,8 +43,6 @@ class SearchListActivity : AppCompatActivity() {
     adapter = RestroomAdapter(datas!!, currentLat, currentLong)
     binding.searchRecyclerView.adapter = adapter
     binding.searchRecyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
-
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, authHelper.isLoggedIn())
 
     //메뉴바 아이템 연결
     binding.bottomNavigation.setOnItemSelectedListener { item ->
@@ -78,9 +71,4 @@ class SearchListActivity : AppCompatActivity() {
 
   }
 
-  override fun onDestroy() {
-    super.onDestroy()
-    authHelper.removeAuthStateListener()
-
-  }
 }

@@ -4,12 +4,10 @@ import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.busanit.searchrestroom.R
-import com.busanit.searchrestroom.activity.MainActivity
+import com.busanit.searchrestroom.mainPage.MainActivity
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.databinding.ActivityLoginBinding
 import com.google.firebase.auth.ktx.auth

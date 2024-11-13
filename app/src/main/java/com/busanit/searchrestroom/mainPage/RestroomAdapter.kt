@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom.activity
+package com.busanit.searchrestroom.mainPage
 
 import android.content.Intent
 import android.location.Location
@@ -26,7 +26,7 @@ class RestroomAdapter(val datas: MutableList<Restroom>?, val currentLat: Double,
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder
-  = MyViewHolder(SearchlistRecyclerviewBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+          = MyViewHolder(SearchlistRecyclerviewBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
   override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
     val binding = (holder as MyViewHolder).binding

@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom.activity
+package com.busanit.searchrestroom.mainPage
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -20,6 +20,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -61,23 +62,21 @@ import kotlin.math.cos
 
 class MainActivity : AppCompatActivity(){
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-
-  private lateinit var authHelper: AuthHelper
   // 지도 초기화
   private val PERMISSIONS = arrayOf(
     android.Manifest.permission.ACCESS_COARSE_LOCATION,
     android.Manifest.permission.ACCESS_FINE_LOCATION
   )
 
-  val REQUEST_PERMISSION_CODE = 1
+  private val REQUEST_PERMISSION_CODE = 1
 
-  val DEFAULT_ZOOM_LEVEL = 17f
+  private val DEFAULT_ZOOM_LEVEL = 17f
 
-  val SEOMYEON = LatLng(35.157696, 129.059116)
+  private val SEOMYEON = LatLng(35.157696, 129.059116)
 
   var googleMap: GoogleMap? = null
 
-  lateinit var fusedLocationClient: FusedLocationProviderClient
+  private lateinit var fusedLocationClient: FusedLocationProviderClient
 
   private lateinit var job: Job
 
@@ -99,15 +98,15 @@ class MainActivity : AppCompatActivity(){
   // 기존 마커를 저장하는 리스트를 선언
   private val markers = mutableListOf<com.google.android.gms.maps.model.Marker>()
 
+  private var backPressedTime: Long = 0
+  private var backPressedToast: Toast? = null
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
 
-    authHelper = AuthHelper(FirebaseAuth.getInstance(), GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN))
-    authHelper.setAuthStateListener { isLoggedIn ->
-      MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
-      binding.bottomNavigation.invalidate()
-    }
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, AuthHelper.isLoggedIn())
+    binding.bottomNavigation.invalidate()
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -143,10 +142,6 @@ class MainActivity : AppCompatActivity(){
     binding.checkDiaper.isChecked = filterDiaper
     binding.checkAccessible.isChecked = filterAccessible
     binding.checkUnisex.isChecked = filterUnisex
-
-    val db = DatabaseCopier.getAppDataBase(context = applicationContext)
-    var restroom = db!!.restroomDao().getRestroomById(1)
-    Log.d("test", "restroom: $restroom")
 
     // 필터 반경이 변경될 때마다 업데이트
     binding.searchRadius200.setOnCheckedChangeListener { _, isChecked ->
@@ -237,8 +232,6 @@ class MainActivity : AppCompatActivity(){
       binding.menuCollapseButton.setImageResource(R.drawable.icon_up)
     }
 
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, authHelper.isLoggedIn())
-
     //메뉴바 아이템 연결
     binding.bottomNavigation.setOnItemSelectedListener { item ->
       when (item.itemId) {
@@ -264,6 +257,20 @@ class MainActivity : AppCompatActivity(){
         else -> false
       }
     }
+
+    onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+      override fun handleOnBackPressed() {
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
+          isEnabled = false
+          finish()
+        } else {
+          backPressedToast?.cancel()
+          backPressedToast = Toast.makeText(this@MainActivity, "'뒤로' 버튼을 한 번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT)
+          backPressedToast?.show()
+        }
+        backPressedTime = System.currentTimeMillis()
+      }
+    })
   }
 
 
@@ -407,7 +414,7 @@ class MainActivity : AppCompatActivity(){
               layoutParams.rightMargin = customMarkerView.width / 2
               layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
               layoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-              layoutParams.bottomMargin = 500
+              layoutParams.bottomMargin = if (marker.tag == "selected") 600 else 700
             }
 
             val layout = findViewById<ConstraintLayout>(R.id.main)
@@ -523,7 +530,7 @@ class MainActivity : AppCompatActivity(){
 
   private fun onAddRestroomButtonClick() {
     // 로그인 상태 확인
-    if (!authHelper.isLoggedIn()) {
+    if (!AuthHelper.isLoggedIn()) {
       Toast.makeText(this, "로그인이 필요한 서비스입니다", Toast.LENGTH_SHORT).show()
       return
     }
@@ -586,21 +593,18 @@ class MainActivity : AppCompatActivity(){
   }
 
 
+
   override fun onStop() {
     super.onStop()
-    ///테스트용 : 앱 종료 시 자동 로그아웃
-//    authHelper.logoutKakao()
-//    authHelper.logoutFirebase()
-//    authHelper.logoutGmail()
-
-    authHelper.removeAuthStateListener()
+//    ///테스트용 : 앱 종료 시 자동 로그아웃
+//    AuthHelper.logout()
 
   }
 
   override fun onResume() {
     super.onResume()
     binding.mapView.onResume()
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, authHelper.isLoggedIn())
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, AuthHelper.isLoggedIn())
   }
 
   override fun onPause() {
@@ -614,13 +618,7 @@ class MainActivity : AppCompatActivity(){
     binding.mapView.onDestroy()
 
     ///테스트용 : 앱 종료 시 자동 로그아웃
-//    authHelper.logoutKakao()
-//    authHelper.logoutFirebase()
-//    authHelper.logoutGmail()
-
-    authHelper.removeAuthStateListener()
-
-
+//    AuthHelper.logout()
   }
 
   override fun onLowMemory() {

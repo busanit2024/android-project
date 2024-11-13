@@ -57,30 +57,30 @@ object DatabaseCopier {
     }
   }
 
-    private fun copyDB(context: Context, _dbPath: File) {
-      try {
-        val inputStream = context.assets.open("databases/$DATABASE_NAME.db")
-        val output = FileOutputStream(_dbPath)
-        var length: Int
+  private fun copyDB(context: Context, _dbPath: File) {
+    try {
+      val inputStream = context.assets.open("databases/$DATABASE_NAME.db")
+      val output = FileOutputStream(_dbPath)
+      var length: Int
 
-        val buffer = ByteArray(8192)
-        while(true) {
-          length = inputStream.read(buffer, 0, 8192)
-          if(length <= 0) {
-            break
-          }
-          output.write(buffer, 0, length)
+      val buffer = ByteArray(8192)
+      while(true) {
+        length = inputStream.read(buffer, 0, 8192)
+        if(length <= 0) {
+          break
+        }
+        output.write(buffer, 0, length)
       }
 
-        output.flush()
-        output.close()
-        inputStream.close()
+      output.flush()
+      output.close()
+      inputStream.close()
 
-        Log.d(TAG, "copyDB success")
-      }
-      catch(e: Exception) {
-        Log.d(TAG, "copyDB failed, Exception: $e")
-        e.printStackTrace()
-      }
+      Log.d(TAG, "copyDB success")
     }
+    catch(e: Exception) {
+      Log.d(TAG, "copyDB failed, Exception: $e")
+      e.printStackTrace()
+    }
+  }
 }

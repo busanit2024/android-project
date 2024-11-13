@@ -9,16 +9,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.R
-import com.busanit.searchrestroom.mainPage.MainActivity
 import com.busanit.searchrestroom.dao.MemberDao
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.database.Member
+import com.busanit.searchrestroom.mainPage.MainActivity
 import com.busanit.searchrestroom.databinding.ActivityMypageBinding
 import com.busanit.searchrestroom.member.LoginActivity
 import com.busanit.searchrestroom.member.RegisterActivity
+import com.busanit.searchrestroom.member.UserRepository
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -151,7 +153,7 @@ class MyPageActivity : AppCompatActivity() {
     }
 
     private fun updateUI() {
-        val isAdmin = sharedPreferences.getString("userRole", "USER") == "ADMIN"
+        val isAdmin = sharedPreferences.getString("userRole", "") == "ADMIN"
         val isLoggedIn = AuthHelper.isLoggedIn()
 
         binding.logout.text = if (isLoggedIn) "로그아웃" else "로그인"
@@ -176,10 +178,7 @@ class MyPageActivity : AppCompatActivity() {
     }
 
     private fun logout() {
-        with(sharedPreferences.edit()) {
-            putBoolean("isLoggedIn", false)
-            apply()
-        }
+        AuthHelper.logout()
         updateUI()
     }
 

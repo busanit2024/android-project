@@ -5,9 +5,9 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.busanit.searchrestroom.activity.MainActivity
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.databinding.ActivityLoginBinding
+import com.busanit.searchrestroom.mainPage.MainActivity
 import com.busanit.searchrestroom.member.GoogleLogin
 import com.busanit.searchrestroom.member.LoginViewModel
 import com.busanit.searchrestroom.member.LoginViewModelFactory
@@ -35,7 +35,7 @@ class LoginActivity : AppCompatActivity(){
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val repository = UserRepository(AppDatabase.getDatabase(application).memberDao())
+        val repository = UserRepository(AppDatabase.getDatabase(application).memberDao(),this)
         viewModel = ViewModelProvider(this, LoginViewModelFactory(repository)).get(LoginViewModel::class.java)
 
         auth = Firebase.auth

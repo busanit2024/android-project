@@ -143,10 +143,6 @@ class MainActivity : AppCompatActivity(){
     binding.checkAccessible.isChecked = filterAccessible
     binding.checkUnisex.isChecked = filterUnisex
 
-    val db = DatabaseCopier.getAppDataBase(context = applicationContext)
-    var restroom = db!!.restroomDao().getRestroomById(1)
-    Log.d("test", "restroom: $restroom")
-
     // 필터 반경이 변경될 때마다 업데이트
     binding.searchRadius200.setOnCheckedChangeListener { _, isChecked ->
       if (isChecked) {
@@ -418,7 +414,7 @@ class MainActivity : AppCompatActivity(){
               layoutParams.rightMargin = customMarkerView.width / 2
               layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
               layoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-              layoutParams.bottomMargin = 500
+              layoutParams.bottomMargin = if (marker.tag == "selected") 600 else 700
             }
 
             val layout = findViewById<ConstraintLayout>(R.id.main)

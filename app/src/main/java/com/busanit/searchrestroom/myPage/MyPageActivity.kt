@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import com.busanit.searchrestroom.AuthHelper
@@ -160,15 +161,33 @@ class MyPageActivity : AppCompatActivity() {
     private fun deleteAccount() {
         // 회원탈퇴
         if (currentMember != null) {
-            CoroutineScope(Dispatchers.IO).launch {
-                memberDao.delete(currentMember!!) // 회원 정보 삭제
-                withContext(Dispatchers.Main) {
-                    showToast("회원 탈퇴가 완료되었습니다.")
-                    AuthHelper.logout() // 로그아웃 처리
-                    startActivity(Intent(this@MyPageActivity, LoginActivity::class.java))   // 로그인 화면으로 이동
-                    finish()
+            // 확인용 다이얼로그
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("회원 탈퇴")
+            builder.setMessage("정말로 탈퇴하시겠습니까?")
+
+            // 확인 버튼
+            builder.setPositiveButton("확인") { dialog, which ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    memberDao.delete(currentMember!!) // 회원 정보 삭제
+                    withContext(Dispatchers.Main) {
+                        showToast("회원 탈퇴가 완료되었습니다.")
+                        AuthHelper.logout() // 로그아웃 처리
+                        startActivity(Intent(this@MyPageActivity, LoginActivity::class.java))   // 로그인 화면으로 이동
+                        finish()
+                    }
                 }
             }
+
+            // 취소 버튼
+            builder.setNegativeButton("취소") { dialog, which ->
+                dialog.dismiss()
+            }
+
+            // 다이얼로그 표시
+            val alertDialog = builder.create()
+            alertDialog.show()
+
         }
     }
 

@@ -63,6 +63,9 @@
     <activity android:name=".reviewReg.ReviewRegActivity" />
     <activity android:name=".restroomDetail.RestroomUpdateActivity"
         tools:ignore="Instantiatable" />
+    <activity
+        android:name=".activity.SearchListActivity"
+        android:exported="false" />
 
 
     <provider

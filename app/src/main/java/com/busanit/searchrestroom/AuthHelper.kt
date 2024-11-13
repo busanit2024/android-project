@@ -76,4 +76,12 @@ object AuthHelper {
     return preferences.getInt("member_id", -1)
   }
 
+  fun getEmail() : String {
+    return preferences.getString("email", "") ?: ""
+  }
+
+  fun getNickname() : String {
+    return preferences.getString("nickname", "") ?: ""
+  }
+
 }

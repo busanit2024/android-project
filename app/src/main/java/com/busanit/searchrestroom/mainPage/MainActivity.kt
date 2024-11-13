@@ -1,8 +1,10 @@
-package com.busanit.searchrestroom.activity
+package com.busanit.searchrestroom.mainPage
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -24,8 +26,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
-import com.busanit.searchrestroom.FirebaseAuthHelper
+import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.BuildConfig
 import com.busanit.searchrestroom.member.LoginActivity
 import com.busanit.searchrestroom.MenuHelper
@@ -36,6 +37,8 @@ import com.busanit.searchrestroom.databinding.ActivityMainBinding
 import com.busanit.searchrestroom.myPage.FavoriteActivity
 import com.busanit.searchrestroom.myPage.MyPageActivity
 import com.busanit.searchrestroom.restroomDetail.ToiletDetailActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -59,23 +62,21 @@ import kotlin.math.cos
 
 class MainActivity : AppCompatActivity(){
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-
-  private lateinit var firebaseAuthHelper: FirebaseAuthHelper
   // 지도 초기화
   private val PERMISSIONS = arrayOf(
     android.Manifest.permission.ACCESS_COARSE_LOCATION,
     android.Manifest.permission.ACCESS_FINE_LOCATION
   )
 
-  val REQUEST_PERMISSION_CODE = 1
+  private val REQUEST_PERMISSION_CODE = 1
 
-  val DEFAULT_ZOOM_LEVEL = 17f
+  private val DEFAULT_ZOOM_LEVEL = 17f
 
-  val SEOMYEON = LatLng(35.157696, 129.059116)
+  private val SEOMYEON = LatLng(35.157696, 129.059116)
 
   var googleMap: GoogleMap? = null
 
-  lateinit var fusedLocationClient: FusedLocationProviderClient
+  private lateinit var fusedLocationClient: FusedLocationProviderClient
 
   private lateinit var job: Job
 
@@ -97,17 +98,12 @@ class MainActivity : AppCompatActivity(){
   // 기존 마커를 저장하는 리스트를 선언
   private val markers = mutableListOf<com.google.android.gms.maps.model.Marker>()
 
-
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
 
-    firebaseAuthHelper = FirebaseAuthHelper(FirebaseAuth.getInstance())
-    firebaseAuthHelper.setAuthStateListener { isLoggedIn ->
-      MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
+      MenuHelper.updateMenuItems(binding.bottomNavigation.menu, AuthHelper.isLoggedIn())
       binding.bottomNavigation.invalidate()
-    }
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -185,7 +181,6 @@ class MainActivity : AppCompatActivity(){
       updateLocations()
     }
 
-
     setupSearchBar()
 
 
@@ -247,8 +242,6 @@ class MainActivity : AppCompatActivity(){
       binding.menuCollapseButton.setImageResource(R.drawable.icon_up)
     }
 
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, firebaseAuthHelper.isLoggedIn())
-
     //메뉴바 아이템 연결
     binding.bottomNavigation.setOnItemSelectedListener { item ->
       when (item.itemId) {
@@ -258,6 +251,7 @@ class MainActivity : AppCompatActivity(){
         R.id.menu_login -> {
           val intent = Intent(this, LoginActivity::class.java)
           startActivity(intent)
+          finish()
           true
         }
         R.id.menu_mypage -> {
@@ -545,7 +539,7 @@ class MainActivity : AppCompatActivity(){
 
   private fun onAddRestroomButtonClick() {
     // 로그인 상태 확인
-    if (!firebaseAuthHelper.isLoggedIn()) {
+    if (!AuthHelper.isLoggedIn()) {
       Toast.makeText(this, "로그인이 필요한 서비스입니다", Toast.LENGTH_SHORT).show()
       return
     }
@@ -610,13 +604,15 @@ class MainActivity : AppCompatActivity(){
 
   override fun onStop() {
     super.onStop()
-    firebaseAuthHelper.removeAuthStateListener()
+//    ///테스트용 : 앱 종료 시 자동 로그아웃
+//    AuthHelper.logout()
+
   }
 
   override fun onResume() {
     super.onResume()
     binding.mapView.onResume()
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, firebaseAuthHelper.isLoggedIn())
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, AuthHelper.isLoggedIn())
   }
 
   override fun onPause() {
@@ -628,8 +624,9 @@ class MainActivity : AppCompatActivity(){
     job.cancel()
     super.onDestroy()
     binding.mapView.onDestroy()
-    firebaseAuthHelper.removeAuthStateListener()
 
+    ///테스트용 : 앱 종료 시 자동 로그아웃
+//    AuthHelper.logout()
   }
 
   override fun onLowMemory() {

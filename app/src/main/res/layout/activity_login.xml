@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -94,6 +95,8 @@
         android:layout_margin="15dp"
         android:layout_gravity="center"
         android:background="@drawable/google_login" />
+
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -105,12 +108,5 @@
             android:layout_margin="15dp"
             android:layout_gravity="center"
             android:background="@drawable/kakao" />
-        <ImageButton
-            android:id="@+id/login_naver"
-            android:layout_width="80dp"
-            android:layout_height="75dp"
-            android:layout_margin="15dp"
-            android:layout_gravity="center"
-            android:background="@drawable/naver" />
     </LinearLayout>
 </LinearLayout>

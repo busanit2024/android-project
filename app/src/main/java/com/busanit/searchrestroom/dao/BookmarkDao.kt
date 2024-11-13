@@ -5,24 +5,23 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.busanit.searchrestroom.database.Bookmark
-
 @Dao
 interface BookmarkDao {
   @Query("select * from bookmark")
-  fun getAll(): List<Bookmark>
+  suspend fun getAll(): List<Bookmark>
 
   @Query("select * from bookmark where bookmark_id = :id")
-  fun getBookmarkById(id: Int): Bookmark
+  suspend fun getBookmarkById(id: Int): Bookmark
 
   @Query("select * from bookmark where member_id = :memberId")
-  fun getBookmarkByMemberId(memberId: Int): List<Bookmark>
+  suspend fun getBookmarkByMemberId(memberId: Int): List<Bookmark>
 
   @Query("SELECT * FROM bookmark WHERE restroom_id = :restroomId AND member_id = :memberId LIMIT 1")
-  fun getBookmarkByRestroomIdAndMemberId(restroomId: Int, memberId: Int): Bookmark?
+  suspend fun getBookmarkByRestroomIdAndMemberId(restroomId: Int, memberId: Int): Bookmark?
 
   @Insert
-  fun insert(vararg bookmark: Bookmark)
+  suspend fun insert(vararg bookmark: Bookmark)
 
   @Delete
-  fun delete(bookmark: Bookmark)
+  suspend fun delete(bookmark: Bookmark)
 }

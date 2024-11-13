@@ -45,10 +45,11 @@
           android:scheme="@string/scheme_kakao_app_key" />
       </intent-filter>
     </activity>
-    <activity android:name=".member.FindIdActivity"/>
     <activity android:name=".mainPage.MainActivity" />
     <activity android:name=".member.RegisterActivity" />
     <activity android:name=".member.GoogleLogin" />
+    <activity android:name=".member.FindIdActivity"/>
+    <activity android:name=".member.FindPwActivity"/>
     <activity android:name=".restroomDetail.RestroomDetailActivity" />
     <activity android:name=".myPage.MyPageActivity"/>
     <activity android:name=".myPage.FavoriteActivity"/>

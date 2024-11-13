@@ -9,19 +9,17 @@ import com.busanit.searchrestroom.database.Restroom
 @Dao
 interface RestroomDao {
   @Query("select * from restroom")
-  fun getAll(): List<Restroom>
+  suspend fun getAll(): List<Restroom>
 
   @Query("select * from restroom where restroom_id = :id")
-  fun getRestroomById(id: Int): Restroom
+  suspend fun getRestroomById(id: Int): Restroom
 
   @Query("SELECT * FROM restroom WHERE latitude BETWEEN :minLat AND :maxLat AND longitude BETWEEN :minLong AND :maxLong")
-  fun getRestroomsWithinArea(minLat: Double, maxLat: Double, minLong: Double, maxLong: Double): List<Restroom>
-
+  suspend fun getRestroomsWithinArea(minLat: Double, maxLat: Double, minLong: Double, maxLong: Double): List<Restroom>
 
   @Insert
-  fun insert(vararg restroom: Restroom)
+  suspend fun insert(vararg restroom: Restroom)  // suspend 키워드 추가
 
   @Delete
-  fun delete(restroom: Restroom)
-
+  suspend fun delete(restroom: Restroom)  // suspend 키워드 추가
 }

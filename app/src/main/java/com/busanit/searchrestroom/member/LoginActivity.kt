@@ -32,6 +32,11 @@ class LoginActivity : AppCompatActivity(){
 
         auth = Firebase.auth
 
+        // 뒤로 가기 버튼 클릭 시
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
+
         // 로그인 버튼 클릭 시
         binding.loginBtn.setOnClickListener {
             val email = binding.loginEmail.text.toString()
@@ -73,6 +78,18 @@ class LoginActivity : AppCompatActivity(){
                 // 카카오톡이 설치되어 있지 않은 경우 웹 로그인 진행
                 loginWithKaKaoAccount()
             }
+        }
+
+        // 아이디 찾기 버튼 클릭 시
+        binding.findIdBtn.setOnClickListener {
+            val intent = Intent(this, FindIdActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 비밀번호 찾기 버튼 클릭 시
+        binding.findpwBtn.setOnClickListener {
+            val intent = Intent(this, FindPwActivity::class.java)
+            startActivity(intent)
         }
 
         // 로그인 결과 관찰

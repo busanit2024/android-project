@@ -1,8 +1,10 @@
-package com.busanit.searchrestroom.activity
+package com.busanit.searchrestroom.mainPage
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -18,13 +20,14 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
-import com.busanit.searchrestroom.FirebaseAuthHelper
+import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.BuildConfig
 import com.busanit.searchrestroom.member.LoginActivity
 import com.busanit.searchrestroom.MenuHelper
@@ -34,7 +37,9 @@ import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
 import com.busanit.searchrestroom.myPage.FavoriteActivity
 import com.busanit.searchrestroom.myPage.MyPageActivity
-import com.busanit.searchrestroom.restroomDetail.RestroomDetailActivity
+import com.busanit.searchrestroom.restroomDetail.ToiletDetailActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -57,23 +62,21 @@ import kotlin.math.cos
 
 class MainActivity : AppCompatActivity(){
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-
-  private lateinit var firebaseAuthHelper: FirebaseAuthHelper
   // 지도 초기화
   private val PERMISSIONS = arrayOf(
     android.Manifest.permission.ACCESS_COARSE_LOCATION,
     android.Manifest.permission.ACCESS_FINE_LOCATION
   )
 
-  val REQUEST_PERMISSION_CODE = 1
+  private val REQUEST_PERMISSION_CODE = 1
 
-  val DEFAULT_ZOOM_LEVEL = 17f
+  private val DEFAULT_ZOOM_LEVEL = 17f
 
-  val SEOMYEON = LatLng(35.157696, 129.059116)
+  private val SEOMYEON = LatLng(35.157696, 129.059116)
 
   var googleMap: GoogleMap? = null
 
-  lateinit var fusedLocationClient: FusedLocationProviderClient
+  private lateinit var fusedLocationClient: FusedLocationProviderClient
 
   private lateinit var job: Job
 
@@ -95,17 +98,15 @@ class MainActivity : AppCompatActivity(){
   // 기존 마커를 저장하는 리스트를 선언
   private val markers = mutableListOf<com.google.android.gms.maps.model.Marker>()
 
-
+  private var backPressedTime: Long = 0
+  private var backPressedToast: Toast? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
 
-    firebaseAuthHelper = FirebaseAuthHelper(FirebaseAuth.getInstance())
-    firebaseAuthHelper.setAuthStateListener { isLoggedIn ->
-      MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
+      MenuHelper.updateMenuItems(binding.bottomNavigation.menu, AuthHelper.isLoggedIn())
       binding.bottomNavigation.invalidate()
-    }
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -142,10 +143,6 @@ class MainActivity : AppCompatActivity(){
     binding.checkAccessible.isChecked = filterAccessible
     binding.checkUnisex.isChecked = filterUnisex
 
-    val db = DatabaseCopier.getAppDataBase(context = applicationContext)
-    var restroom = db!!.restroomDao().getRestroomById(1)
-    Log.d("test", "restroom: $restroom")
-
     // 필터 반경이 변경될 때마다 업데이트
     binding.searchRadius200.setOnCheckedChangeListener { _, isChecked ->
       if (isChecked) {
@@ -173,7 +170,6 @@ class MainActivity : AppCompatActivity(){
       filterDiaper = isChecked
       updateLocations()
     }
-
 
     setupSearchBar()
 
@@ -236,8 +232,6 @@ class MainActivity : AppCompatActivity(){
       binding.menuCollapseButton.setImageResource(R.drawable.icon_up)
     }
 
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, firebaseAuthHelper.isLoggedIn())
-
     //메뉴바 아이템 연결
     binding.bottomNavigation.setOnItemSelectedListener { item ->
       when (item.itemId) {
@@ -247,6 +241,7 @@ class MainActivity : AppCompatActivity(){
         R.id.menu_login -> {
           val intent = Intent(this, LoginActivity::class.java)
           startActivity(intent)
+          finish()
           true
         }
         R.id.menu_mypage -> {
@@ -262,6 +257,20 @@ class MainActivity : AppCompatActivity(){
         else -> false
       }
     }
+
+    onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+      override fun handleOnBackPressed() {
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
+          isEnabled = false
+          finish()
+        } else {
+          backPressedToast?.cancel()
+          backPressedToast = Toast.makeText(this@MainActivity, "'뒤로' 버튼을 한 번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT)
+          backPressedToast?.show()
+        }
+        backPressedTime = System.currentTimeMillis()
+      }
+    })
   }
 
 
@@ -384,7 +393,7 @@ class MainActivity : AppCompatActivity(){
               Log.d("test", "detailsButton clicked")
               val id = marker.tag as Int
               val restroom = locations.find { it.restroomId == id }
-              val intent = Intent(context, RestroomDetailActivity::class.java)
+              val intent = Intent(context, ToiletDetailActivity::class.java)
               intent.putExtra("restroom_id", id)
               intent.putExtra("restroom", restroom)
               startActivity(intent)
@@ -405,7 +414,7 @@ class MainActivity : AppCompatActivity(){
               layoutParams.rightMargin = customMarkerView.width / 2
               layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
               layoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-              layoutParams.bottomMargin = 500
+              layoutParams.bottomMargin = if (marker.tag == "selected") 600 else 700
             }
 
             val layout = findViewById<ConstraintLayout>(R.id.main)
@@ -521,7 +530,7 @@ class MainActivity : AppCompatActivity(){
 
   private fun onAddRestroomButtonClick() {
     // 로그인 상태 확인
-    if (!firebaseAuthHelper.isLoggedIn()) {
+    if (!AuthHelper.isLoggedIn()) {
       Toast.makeText(this, "로그인이 필요한 서비스입니다", Toast.LENGTH_SHORT).show()
       return
     }
@@ -584,15 +593,18 @@ class MainActivity : AppCompatActivity(){
   }
 
 
+
   override fun onStop() {
     super.onStop()
-    firebaseAuthHelper.removeAuthStateListener()
+//    ///테스트용 : 앱 종료 시 자동 로그아웃
+//    AuthHelper.logout()
+
   }
 
   override fun onResume() {
     super.onResume()
     binding.mapView.onResume()
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, firebaseAuthHelper.isLoggedIn())
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, AuthHelper.isLoggedIn())
   }
 
   override fun onPause() {
@@ -604,8 +616,9 @@ class MainActivity : AppCompatActivity(){
     job.cancel()
     super.onDestroy()
     binding.mapView.onDestroy()
-    firebaseAuthHelper.removeAuthStateListener()
 
+    ///테스트용 : 앱 종료 시 자동 로그아웃
+//    AuthHelper.logout()
   }
 
   override fun onLowMemory() {

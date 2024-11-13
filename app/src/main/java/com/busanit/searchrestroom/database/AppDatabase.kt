@@ -63,7 +63,7 @@ abstract class AppDatabase : RoomDatabase() {
         val instance = Room.databaseBuilder(
           context.applicationContext,
           AppDatabase::class.java,
-          "app_database"
+          "search-restroom"
         )
           .addMigrations(MIGRATION_1_2) // 마이그레이션 적용
           .addMigrations(MIGRATION_2_3)

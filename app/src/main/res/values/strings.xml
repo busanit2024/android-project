@@ -21,6 +21,7 @@
   <string name="review_how_many">화장실에 몇 칸이 있나요?</string>
   <string name="review_cleanliness">화장실이 깨끗한가요?</string>
   <string name="review_txt">사용하신 화장실의 후기를 남겨주시면 다음 이용자들에게도 도움이 됩니다.</string>
+
   <string name="web_client_id">116311315882-e6c2v9kl8cfegibd79vfogouseg6jcfj.apps.googleusercontent.com</string>
   <string name="kakao_app_key">d7727a5bab2cc3b7b496c87da534ffc8</string>
   <string name="scheme_kakao_app_key">kakaod7727a5bab2cc3b7b496c87da534ffc8</string>

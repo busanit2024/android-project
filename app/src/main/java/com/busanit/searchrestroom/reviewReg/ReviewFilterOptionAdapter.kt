@@ -6,7 +6,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.databinding.ReviewFilterOptionBinding
 
-class ReviewFilterOptionAdapter(private val onOptionClicked: (FilterOptionState) -> Unit) : RecyclerView.Adapter<ReviewFilterOptionAdapter.ViewHolder>() {
+class ReviewFilterOptionAdapter(private val onOptionClicked: (FilterOptionState) -> Unit)
+    : RecyclerView.Adapter<ReviewFilterOptionAdapter.ViewHolder>() {
     private var optionList = listOf<FilterOptionState>()  // 필터 옵션 리스트
 
     // 옵션 목록을 추가하는 메서드

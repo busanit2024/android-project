@@ -26,7 +26,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
-import com.busanit.searchrestroom.FirebaseAuthHelper
+import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.BuildConfig
 import com.busanit.searchrestroom.member.LoginActivity
 import com.busanit.searchrestroom.MenuHelper
@@ -37,6 +37,8 @@ import com.busanit.searchrestroom.databinding.ActivityMainBinding
 import com.busanit.searchrestroom.myPage.FavoriteActivity
 import com.busanit.searchrestroom.myPage.MyPageActivity
 import com.busanit.searchrestroom.restroomDetail.ToiletDetailActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -60,7 +62,7 @@ import kotlin.math.cos
 class MainActivity : AppCompatActivity(){
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
-  private lateinit var firebaseAuthHelper: FirebaseAuthHelper
+  private lateinit var authHelper: AuthHelper
   // 지도 초기화
   private val PERMISSIONS = arrayOf(
     android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -100,9 +102,9 @@ class MainActivity : AppCompatActivity(){
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
-    
-    firebaseAuthHelper = FirebaseAuthHelper(FirebaseAuth.getInstance())
-    firebaseAuthHelper.setAuthStateListener { isLoggedIn ->
+
+    authHelper = AuthHelper(FirebaseAuth.getInstance(), GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN))
+    authHelper.setAuthStateListener { isLoggedIn ->
       MenuHelper.updateMenuItems(binding.bottomNavigation.menu, isLoggedIn)
       binding.bottomNavigation.invalidate()
     }
@@ -174,7 +176,6 @@ class MainActivity : AppCompatActivity(){
       updateLocations()
     }
 
-
     setupSearchBar()
 
 
@@ -236,7 +237,7 @@ class MainActivity : AppCompatActivity(){
       binding.menuCollapseButton.setImageResource(R.drawable.icon_up)
     }
 
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, firebaseAuthHelper.isLoggedIn())
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, authHelper.isLoggedIn())
 
     //메뉴바 아이템 연결
     binding.bottomNavigation.setOnItemSelectedListener { item ->
@@ -247,6 +248,7 @@ class MainActivity : AppCompatActivity(){
         R.id.menu_login -> {
           val intent = Intent(this, LoginActivity::class.java)
           startActivity(intent)
+          finish()
           true
         }
         R.id.menu_mypage -> {
@@ -521,7 +523,7 @@ class MainActivity : AppCompatActivity(){
 
   private fun onAddRestroomButtonClick() {
     // 로그인 상태 확인
-    if (!firebaseAuthHelper.isLoggedIn()) {
+    if (!authHelper.isLoggedIn()) {
       Toast.makeText(this, "로그인이 필요한 서비스입니다", Toast.LENGTH_SHORT).show()
       return
     }
@@ -586,13 +588,19 @@ class MainActivity : AppCompatActivity(){
 
   override fun onStop() {
     super.onStop()
-    firebaseAuthHelper.removeAuthStateListener()
+    ///테스트용 : 앱 종료 시 자동 로그아웃
+//    authHelper.logoutKakao()
+//    authHelper.logoutFirebase()
+//    authHelper.logoutGmail()
+
+    authHelper.removeAuthStateListener()
+
   }
 
   override fun onResume() {
     super.onResume()
     binding.mapView.onResume()
-    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, firebaseAuthHelper.isLoggedIn())
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, authHelper.isLoggedIn())
   }
 
   override fun onPause() {
@@ -604,7 +612,14 @@ class MainActivity : AppCompatActivity(){
     job.cancel()
     super.onDestroy()
     binding.mapView.onDestroy()
-    firebaseAuthHelper.removeAuthStateListener()
+
+    ///테스트용 : 앱 종료 시 자동 로그아웃
+//    authHelper.logoutKakao()
+//    authHelper.logoutFirebase()
+//    authHelper.logoutGmail()
+
+    authHelper.removeAuthStateListener()
+
 
   }
 

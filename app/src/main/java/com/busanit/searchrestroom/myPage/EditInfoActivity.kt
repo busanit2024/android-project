@@ -1,6 +1,7 @@
 package com.busanit.searchrestroom.myPage
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -38,6 +39,7 @@ class EditInfoActivity : AppCompatActivity() {
     private val CAMERA_PERMISSION = Manifest.permission.CAMERA
     private val READ_STORAGE_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE
     private val WRITE_STORAGE_PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE
+    // 안드로이드 10 이상이라면 WRITE_EXTERNAL_STORAGE는 필요하지 않을 수 있다.
     private val PERMISSION_REQUEST_CODE = 100
     private lateinit var currentPhotoPath: String
     private var currentMember: Member? = null // 로그인한 사용자의 정보
@@ -56,25 +58,32 @@ class EditInfoActivity : AppCompatActivity() {
     private val requestGalleryLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()) {
         try {
-            val calRatio = calculateInSampleSize(
-                it.data!!.data!!,
-                resources.getDimensionPixelSize(R.dimen.imgSize),
-                resources.getDimensionPixelSize(R.dimen.imgSize)
-            )
-            val option = BitmapFactory.Options()
-            option.inSampleSize = calRatio
+            if (it.resultCode == RESULT_OK && it.data != null) {
+                val calRatio = calculateInSampleSize(
+                    it.data!!.data!!,
+                    resources.getDimensionPixelSize(R.dimen.imgSize),
+                    resources.getDimensionPixelSize(R.dimen.imgSize)
+                )
+                val option = BitmapFactory.Options()
+                option.inSampleSize = calRatio
 
-            val inputStream = contentResolver.openInputStream(it.data!!.data!!)
-            val bitmap = BitmapFactory.decodeStream(inputStream, null, option)
-            inputStream!!.close()
+                val inputStream = contentResolver.openInputStream(it.data!!.data!!)
+                val bitmap = BitmapFactory.decodeStream(inputStream, null, option)
+                inputStream?.close()
 
-            bitmap?.let {
-                binding.profileImage.setImageBitmap(bitmap)
-            } ?: let {
-                Log.d("test", "bitmap null")
+                bitmap?.let {
+                    binding.profileImage.setImageBitmap(bitmap)
+                } ?: run {
+                    Log.d("test", "bitmap null")
+                    Toast.makeText(this, "이미지 로드에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Log.d("갤러리 미선택", "갤러리에서 이미지를 선택하지 않았습니다.")
+                Toast.makeText(this, "이미지를 선택하지 않습니다.", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.d("갤러리 오류", "갤러리 선택 중 오류 발생: ${e.message}")
+            Toast.makeText(this, "갤러리 선택 중 오류 발생!", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -110,25 +119,27 @@ class EditInfoActivity : AppCompatActivity() {
     private fun loadMemberInfo() {
         // Coroutine을 사용해 데이터베이스에서 회원 정보 불러오기
         CoroutineScope(Dispatchers.IO).launch {
-            val db = Room.databaseBuilder(
-                this@EditInfoActivity,
-                AppDatabase::class.java, "app_database"
-            ).build()
+            val db = AppDatabase.getDatabase(this@EditInfoActivity)
 
-            val member: Member = Member(1, "test@naver.com", "둘리", "1234", null, null, null, false, true)
-
-//            db.memberDao().insert(member)
-
-            val memberDao = db.memberDao()
-            currentMember = memberDao.getMemberById(1)  // member_id가 1일 때 한정(나중에 수정)
+            // currentMember가 null일 경우 ID를 사용하여 멤버 정보를 가져옴
+            currentMember = if (currentMember == null) {
+                db.memberDao().getMemberById(1) // 기본 아이디
+            } else {
+                db.memberDao().getMemberById(currentMember!!.memberId)
+            }
 
             withContext(Dispatchers.Main) {
-                Log.d("test", currentMember?.email.toString())
-                Log.d("test", currentMember?.nickname.toString())
-                // UI 업데이트
-                binding.email.setText(currentMember?.email)
-                binding.email.isEnabled = false // 이메일은 수정 불가
-                binding.newNickname.setText(currentMember?.nickname)
+                // currentMember가 null이 아닌 경우 처리
+                if (currentMember != null) {
+                    Log.d("test", currentMember?.email.toString())
+                    Log.d("test", currentMember?.nickname.toString())
+                    // UI 업데이트
+                    binding.email.setText(currentMember?.email)
+                    binding.email.isEnabled = false // 이메일은 수정 불가
+                    binding.newNickname.setText(currentMember?.nickname)
+                } else {
+                    Log.d("test", "No member found with the given ID.")
+                }
             }
         }
     }
@@ -215,6 +226,7 @@ class EditInfoActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("IntentReset")
     private fun showImagePickerDialog() {
         val options = arrayOf("카메라로 촬영", "갤러리에서 선택")
         AlertDialog.Builder(this)
@@ -222,27 +234,37 @@ class EditInfoActivity : AppCompatActivity() {
             .setItems(options) { dialog, which ->
                 when (which) {
                     0 -> {
-                        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                        if (takePictureIntent.resolveActivity(packageManager) != null) {
-                            // 이미지 파일 생성
-                            val photoFile: File? = createImageFile()
-                            photoFile?.also {
-                                val photoURI: Uri = FileProvider.getUriForFile(
-                                    this,
-                                    "com.busanit.searchrestroom.fileprovider",
-                                    it
-                                )
-                                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                                requestCameraLauncher.launch(takePictureIntent)
+                        try {
+                            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                            if (takePictureIntent.resolveActivity(packageManager) != null) {
+                                // 이미지 파일 생성
+                                val photoFile: File? = createImageFile()
+                                photoFile?.also {
+                                    val photoURI: Uri = FileProvider.getUriForFile(
+                                        this,
+                                        "com.busanit.searchrestroom.fileprovider",
+                                        it
+                                    )
+                                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                                    requestCameraLauncher.launch(takePictureIntent)
+                                }
+                            } else {
+                                Toast.makeText(this, "카메라 앱이 설치되어 있지 않습니다.", Toast.LENGTH_SHORT).show()
                             }
-                        } else {
-                            Toast.makeText(this, "카메라 앱이 설치되어 있지 않습니다.", Toast.LENGTH_SHORT).show()
+                        } catch (e: Exception) {
+                            Log.e("카메라 오류", "카메라 촬영 중 오류 발생: ${e.message}")
+                            Toast.makeText(this, "카메라 촬영 중 오류 발생!", Toast.LENGTH_SHORT).show()
                         }
                     }
                     1 -> {
-                        val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                        galleryIntent.type = "image/*"
-                        requestGalleryLauncher.launch(galleryIntent)
+                        try {
+                            val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                            galleryIntent.type = "image/*"
+                            requestGalleryLauncher.launch(galleryIntent)
+                        } catch (e: Exception) {
+                            Log.e("갤러리 오류", "갤러리에서 이미지 선택 중 오류 발생: ${e.message}")
+                            Toast.makeText(this, "갤러리에서 이미지 선택 중 오류 발생!", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }

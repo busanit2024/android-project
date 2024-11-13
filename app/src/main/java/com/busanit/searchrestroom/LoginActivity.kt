@@ -8,6 +8,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.busanit.searchrestroom.activity.MainActivity
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.databinding.ActivityLoginBinding
+import com.busanit.searchrestroom.member.GoogleLogin
+import com.busanit.searchrestroom.member.LoginViewModel
+import com.busanit.searchrestroom.member.LoginViewModelFactory
+import com.busanit.searchrestroom.member.RegisterActivity
+import com.busanit.searchrestroom.member.UserRepository
+import com.busanit.searchrestroom.member.auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient

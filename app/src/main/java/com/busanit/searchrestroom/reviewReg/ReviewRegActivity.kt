@@ -74,9 +74,9 @@ class ReviewRegActivity : AppCompatActivity() {
         binding.apply {
             // 각 RecyclerView와 Adapter를 연결
             val recyclerViewList = listOf(
-                filterQuestion1OpenTime,
-                filterQuestion2Comfort,
-                filterQuestion3Unisex
+                filterQuestion1ToiletPaper,
+                filterQuestion2HowMany,
+                filterQuestion3Cleanliness
             )
 
             // RecyclerView에 각각 Adapter 설정
@@ -93,39 +93,31 @@ class ReviewRegActivity : AppCompatActivity() {
     }
 
     private fun onWriteReviewClicked() {
-        val selectedOptions = mutableListOf<FilterOptionState>()
-        viewModel.filterOptions.value?.forEach { optionState ->
-            if (optionState.selected) {
-                selectedOptions.add(optionState)
-            }
-        }
-
+        val selectedOptions = viewModel.filterOptions.value?.filter { it.selected } ?: emptyList()
         val reviewContent = binding.reviewContent.text.toString()
 
-        // sharedPreferences로 memberId 가져오기
         val sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
-        val memberId = sharedPreferences.getInt("memberId", 0) // 로그인한 사용자의 ID
+        val memberId = sharedPreferences.getInt("memberId", 0)
 
         val review = Review(
             reviewId = 0,
             restroomId = restroom?.restroomId,
-            memberId = memberId, // member 연결해야함
+            memberId = memberId,
             content = reviewContent,
             regTime = System.currentTimeMillis().toString(),
-            updateTime = System.currentTimeMillis().toString(),
-
+            updateTime = System.currentTimeMillis().toString()
         )
 
-        // 선택된 필터옵션을 리스트로 저장해서 리뷰에 추가
-        review.selectedOptions = selectedOptions
-
-        viewModel.insertReview(review)
+        viewModel.insertReviewWithOptions(review, selectedOptions) // 리뷰와 옵션 함께 저장
 
         Toast.makeText(this, "리뷰가 저장되었습니다.", Toast.LENGTH_SHORT).show()
-
-        val intent = Intent(this, RestroomDetailActivity::class.java)
+        val intent = Intent(this, RestroomDetailActivity::class.java).apply {
+            putExtra("reviewContent", reviewContent)
+            putExtra("restroomId", restroom?.restroomId)
+        }
         startActivity(intent)
     }
+
 }
 
 

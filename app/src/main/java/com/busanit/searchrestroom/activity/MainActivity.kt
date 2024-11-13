@@ -34,7 +34,7 @@ import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
 import com.busanit.searchrestroom.myPage.FavoriteActivity
 import com.busanit.searchrestroom.myPage.MyPageActivity
-import com.busanit.searchrestroom.restroomDetail.ToiletDetailActivity
+import com.busanit.searchrestroom.restroomDetail.RestroomDetailActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -384,7 +384,7 @@ class MainActivity : AppCompatActivity(){
               Log.d("test", "detailsButton clicked")
               val id = marker.tag as Int
               val restroom = locations.find { it.restroomId == id }
-              val intent = Intent(context, ToiletDetailActivity::class.java)
+              val intent = Intent(context, RestroomDetailActivity::class.java)
               intent.putExtra("restroom_id", id)
               intent.putExtra("restroom", restroom)
               startActivity(intent)

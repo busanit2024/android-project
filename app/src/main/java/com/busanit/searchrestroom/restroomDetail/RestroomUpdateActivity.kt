@@ -1,6 +1,8 @@
 package com.busanit.searchrestroom.restroomDetail
 
-class RestroomUpdateActivity {
+import androidx.appcompat.app.AppCompatActivity
+
+class RestroomUpdateActivity : AppCompatActivity(){
 
     // Detail에서 받은 정보 보여주기
 

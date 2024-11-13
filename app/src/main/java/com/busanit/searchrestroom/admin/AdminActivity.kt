@@ -1,0 +1,31 @@
+package com.busanit.searchrestroom.admin
+
+import android.content.Intent
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.busanit.searchrestroom.databinding.ActivityAdminBinding
+
+class AdminActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityAdminBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        binding = ActivityAdminBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.deleteBtn.setOnClickListener {
+            val intent = Intent(this, AdminDeleteActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.userBtn.setOnClickListener {
+
+        }
+
+        binding.reviewBtn.setOnClickListener {
+
+        }
+    }
+}

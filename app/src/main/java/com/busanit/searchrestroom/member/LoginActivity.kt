@@ -27,13 +27,17 @@ class LoginActivity : AppCompatActivity(){
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val repository = UserRepository(AppDatabase.getDatabase(application)!!.memberDao(), this)
+        val repository = UserRepository(AppDatabase.getDatabase(application).memberDao(), this)
         viewModel = ViewModelProvider(this, LoginViewModelFactory(repository)).get(LoginViewModel::class.java)
 
         auth = Firebase.auth
 
-        // 로그인 버튼 클릭 시
+        // 뒤로 가기 버튼 클릭 시
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
 
+        // 로그인 버튼 클릭 시
         binding.loginBtn.setOnClickListener {
             val email = binding.loginEmail.text.toString()
             val password = binding.loginPassword.text.toString()
@@ -75,7 +79,19 @@ class LoginActivity : AppCompatActivity(){
                 loginWithKaKaoAccount()
             }
         }
-        
+
+        // 아이디 찾기 버튼 클릭 시
+        binding.findIdBtn.setOnClickListener {
+            val intent = Intent(this, FindIdActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 비밀번호 찾기 버튼 클릭 시
+        binding.findpwBtn.setOnClickListener {
+            val intent = Intent(this, FindPwActivity::class.java)
+            startActivity(intent)
+        }
+
         // 로그인 결과 관찰
         viewModel.loginResult.observe(this) { (success, message) ->
             if (success) {

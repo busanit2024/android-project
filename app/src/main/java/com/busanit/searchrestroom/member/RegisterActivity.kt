@@ -39,6 +39,11 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
+        // 뒤로 가기 버튼 클릭 시
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
+
         // 회원가입 버튼 클릭 시
         binding.registerBtn.setOnClickListener {
             val email = binding.registerEmail.text.toString()

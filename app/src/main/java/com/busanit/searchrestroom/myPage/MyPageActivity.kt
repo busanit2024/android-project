@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.R
+import com.busanit.searchrestroom.admin.AdminActivity
 import com.busanit.searchrestroom.dao.MemberDao
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.database.Member
@@ -61,7 +62,7 @@ class MyPageActivity : AppCompatActivity() {
         binding.adminPage.setOnClickListener {
             if (AuthHelper.isLoggedIn() && sharedPreferences.getBoolean("admin", false)) {
                 // 관리자 페이지 이동 (관리자로 로그인한 경우에만 보이게 함)
-//                startActivity(Intent(this, AdminPageActivity::class.java))
+                startActivity(Intent(this, AdminActivity::class.java))
             }
         }
 

@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom.activity
+package com.busanit.searchrestroom.mainPage
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -67,15 +67,15 @@ class MainActivity : AppCompatActivity(){
     android.Manifest.permission.ACCESS_FINE_LOCATION
   )
 
-  val REQUEST_PERMISSION_CODE = 1
+  private val REQUEST_PERMISSION_CODE = 1
 
-  val DEFAULT_ZOOM_LEVEL = 17f
+  private val DEFAULT_ZOOM_LEVEL = 17f
 
-  val SEOMYEON = LatLng(35.157696, 129.059116)
+  private val SEOMYEON = LatLng(35.157696, 129.059116)
 
   var googleMap: GoogleMap? = null
 
-  lateinit var fusedLocationClient: FusedLocationProviderClient
+  private lateinit var fusedLocationClient: FusedLocationProviderClient
 
   private lateinit var job: Job
 

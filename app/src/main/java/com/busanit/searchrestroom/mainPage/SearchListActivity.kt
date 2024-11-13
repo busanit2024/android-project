@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom.activity
+package com.busanit.searchrestroom.mainPage
 
 import android.content.Intent
 import android.os.Bundle

@@ -7,7 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.busanit.searchrestroom.activity.MainActivity
+import com.busanit.searchrestroom.mainPage.MainActivity
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.databinding.ActivityLoginBinding
 import com.google.firebase.auth.ktx.auth

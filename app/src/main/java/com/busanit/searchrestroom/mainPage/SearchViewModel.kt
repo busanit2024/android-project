@@ -1,4 +1,4 @@
-package com.busanit.searchrestroom.activity
+package com.busanit.searchrestroom.mainPage
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

@@ -25,12 +25,10 @@ class AuthHelper(private val auth: FirebaseAuth, private val googleSignInClient:
   }
 
   private fun checkLoginStatus(onAuthStateChanged: (Boolean) -> Unit) {
-    // Firebase와 카카오 로그인 상태를 OR 연산하여 로그인 여부를 결정
+    // Firebase와 카카오 로그인 상태를 OR 연산하여 현재 로그인 여부를 결정
     val isLoggedIn = isFirebaseLoggedIn || isKakaoLoggedIn
     onAuthStateChanged(isLoggedIn)
   }
-
-
 
   fun removeAuthStateListener() {
     authStateListener?.let { auth.removeAuthStateListener(it) }

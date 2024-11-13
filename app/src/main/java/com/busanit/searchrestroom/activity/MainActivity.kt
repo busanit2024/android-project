@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.busanit.searchrestroom.FirebaseAuthHelper
 import com.busanit.searchrestroom.BuildConfig
 import com.busanit.searchrestroom.member.LoginActivity
@@ -53,6 +54,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlin.math.cos
 
 class MainActivity : AppCompatActivity(){
@@ -143,8 +145,17 @@ class MainActivity : AppCompatActivity(){
     binding.checkUnisex.isChecked = filterUnisex
 
     val db = DatabaseCopier.getAppDataBase(context = applicationContext)
-    var restroom = db!!.restroomDao().getRestroomById(1)
-    Log.d("test", "restroom: $restroom")
+    lifecycleScope.launch {
+      try {
+        val db = DatabaseCopier.getAppDataBase(context = applicationContext)
+        withContext(Dispatchers.IO) {
+          val restroom = db!!.restroomDao().getRestroomById(1)
+          Log.d("test", "restroom: $restroom")
+        }
+      } catch (e: Exception) {
+        Log.e("MainActivity", "Error getting restroom: ${e.message}")
+      }
+    }
 
     // 필터 반경이 변경될 때마다 업데이트
     binding.searchRadius200.setOnCheckedChangeListener { _, isChecked ->
@@ -445,18 +456,31 @@ class MainActivity : AppCompatActivity(){
     val minLong = selectedPlace.longitude - longChange
     val maxLong = selectedPlace.longitude + longChange
 
-    val db = DatabaseCopier.getAppDataBase(context = applicationContext)
-    val locationsList = db!!.restroomDao().getRestroomsWithinArea(minLat, maxLat, minLong, maxLong) as MutableList<Restroom>
+    lifecycleScope.launch {
+      try {
+        val db = DatabaseCopier.getAppDataBase(context = applicationContext)
+        withContext(Dispatchers.IO) {
+          val locationsList = db!!.restroomDao().getRestroomsWithinArea(minLat, maxLat, minLong, maxLong) as MutableList<Restroom>
 
-    // 필터링된 위치만 locations에 저장
-    locations.clear()
-    locations.addAll(locationsList.filter { restroom ->
-      val distanceToRestroom = calculateDistance(selectedPlace, restroom)
-      val matchesUisex = !filterUnisex || (restroom.unisex ?: false)
-      val matchesAccessible = !filterAccessible || (restroom.accessible ?: false)
-      val matchesDiaper = !filterDiaper || (restroom.diaper ?: false)
-      distanceToRestroom <= filterDistance && matchesUisex && matchesAccessible && matchesDiaper
-    })
+          // 필터링된 위치만 locations에 저장
+          locations.clear()
+          locations.addAll(locationsList.filter { restroom ->
+            val distanceToRestroom = calculateDistance(selectedPlace, restroom)
+            val matchesUisex = !filterUnisex || (restroom.unisex ?: false)
+            val matchesAccessible = !filterAccessible || (restroom.accessible ?: false)
+            val matchesDiaper = !filterDiaper || (restroom.diaper ?: false)
+            distanceToRestroom <= filterDistance && matchesUisex && matchesAccessible && matchesDiaper
+          })
+
+          // UI 업데이트는 메인 스레드에서 실행
+          withContext(Dispatchers.Main) {
+            updateMapMarkers()
+          }
+        }
+      } catch (e: Exception) {
+        Log.e("MainActivity", "Error updating locations: ${e.message}")
+      }
+    }
 
     // 업데이트된 locations를 화면에 표시
     updateMapMarkers()

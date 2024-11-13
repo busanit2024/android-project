@@ -22,7 +22,9 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityAddRestroomBinding
@@ -53,7 +55,10 @@ class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
                 ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSION_CODE)
             }
 
-            db = AppDatabase.getDatabase(this)
+            // 데이터베이스 초기화를 applicationContext로 변경
+            db = AppDatabase.getDatabase(applicationContext)
+            Log.d("AddRestroomActivity", "Database initialized successfully")
+
             binding.mapViewRegister.onCreate(savedInstanceState)
             binding.mapViewRegister.getMapAsync(this)
 
@@ -67,8 +72,8 @@ class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
                 finish()
             }
         } catch (e: Exception) {
-            Log.e("AddRestroomActivity", "Error in onCreate: ${e.message}")
-            Toast.makeText(this, "초기화 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+            Log.e("AddRestroomActivity", "Error in onCreate", e)
+            Toast.makeText(this, "초기화 중 오류가 발생했습니다: ${e.message}", Toast.LENGTH_SHORT).show()
             finish()
         }
     }
@@ -198,6 +203,61 @@ class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun registerRestroom() {
+        // 필수 필드 검증
+        if (binding.editRestroomName.text.toString().trim().isEmpty()) {
+            Toast.makeText(this, "화장실 이름을 입력해주세요", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (binding.editLocation.text.toString().trim().isEmpty()) {
+            Toast.makeText(this, "위치를 입력해주세요", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (selectedLocation == null) {
+            Toast.makeText(this, "지도에서 위치를 선택해주세요", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val restroom = Restroom(
+            restroomId = 0, // Room이 자동으로 ID를 생성
+            restroomName = binding.editRestroomName.text.toString().trim(),
+            location = binding.editLocation.text.toString().trim(),
+            latitude = selectedLocation?.latitude,
+            longitude = selectedLocation?.longitude,
+            openTime = binding.editOpenTime.text.toString().trim(),
+            fullTime = binding.checkFullTime.isChecked,
+            unisex = binding.checkUnisex.isChecked,
+            diaper = binding.checkDiaper.isChecked,
+            accessible = binding.checkAccessible.isChecked,
+            memo = binding.editMemo.text.toString().trim()
+        )
+
+        // Coroutine scope에서 데이터베이스 작업 수행
+        lifecycleScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    Log.d("AddRestroomActivity", "Attempting to insert restroom: $restroom")
+                    db.restroomDao().insert(restroom)
+                    Log.d("AddRestroomActivity", "Successfully inserted restroom")
+                }
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@AddRestroomActivity, "등록되었습니다", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            } catch (e: Exception) {
+                Log.e("AddRestroomActivity", "Error registering restroom", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@AddRestroomActivity,
+                        "등록 중 오류가 발생했습니다: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
     @SuppressLint("MissingPermission")
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -214,38 +274,6 @@ class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
             } else {
                 Toast.makeText(this, "위치 권한이 필요합니다", Toast.LENGTH_SHORT).show()
                 updateMapLocation(DEFAULT_LOCATION)
-            }
-        }
-    }
-
-    private fun registerRestroom() {
-        if (selectedLocation == null) {
-            Toast.makeText(this, "지도에서 위치를 선택해주세요", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val restroom = Restroom(
-            restroomId = 0,
-            restroomName = binding.editRestroomName.text.toString(),
-            location = binding.editLocation.text.toString(),
-            latitude = selectedLocation?.latitude,
-            longitude = selectedLocation?.longitude,
-            openTime = binding.editOpenTime.text.toString(),
-            fullTime = binding.checkFullTime.isChecked,
-            unisex = binding.checkUnisex.isChecked,
-            diaper = binding.checkDiaper.isChecked,
-            accessible = binding.checkAccessible.isChecked,
-            memo = binding.editMemo.text.toString()
-        )
-
-        lifecycleScope.launch {
-            try {
-                db.restroomDao().insert(restroom)
-                Toast.makeText(this@AddRestroomActivity, "등록되었습니다", Toast.LENGTH_SHORT).show()
-                finish()
-            } catch (e: Exception) {
-                Log.e("AddRestroomActivity", "Error registering restroom: ${e.message}")
-                Toast.makeText(this@AddRestroomActivity, "등록 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show()
             }
         }
     }

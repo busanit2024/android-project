@@ -32,6 +32,7 @@ import com.busanit.searchrestroom.BuildConfig
 import com.busanit.searchrestroom.member.LoginActivity
 import com.busanit.searchrestroom.MenuHelper
 import com.busanit.searchrestroom.R
+import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
@@ -78,6 +79,7 @@ class MainActivity : AppCompatActivity(){
 
   private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+  private var db: AppDatabase? = null
   private lateinit var job: Job
 
   private val searchViewModel : SearchViewModel by viewModels()
@@ -454,7 +456,7 @@ class MainActivity : AppCompatActivity(){
     val minLong = selectedPlace.longitude - longChange
     val maxLong = selectedPlace.longitude + longChange
 
-    val db = DatabaseCopier.getAppDataBase(context = applicationContext)
+    db = AppDatabase.getDatabase(context = applicationContext)
     val locationsList = db!!.restroomDao().getRestroomsWithinArea(minLat, maxLat, minLong, maxLong) as MutableList<Restroom>
 
     // 필터링된 위치만 locations에 저장

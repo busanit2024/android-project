@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityAddRestroomBinding
     private lateinit var map: GoogleMap
-    private lateinit var db: AppDatabase
+    private var db: AppDatabase? = null
     private var selectedLocation: LatLng? = null
 
     private val PERMISSIONS = arrayOf(
@@ -240,7 +240,7 @@ class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
 
         lifecycleScope.launch {
             try {
-                db.restroomDao().insert(restroom)
+                db!!.restroomDao().insert(restroom)
                 Toast.makeText(this@AddRestroomActivity, "등록되었습니다", Toast.LENGTH_SHORT).show()
                 finish()
             } catch (e: Exception) {

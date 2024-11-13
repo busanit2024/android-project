@@ -28,7 +28,7 @@ class LoginActivity : AppCompatActivity(){
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val repository = UserRepository(AppDatabase.getDatabase(application).memberDao(), this)
+        val repository = UserRepository(AppDatabase.getDatabase(application)!!.memberDao(), this)
         viewModel = ViewModelProvider(this, LoginViewModelFactory(repository)).get(LoginViewModel::class.java)
 
         auth = Firebase.auth

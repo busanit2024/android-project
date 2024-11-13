@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.R
+import com.busanit.searchrestroom.admin.AdminActivity
 import com.busanit.searchrestroom.mainPage.MainActivity
 import com.busanit.searchrestroom.databinding.ActivityMypageBinding
 import com.busanit.searchrestroom.member.UserRepository
@@ -41,11 +42,14 @@ class MyPageActivity : AppCompatActivity() {
             startActivity(Intent(this, FavoriteActivity::class.java))
         }
 
+        if (AuthHelper.isLoggedIn() && AuthHelper.isAdmin()) {
+            binding.adminPage.visibility = View.VISIBLE
+        } else {
+            binding.adminPage.visibility = View.GONE
+        }
+
         binding.adminPage.setOnClickListener {
-            if (AuthHelper.isLoggedIn() && sharedPreferences.getString("userRole", "") == "ADMIN") {
-                // 관리자 페이지 이동 (관리자로 로그인한 경우에만 보이게 함)
-//                startActivity(Intent(this, AdminPageActivity::class.java))
-            }
+            startActivity(Intent(this, AdminActivity::class.java))
         }
 
         binding.logout.setOnClickListener {

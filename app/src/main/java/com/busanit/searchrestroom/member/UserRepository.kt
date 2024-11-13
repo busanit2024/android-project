@@ -71,11 +71,12 @@ class UserRepository(private val memberDao: MemberDao, private val context: Cont
             }
     }
     // 로그인 성공 시 member_id를 SharedPreferences에 저장하는 메서드
-    private fun saveUserInfoToPreferences(memberId: Int, email: String, nickname: String) {
+    private fun saveUserInfoToPreferences(memberId: Int, email: String, nickname: String, admin: Boolean) {
         sharedPreferences.edit().apply {
             putInt("member_id", memberId)
             putString("email", email)
             putString("nickname", nickname)
+            putBoolean("admin", admin)
             apply()
         }
     }
@@ -88,7 +89,7 @@ class UserRepository(private val memberDao: MemberDao, private val context: Cont
                     GlobalScope.launch {
                         val member = memberDao.getMemberByEmail(email)
                         member?.let {
-                            saveUserInfoToPreferences(it.memberId, it.email, it.nickname ?: "")  // member_id, email, nickname 저장
+                            saveUserInfoToPreferences(it.memberId, it.email, it.nickname ?: "", it.admin)  // member_id, email, nickname 저장
                         }
                         onComplete(true, null)  // UID가 일치하면 로그인 성공
                     }
@@ -117,10 +118,10 @@ class UserRepository(private val memberDao: MemberDao, private val context: Cont
                 memberDao.insert(member)
                 val searchMember = memberDao.getMemberByEmail(email)
                 if (searchMember != null) {
-                    saveUserInfoToPreferences(searchMember.memberId, email, member.nickname ?: "")
+                    saveUserInfoToPreferences(searchMember.memberId, email, member.nickname ?: "", member.admin)
                 }
             } else {
-                saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "")
+                saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "", existingMember.admin)
             }
             onComplete(true, null)
         }
@@ -144,10 +145,10 @@ class UserRepository(private val memberDao: MemberDao, private val context: Cont
                 memberDao.insert(member)
                 val searchMember = memberDao.getMemberByEmail(email)
                 if (searchMember != null) {
-                    saveUserInfoToPreferences(searchMember.memberId, email, member.nickname ?: "")
+                    saveUserInfoToPreferences(searchMember.memberId, email, member.nickname ?: "", member.admin)
                 }
             } else {
-                saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "")
+                saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "", existingMember.admin)
             }
             onComplete(true, null)
         }

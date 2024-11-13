@@ -13,24 +13,6 @@ object DatabaseCopier {
   private const val DATABASE_NAME = "search-restroom"
   private var INSTANCE : AppDatabase? = null
 
-  fun getAppDataBase(context: Context): AppDatabase? {
-    if(INSTANCE == null) {
-      Log.d(TAG, "instance null")
-      synchronized(AppDatabase::class) {
-        INSTANCE = Room.databaseBuilder(
-          context,
-          AppDatabase::class.java,
-          DATABASE_NAME
-        ).addMigrations(AppDatabase.MIGRATION_1_2)
-          .allowMainThreadQueries()
-          .build()
-      }
-    }
-    else {
-      Log.d(TAG, "instance not null")
-    }
-    return INSTANCE
-  }
 
   fun copyAttachedDatabase(context: Context) {
     Log.d(TAG, "copyAttachedDatabase")

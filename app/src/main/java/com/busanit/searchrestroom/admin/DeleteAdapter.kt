@@ -6,9 +6,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.busanit.searchrestroom.R
+import com.busanit.searchrestroom.database.DeleteRequest
+import com.busanit.searchrestroom.database.DeleteRequestWithRestroom
 
 class DeleteAdapter(
-    private val deleteList: List<RequestDelete>
+    private val deleteList: List<DeleteRequestWithRestroom>
 ) : RecyclerView.Adapter<DeleteAdapter.DeleteViewHolder>() {
 
     inner class DeleteViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -25,10 +27,10 @@ class DeleteAdapter(
 
     override fun onBindViewHolder(holder: DeleteViewHolder, position: Int) {
         val deleteItem = deleteList[position]
-        holder.buildingName.text = deleteItem.buildingName
-        holder.buildingAddress.text = deleteItem.buildingAddress
-        holder.deleteRequestDate.text = deleteItem.delete_request_time.toString()
-        holder.deleteRequestReason.text = deleteItem.delete_request_reason
+        holder.buildingName.text = deleteItem.restroom?.restroomName
+        holder.buildingAddress.text = deleteItem.restroom?.location
+        holder.deleteRequestDate.text = deleteItem.deleteRequest.regTime.toString()
+        holder.deleteRequestReason.text = deleteItem.deleteRequest.requestMessage
     }
 
     override fun getItemCount(): Int = deleteList.size

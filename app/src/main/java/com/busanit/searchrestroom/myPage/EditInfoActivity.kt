@@ -123,9 +123,9 @@ class EditInfoActivity : AppCompatActivity() {
 
             // currentMember가 null일 경우 ID를 사용하여 멤버 정보를 가져옴
             currentMember = if (currentMember == null) {
-                db.memberDao().getMemberById(1) // 기본 아이디
+                db!!.memberDao().getMemberById(1) // 기본 아이디
             } else {
-                db.memberDao().getMemberById(currentMember!!.memberId)
+                db!!.memberDao().getMemberById(currentMember!!.memberId)
             }
 
             withContext(Dispatchers.Main) {
@@ -172,10 +172,10 @@ class EditInfoActivity : AppCompatActivity() {
         // 데이터베이스 업데이트 로직
         CoroutineScope(Dispatchers.IO).launch {
             val db = AppDatabase.getDatabase(this@EditInfoActivity)
-            db.memberDao().updateNickname(currentMember!!.memberId, newNickname)    // 닉네임 업데이트
+            db!!.memberDao().updateNickname(currentMember!!.memberId, newNickname)    // 닉네임 업데이트
             if (newPassword.isNotEmpty()) {
                 if (newPassword != currentPassword) {
-                    db.memberDao().updatePassword(currentMember!!.memberId, newPassword)  // 비밀번호 업데이트
+                    db!!.memberDao().updatePassword(currentMember!!.memberId, newPassword)  // 비밀번호 업데이트
                 } else {
                     Toast.makeText(this@EditInfoActivity, "새 비밀번호는 기존 비밀번호와 달라야 합니다!", Toast.LENGTH_SHORT).show()
                     return@launch

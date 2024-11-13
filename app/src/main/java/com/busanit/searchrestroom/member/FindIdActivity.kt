@@ -38,11 +38,19 @@ class FindIdActivity : AppCompatActivity() {
                     val member = userRepository.memberDao.getMemberByEmail(email)
                     runOnUiThread {
                         if (member != null) {
-                            Toast.makeText(
-                                this@FindIdActivity,
-                                "해당 이메일로 가입한 적이 있습니다.",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            when (member.social) {
+                                false -> Toast.makeText(
+                                    this@FindIdActivity,
+                                    "해당 이메일은 일반회원으로 가입한 적이 있습니다.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                true -> Toast.makeText(
+                                    this@FindIdActivity,
+                                    "해당 이메일은 소셜회원으로 가입한 적이 있습니다.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         } else {
                             Toast.makeText(
                                 this@FindIdActivity,

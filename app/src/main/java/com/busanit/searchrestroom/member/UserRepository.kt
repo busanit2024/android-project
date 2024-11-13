@@ -102,7 +102,7 @@ class UserRepository(val memberDao: MemberDao, private val context: Context) {
                             )
                             memberDao.insert(member)
                         }
-                        saveUserInfoToPreferences(member.memberId, member.email, member.nickname ?: "")  // member_id, email, nickname 저장
+                        saveUserInfoToPreferences(member.memberId, member.email, member.nickname ?: "", admin = member.admin)  // member_id, email, nickname 저장
 
                         onComplete(true, null)  // UID가 일치하면 로그인 성공
                     }

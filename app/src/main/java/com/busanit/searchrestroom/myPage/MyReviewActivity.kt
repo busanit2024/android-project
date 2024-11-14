@@ -3,13 +3,11 @@ package com.busanit.searchrestroom.myPage
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.room.Room
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.databinding.ActivityMyReviewBinding
 import com.busanit.searchrestroom.database.AppDatabase
@@ -25,8 +23,8 @@ import java.sql.Timestamp
 class MyReviewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMyReviewBinding
-    private lateinit var appDatabase: AppDatabase
-    private lateinit var sharedPreferences: SharedPreferences
+    private var appDatabase: AppDatabase? = null
+  private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,11 +34,7 @@ class MyReviewActivity : AppCompatActivity() {
         // SharedPreferences 초기화
         sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
 
-        appDatabase = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java,
-            "search-restroom"
-        ).build()
+      appDatabase = AppDatabase.getDatabase(applicationContext)
 
         // 로그인한 사용자의 member_id 가져오기
         val memberId = sharedPreferences.getInt("member_id", -1)
@@ -51,7 +45,7 @@ class MyReviewActivity : AppCompatActivity() {
             return
         }
 
-        // 리뷰 로드하기
+        // 리뷰 로드
         loadReviews(memberId)
 
         // 뒤로 가기 버튼 클릭 시
@@ -62,7 +56,7 @@ class MyReviewActivity : AppCompatActivity() {
 
     private fun loadReviews(memberId: Int) {
         CoroutineScope(Dispatchers.IO).launch {
-            val reviewDao = appDatabase.reviewDao()
+            val reviewDao = appDatabase!!.reviewDao()
             val reviews = reviewDao.getReviewByMemberId(memberId)
 
             withContext(Dispatchers.Main) {
@@ -76,18 +70,13 @@ class MyReviewActivity : AppCompatActivity() {
         binding.myReviewList.layoutManager = LinearLayoutManager(this)
         binding.myReviewList.adapter = ReviewAdapter(
             reviews.map { review ->
-                // 리뷰에 해당하는 이미지 가져오기
-                val reviewImages = getReviewImages(review.reviewId)
-                // 건물명 가져오기
-                val restroomName = getRestroomName(review.restroomId)
 
                 Review(
                     review.reviewId,
                     review.restroomId,
                     review.memberId,
-                    restroomName ?: "건물명 없음", // 건물명이 없을 때 대체 텍스트
+                    review.content ?: "",
                     (review.regTime?.let { Timestamp.valueOf(it) } ?: Timestamp(System.currentTimeMillis())).toString(),
-                    review.content ?: ""
                 ).apply {
                     // 각 리뷰 항목에 대한 클릭 리스너 설정
                     binding.root.findViewById<TextView>(R.id.delete).setOnClickListener {
@@ -105,18 +94,11 @@ class MyReviewActivity : AppCompatActivity() {
     }
 
     private fun getReviewImages(reviewId: Int): List<ReviewImage> {
-        val reviewImageDao = appDatabase.reviewImageDao()
+        val reviewImageDao = appDatabase!!.reviewImageDao()
         return reviewImageDao.getReviewImageById(reviewId) // 메소드 이름 수정
     }
 
-    private suspend fun getRestroomName(restroomId: Int?): String? {
-        restroomId?.let {
-            val restroomDao = appDatabase.restroomDao()
-            val restroom = restroomDao.getRestroomById(it)
-            return restroom.restroomName
-        }
-        return null
-    }
+
 
     private fun deleteReview(reviewId: Int) {
         // 코루틴 사용 -> 비동기적으로 삭제

@@ -28,7 +28,7 @@
     <uses-library android:name="org.apache.http.legacy"
       android:required="false"/>
     <activity
-        android:name=".member.LoginActivity"
+        android:name=".mainPage.MainActivity"
         android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -47,7 +47,7 @@
           android:scheme="@string/scheme_kakao_app_key" />
       </intent-filter>
     </activity>
-    <activity android:name=".mainPage.MainActivity" />
+    <activity android:name=".member.LoginActivity"/>
     <activity android:name=".member.RegisterActivity" />
     <activity android:name=".member.GoogleLogin" />
     <activity android:name=".member.FindIdActivity"/>
@@ -64,7 +64,7 @@
     <activity android:name=".restroomDetail.RestroomUpdateActivity"
         tools:ignore="Instantiatable" />
     <activity
-        android:name=".activity.SearchListActivity"
+        android:name=".mainPage.SearchListActivity"
         android:exported="false" />
 
 

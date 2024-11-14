@@ -10,10 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.R
-import com.busanit.searchrestroom.admin.AdminActivity
 import com.busanit.searchrestroom.dao.MemberDao
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.database.Member
+import com.busanit.searchrestroom.admin.AdminActivity
 import com.busanit.searchrestroom.mainPage.MainActivity
 import com.busanit.searchrestroom.databinding.ActivityMypageBinding
 import com.busanit.searchrestroom.member.LoginActivity
@@ -59,7 +59,14 @@ class MyPageActivity : AppCompatActivity() {
             startActivity(Intent(this, FavoriteActivity::class.java))
         }
 
+        if (AuthHelper.isLoggedIn() && AuthHelper.isAdmin()) {
+            binding.adminPage.visibility = View.VISIBLE
+        } else {
+            binding.adminPage.visibility = View.GONE
+        }
+
         binding.adminPage.setOnClickListener {
+            startActivity(Intent(this, AdminActivity::class.java))
             if (AuthHelper.isLoggedIn() && sharedPreferences.getBoolean("admin", false)) {
                 // 관리자 페이지 이동 (관리자로 로그인한 경우에만 보이게 함)
                 startActivity(Intent(this, AdminActivity::class.java))
@@ -72,7 +79,7 @@ class MyPageActivity : AppCompatActivity() {
                 showToast("로그아웃 되었습니다.")
             } else {
                 showToast("로그인 화면으로 이동합니다.")
-                startActivity(Intent(this, LoginActivity::class.java))
+                startActivity(Intent(this, LoginActivity::class.java))  // 로그인 화면으로 이동
             }
         }
 
@@ -130,7 +137,7 @@ class MyPageActivity : AppCompatActivity() {
     }
 
     private fun updateUI() {
-        val isAdmin = isLoggedIn()
+        val isAdmin = AuthHelper.isAdmin()
         val isLoggedIn = AuthHelper.isLoggedIn()
 
         binding.logout.text = if (isLoggedIn) "로그아웃" else "로그인"

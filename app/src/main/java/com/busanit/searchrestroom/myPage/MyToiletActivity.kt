@@ -34,7 +34,7 @@ class MyToiletActivity : AppCompatActivity() {
 
         // Repository 초기화
         val db = AppDatabase.getDatabase(this)
-        bookmarkRepository = BookmarkRepository(db.bookmarkDao(), db.restroomDao())
+        bookmarkRepository = BookmarkRepository(db!!.bookmarkDao(), db.restroomDao())
 
         // RecyclerView 설정
         adapter = ToiletAdapter(toiletList)

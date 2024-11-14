@@ -20,7 +20,7 @@ class FindIdActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // AppDatabase를 통해 MemberDao 인스턴스를 가져와서 UserRepository 생성자에 전달
-        val memberDao = AppDatabase.getDatabase(this).memberDao()
+        val memberDao = AppDatabase.getDatabase(this)!!.memberDao()
         userRepository = UserRepository(memberDao, this)
 
         // 뒤로 가기 버튼 클릭 시

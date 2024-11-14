@@ -84,4 +84,8 @@ object AuthHelper {
     return preferences.getString("nickname", "") ?: ""
   }
 
+  fun isAdmin() : Boolean {
+    return preferences.getBoolean("admin", false)
+  }
+
 }

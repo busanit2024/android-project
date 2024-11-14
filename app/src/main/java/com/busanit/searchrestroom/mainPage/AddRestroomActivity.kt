@@ -32,7 +32,7 @@ class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
     private val binding get() = _binding!!
 
     private lateinit var map: GoogleMap
-    private lateinit var db: AppDatabase
+    private var db: AppDatabase? = null
     private var selectedLocation: LatLng? = null
 
     companion object {
@@ -290,7 +290,7 @@ class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
             try {
                 // IO 스레드에서 데이터베이스 작업 수행
                 withContext(Dispatchers.IO) {
-                    db.restroomDao().insert(restroom)
+                    db!!.restroomDao().insert(restroom)
                 }
 
                 // 성공 메시지 표시

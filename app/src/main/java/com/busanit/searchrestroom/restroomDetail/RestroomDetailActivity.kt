@@ -45,7 +45,7 @@ class RestroomDetailActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val db = AppDatabase.getDatabase(application)
-        reviewDao = db.reviewDao()
+        reviewDao = db!!.reviewDao()
         bookmarkDao = db.bookmarkDao()
         bookmarkRepository = BookmarkRepository(bookmarkDao, db.restroomDao())
 

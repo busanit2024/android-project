@@ -24,7 +24,7 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val repository = UserRepository(AppDatabase.getDatabase(application).memberDao(), this)
+        val repository = UserRepository(AppDatabase.getDatabase(application)!!.memberDao(), this)
         viewModel = ViewModelProvider(this, RegisterViewModelFactory(repository)).get(
             RegisterViewModel::class.java)
 

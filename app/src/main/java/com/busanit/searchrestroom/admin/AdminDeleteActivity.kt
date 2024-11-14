@@ -5,12 +5,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.room.Room
 import com.busanit.searchrestroom.database.AppDatabase
+import com.busanit.searchrestroom.database.DeleteRequestWithRestroom
 import com.busanit.searchrestroom.databinding.ActivityAdminDeleteDetailBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class AdminDeleteActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAdminDeleteDetailBinding
-    private lateinit var appDatabase: AppDatabase
+    private var db: AppDatabase? = null
+    private lateinit var deleteItems: List<DeleteRequestWithRestroom>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,26 +23,21 @@ class AdminDeleteActivity : AppCompatActivity() {
         binding = ActivityAdminDeleteDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        appDatabase = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java,
-            "app_database"
-        ).build()
+        db = AppDatabase.getDatabase(applicationContext)
 
-        // 샘플 데이터
-        val deleteItems = listOf(
-            RequestDelete(3, "건물명1", "서울시 강남구", "2024-11-13", "테스트"),
-            RequestDelete(4, "건물명1", "서울시 강남구", "2024-11-13", "테스트")
-        )
+        CoroutineScope(Dispatchers.IO).launch {
+            deleteItems = db!!.DeleteRequestDao().getDeleteRequestWithRestroom()
 
-        // RecyclerView 설정
-        binding.deleteList.layoutManager = LinearLayoutManager(this)
-        binding.deleteList.adapter = DeleteAdapter(deleteItems)
+            // RecyclerView 설정
+            binding.deleteList.layoutManager = LinearLayoutManager(this@AdminDeleteActivity)
+            binding.deleteList.adapter = DeleteAdapter(deleteItems)
+        }
 
         // 뒤로 가기 버튼 클릭 시
         binding.backBtn.setOnClickListener {
             finish()
         }
     }
+
 
 }

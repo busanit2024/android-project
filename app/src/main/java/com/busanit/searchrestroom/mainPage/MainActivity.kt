@@ -34,7 +34,8 @@ import com.busanit.searchrestroom.BuildConfig
 import com.busanit.searchrestroom.member.LoginActivity
 import com.busanit.searchrestroom.MenuHelper
 import com.busanit.searchrestroom.R
-import com.busanit.searchrestroom.activity.SearchListActivity
+import com.busanit.searchrestroom.database.AppDatabase
+import com.busanit.searchrestroom.mainPage.SearchListActivity
 import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding
@@ -86,6 +87,7 @@ class MainActivity : AppCompatActivity(){
 
   private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+  private var db: AppDatabase? = null
   private lateinit var job: Job
 
   private val searchViewModel : SearchViewModel by viewModels()
@@ -150,10 +152,10 @@ class MainActivity : AppCompatActivity(){
     binding.checkAccessible.isChecked = filterAccessible
     binding.checkUnisex.isChecked = filterUnisex
 
-    val db = DatabaseCopier.getAppDataBase(context = applicationContext)
+    val db = AppDatabase.getDatabase(context = applicationContext)
     lifecycleScope.launch {
       try {
-        val db = DatabaseCopier.getAppDataBase(context = applicationContext)
+        val db = AppDatabase.getDatabase(context = applicationContext)
         withContext(Dispatchers.IO) {
           val restroom = db!!.restroomDao().getRestroomById(1)
           Log.d("test", "restroom: $restroom")
@@ -477,7 +479,7 @@ class MainActivity : AppCompatActivity(){
 
     lifecycleScope.launch {
       try {
-        val db = DatabaseCopier.getAppDataBase(context = applicationContext)
+        val db = AppDatabase.getDatabase(context = applicationContext)
         val locationsList = withContext(Dispatchers.IO) {
           db!!.restroomDao().getRestroomsWithinArea(minLat, maxLat, minLong, maxLong)
         }

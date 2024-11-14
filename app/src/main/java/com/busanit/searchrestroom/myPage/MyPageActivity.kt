@@ -130,10 +130,10 @@ class MyPageActivity : AppCompatActivity() {
         val isAdmin = AuthHelper.isAdmin()
         val isLoggedIn = AuthHelper.isLoggedIn()
 
-        binding.username.text = if (isLoggedIn) currentMember?.nickname ?: "" else "Unknown"    // 닉네임
-        binding.email.text = if (isLoggedIn) currentMember?.email ?: "" else "Unknown@email.com"    // 이메일
-        binding.logout.text = if (isLoggedIn) "로그아웃" else "로그인" // 로그인&로그아웃
-        binding.deleteAccount.text = if (isLoggedIn) "회원탈퇴" else "회원가입" // 회원가입&회원탈퇴
+        binding.username.text = if (isLoggedIn) currentMember?.nickname ?: "" else "Unknown"
+        binding.email.text = if (isLoggedIn) currentMember?.email ?: "" else "Unknown@email.com"
+        binding.logout.text = if (isLoggedIn) "로그아웃" else "로그인"
+        binding.deleteAccount.text = if (isLoggedIn) "회원탈퇴" else "회원가입"
 
         binding.adminPage.visibility = if (isLoggedIn && isAdmin) View.VISIBLE else View.GONE
     }

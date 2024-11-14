@@ -107,8 +107,10 @@ class MyReviewActivity : AppCompatActivity() {
             .setMessage("정말로 리뷰를 삭제하시겠습니까?")
             .setPositiveButton("삭제") { dialog, which ->
                 CoroutineScope(Dispatchers.IO).launch {
-                    val reviewDao = appDatabase.reviewDao()
-                    reviewDao.getReviewById(reviewId)
+                    val reviewDao = appDatabase?.reviewDao()
+                    if (reviewDao != null) {
+                        reviewDao.getReviewById(reviewId)
+                    }
                     withContext(Dispatchers.Main) {
                         Toast.makeText(this@MyReviewActivity, "리뷰가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
                         // 삭제 후 화면 갱신
@@ -124,8 +126,8 @@ class MyReviewActivity : AppCompatActivity() {
 
     private fun updateReview(reviewId: Int, newContent: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val reviewDao = appDatabase.reviewDao()
-            val review = reviewDao.getReviewById(reviewId)
+            val reviewDao = appDatabase?.reviewDao()
+            val review = reviewDao?.getReviewById(reviewId)
 
             if (review != null) {
                 review.content = newContent

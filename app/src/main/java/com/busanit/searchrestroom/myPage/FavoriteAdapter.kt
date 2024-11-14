@@ -7,32 +7,45 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.busanit.searchrestroom.R
+import com.busanit.searchrestroom.database.Restroom
 
 class FavoriteAdapter(
-    private val favoriteList: List<FavoriteItem>
+    private val restroomList: MutableList<Restroom>,
+    private val onItemClick: (Restroom) -> Unit
 ) : RecyclerView.Adapter<FavoriteAdapter.FavoriteViewHolder>() {
 
-    inner class FavoriteViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val ic_star: ImageView = view.findViewById(R.id.ic_star)
-        val buildingName: TextView = view.findViewById(R.id.building_name)
-        val address: TextView = view.findViewById(R.id.address)
+    fun updateList(newList: List<Restroom>) {
+        restroomList.clear()
+        restroomList.addAll(newList)
+        notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): FavoriteViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_favorite, parent, false)
+    inner class FavoriteViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val icStar: ImageView = view.findViewById(R.id.ic_star)
+        val buildingName: TextView = view.findViewById(R.id.building_name)
+        val address: TextView = view.findViewById(R.id.address)
+
+        init {
+            itemView.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onItemClick(restroomList[position])
+                }
+            }
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_favorite, parent, false)
         return FavoriteViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: FavoriteViewHolder, position: Int) {
-        val favoriteItem = favoriteList[position]
-        holder.ic_star.setImageResource(favoriteItem.iconResId)
-        holder.buildingName.text = favoriteItem.buildingName
-        holder.address.text = favoriteItem.address
+        val restroom = restroomList[position]
+        holder.buildingName.text = restroom.restroomName
+        holder.address.text = restroom.location
     }
 
-    override fun getItemCount(): Int = favoriteList.size
-
+    override fun getItemCount(): Int = restroomList.size
 }

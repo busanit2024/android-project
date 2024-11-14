@@ -55,7 +55,7 @@ class ReviewAdapter(
 
             withContext(Dispatchers.Main) {
                 holder.buildingName.text = restRoom?.restroomName
-                holder.reviewDate.text = reviewItem.regTime
+                holder.reviewDate.text = reviewItem.regTime.toString()
                 holder.reviewContent.text = reviewItem.content
             }
         }

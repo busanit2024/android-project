@@ -92,8 +92,12 @@ class EditInfoActivity : AppCompatActivity() {
         binding = ActivityEditInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // sharedPreferences에서 memberId를 가져오기
+        val sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
+        val memberId = sharedPreferences.getInt("member_id", -1)
+
         // 로그인한 사용자의 정보를 DB에서 가져오기
-        loadMemberInfo()
+        loadMemberInfo(memberId)
 
         // 프로필 이미지 클릭 시 권한 체크
         binding.profileImage.setOnClickListener {
@@ -116,16 +120,14 @@ class EditInfoActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadMemberInfo() {
+    private fun loadMemberInfo(memberId: Int) {
         // Coroutine을 사용해 데이터베이스에서 회원 정보 불러오기
         CoroutineScope(Dispatchers.IO).launch {
             val db = AppDatabase.getDatabase(this@EditInfoActivity)
 
             // currentMember가 null일 경우 ID를 사용하여 멤버 정보를 가져옴
-            currentMember = if (currentMember == null) {
-                db!!.memberDao().getMemberById(1) // 기본 아이디
-            } else {
-                db!!.memberDao().getMemberById(currentMember!!.memberId)
+            if (memberId != -1) {
+                currentMember = db!!.memberDao().getMemberById(memberId)
             }
 
             withContext(Dispatchers.Main) {

@@ -38,7 +38,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- 지도 추가 -->
+            <!-- 지도 -->
             <com.google.android.gms.maps.MapView
                 android:id="@+id/mapViewUpdate"
                 android:layout_width="match_parent"
@@ -110,52 +110,69 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="편의시설"
-                android:textSize="18sp"
-                android:layout_marginTop="16dp"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp"/>
 
             <com.google.android.material.chip.ChipGroup
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                app:singleSelection="false"
+                app:chipSpacingHorizontal="8dp"
+                app:chipSpacingVertical="8dp">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipFullTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="24시간 개방"
-                    android:checkable="true"/>
+                    app:chipBackgroundColor="@color/chip_background_selector"
+                    app:chipStrokeColor="@color/gray"
+                    app:chipStrokeWidth="1dp"
+                    app:textEndPadding="12dp"
+                    app:textStartPadding="12dp"
+                    android:textColor="@color/chip_text_selector"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"/>
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipDiaper"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="기저귀 교환대"
-                    android:checkable="true"/>
+                    app:chipBackgroundColor="@color/chip_background_selector"
+                    app:chipStrokeColor="@color/gray"
+                    app:chipStrokeWidth="1dp"
+                    app:textEndPadding="12dp"
+                    app:textStartPadding="12dp"
+                    android:textColor="@color/chip_text_selector"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"/>
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipAccessible"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="장애인 화장실"
-                    android:checkable="true"/>
+                    app:chipBackgroundColor="@color/chip_background_selector"
+                    app:chipStrokeColor="@color/gray"
+                    app:chipStrokeWidth="1dp"
+                    app:textEndPadding="12dp"
+                    app:textStartPadding="12dp"
+                    android:textColor="@color/chip_text_selector"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipUnisex"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="남녀공용"
+                    app:chipBackgroundColor="@color/chip_background_selector"
+                    app:chipStrokeColor="@color/gray"
+                    app:textEndPadding="12dp"
+                    app:textStartPadding="12dp"
+                    app:chipStrokeWidth="1dp"
+                    android:textColor="@color/chip_text_selector"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"/>
             </com.google.android.material.chip.ChipGroup>
-
-            <!-- 남녀공용 여부 -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="남녀공용 여부"
-                android:textSize="18sp"
-                android:layout_marginTop="16dp"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipUnisex"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="남녀공용"
-                android:checkable="true"
-                android:layout_marginTop="8dp"/>
-
             <!-- 기타 메모 -->
             <TextView
                 android:layout_width="wrap_content"
@@ -182,37 +199,32 @@
             <!-- 버튼 -->
             <LinearLayout
                 android:id="@+id/memberonlyBtn"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_gravity="center"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="32dp"
                 android:layout_marginBottom="16dp">
 
                 <Button
                     android:id="@+id/rewriteInfo"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="20dp"
-                    android:text="수정하기"
-                    android:textSize="20sp"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:background="@drawable/rounded_button"
-                    android:maxLines="1"
-                    android:singleLine="true"/>
+                    android:layout_marginEnd="8dp"
+                    android:text="수정하기"
+                    android:textSize="16sp"
+                    android:background="@drawable/rounded_button"/>
 
                 <Button
                     android:id="@+id/deleteRequestButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="삭제요청"
-                    android:textSize="20sp"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:background="@drawable/rounded_button"
-                    android:maxLines="1"
-                    android:singleLine="true"/>
+                    android:layout_marginStart="8dp"
+                    android:text="삭제요청"
+                    android:textSize="16sp"
+                    android:backgroundTint="@android:color/holo_red_light"
+                    android:background="@drawable/rounded_button"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

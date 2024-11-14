@@ -36,26 +36,8 @@ abstract class AppDatabase : RoomDatabase() {
     private var INSTANCE: AppDatabase? = null
 
     @JvmField
-    val MIGRATION_1_2 : Migration = object : Migration(1, 2) {
-      override fun migrate(db: SupportSQLiteDatabase) {
-        Log.d("AppDatabase", "migrate 1_2")
-      }
-
-    }
-
-    @JvmField
-    val MIGRATION_2_3 : Migration = object : Migration(2, 3) {
-      override fun migrate(db: SupportSQLiteDatabase) {
-        Log.d("AppDatabase", "migrate 2_3")
-      }
-
-    }
-
-
-    @JvmField
     val MIGRATION_3_4 : Migration = object : Migration(3, 4) {
       override fun migrate(db: SupportSQLiteDatabase) {
-        Log.d("AppDatabase", "migration 3 to 4")
         db.execSQL("""
         CREATE TABLE IF NOT EXISTS review_filter_option (
             option_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -88,8 +70,6 @@ abstract class AppDatabase : RoomDatabase() {
             AppDatabase::class.java,
             "search-restroom"
           )
-            .addMigrations(MIGRATION_1_2)
-            .addMigrations(MIGRATION_2_3)
             .addMigrations(MIGRATION_3_4)
             .allowMainThreadQueries()
             .build()

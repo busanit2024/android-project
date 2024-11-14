@@ -1,17 +1,13 @@
 package com.busanit.searchrestroom.myPage
 
-import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.room.Room
+import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.databinding.ActivityMyReviewBinding
 import com.busanit.searchrestroom.database.AppDatabase
-import com.busanit.searchrestroom.database.Review
-import com.busanit.searchrestroom.database.ReviewImage
-import com.busanit.searchrestroom.member.LoginActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,15 +18,11 @@ class MyReviewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMyReviewBinding
     private lateinit var appDatabase: AppDatabase
-    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMyReviewBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // SharedPreferences 초기화
-        sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
 
         appDatabase = Room.databaseBuilder(
             applicationContext,
@@ -38,17 +30,27 @@ class MyReviewActivity : AppCompatActivity() {
             "search-restroom"
         ).build()
 
-        // 로그인한 사용자의 member_id 가져오기
-        val memberId = sharedPreferences.getInt("memberId", -1)
-        if (memberId == -1) {
-            Toast.makeText(this, "로그인이 필요합니다!", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-            return
-        }
+        // 샘플 데이터
+        val reviewItems = listOf(
+            MyReview(1, "건물명", Timestamp.valueOf("2024-11-07 12:00:00"), "리뷰 내용1", listOf(R.drawable.empty_image, R.drawable.empty_image, R.drawable.empty_image)),
+            MyReview(2, "건물명", Timestamp.valueOf("2024-11-06 09:22:00"), "리뷰 내용2", listOf(R.drawable.empty_image, R.drawable.empty_image, R.drawable.empty_image)),
+            MyReview(3, "건물명", Timestamp.valueOf("2024-11-05 14:54:00"), "리뷰 내용3", listOf(R.drawable.empty_image, R.drawable.empty_image, R.drawable.empty_image))
+        )
 
-        // 리뷰 로드
-        loadReviews(memberId)
+        // RecyclerView 설정
+        binding.myReviewList.layoutManager = LinearLayoutManager(this)
+        binding.myReviewList.adapter = ReviewAdapter(
+            reviewItems,
+            onEditClick = { position ->
+                val review = reviewItems[position]
+                updateReview(review.review_id, review.reviewContent)
+            },
+            onDeleteClick = { position ->
+                // 삭제 버튼 클릭 시 해당 리뷰 삭제
+                val review = reviewItems[position]
+                deleteReview(review.review_id)
+            }
+        )
 
         // 뒤로 가기 버튼 클릭 시
         binding.backButton.setOnClickListener {
@@ -56,50 +58,44 @@ class MyReviewActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadReviews(memberId: Int) {
+    private fun deleteReview(reviewId: Int) {
+        // 코루틴 사용 -> 비동기적으로 삭제
         CoroutineScope(Dispatchers.IO).launch {
             val reviewDao = appDatabase.reviewDao()
-            val reviews = reviewDao.getReviewByMemberId(memberId)
-
+            reviewDao.getReviewById(reviewId)
             withContext(Dispatchers.Main) {
-                // RecyclerView에 데이터 설정
-                setupRecyclerView(reviews)
+                Toast.makeText(this@MyReviewActivity, "리뷰가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                // 삭제 후 화면 갱신
+                finish()
             }
         }
     }
 
-    private suspend fun setupRecyclerView(reviews: List<Review>) {
-        binding.myReviewList.layoutManager = LinearLayoutManager(this)
-        binding.myReviewList.adapter = ReviewAdapter(
-            reviews.map { review ->
-                // 리뷰에 해당하는 이미지 가져오기
-                val reviewImages = getReviewImages(review.reviewId)
-                // 건물명 가져오기
-                val restroomName = getRestroomName(review.restroomId)
+    private fun updateReview(reviewId: Int, newContent: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val reviewDao = appDatabase.reviewDao()
+            val review = reviewDao.getReviewById(reviewId)
 
-                Review(
-                    review.reviewId,
-                    restroomName ?: "건물명 없음", // 건물명이 없을 때 대체 텍스트
-                    review.regTime?.let { Timestamp.valueOf(it) } ?: Timestamp(System.currentTimeMillis()),
-                    review.content ?: "",
-                    reviewImages.map { it.fileName ?: "" }  // 이미지 파일 이름 리스트
-                )
+            if (review != null) {
+                review.content = newContent
+                reviewDao.getReviewById(reviewId)
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MyReviewActivity, "리뷰가 수정되었습니다.", Toast.LENGTH_SHORT).show()
+                    // 수정 후 화면 갱신
+                    finish()
+                }
             }
-        )
-    }
-
-    private fun getReviewImages(reviewId: Int): List<ReviewImage> {
-        val reviewImageDao = appDatabase.reviewImageDao()
-        return reviewImageDao.getReviewImageById(reviewId) // 메소드 이름 수정
-    }
-
-    private suspend fun getRestroomName(restroomId: Int?): String? {
-        restroomId?.let {
-            val restroomDao = appDatabase.restroomDao()
-            val restroom = restroomDao.getRestroomById(it)
-            return restroom?.restroomName
         }
-        return null
     }
+
+
+
+
+
+
+
+
+
 
 }

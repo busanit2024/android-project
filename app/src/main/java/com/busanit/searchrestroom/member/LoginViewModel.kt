@@ -16,11 +16,11 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
     val loginResult = MutableLiveData<Pair<Boolean, String?>>()
 
     init {
-        observeNaverLoginResult()
+//        observeNaverLoginResult()
     }
 
     // 네이버 로그인 결과를 수신하고 로컬 DB에 저장
-    private fun observeNaverLoginResult() {
+    private fun observeNaverLoginResult(context: Context) {
         viewModelScope.launch {
             NaverLoginManager.loginResult.collect { response ->
                 when (response) {
@@ -32,6 +32,7 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
                     }
                     is ApiResponse.Error -> {
                         loginResult.postValue(Pair(false, response.errorMessage))
+                        NaverLoginManager.login(context)
                     }
                 }
             }
@@ -61,7 +62,8 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
 
     // 네이버 로그인 요청
     fun loginNaver(context: Context) {
-        NaverLoginManager.login(context)
+        observeNaverLoginResult(context)
+//        NaverLoginManager.login(context)
     }
 }
 

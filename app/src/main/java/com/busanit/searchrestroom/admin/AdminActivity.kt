@@ -34,5 +34,16 @@ class AdminActivity : AppCompatActivity() {
         binding.reviewBtn.setOnClickListener {
 
         }
+
+        // 뒤로 가기 버튼 클릭 시
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val deleteRequestCount = db?.DeleteRequestDao()?.getCount() ?: 0
+        binding.badge.text = deleteRequestCount.toString()
     }
 }

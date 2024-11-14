@@ -108,24 +108,22 @@ class RestroomDetailActivity : AppCompatActivity() {
             setupBookmarkButton()
         }
     }
+
     private fun setupUI(restroom: Restroom?) {
         restroom?.let {
             binding.restroomName.text = it.restroomName
             binding.location.text = it.location
             binding.openTime.text = it.openTime
 
-            binding.unisexOrNot.apply {
-                text = if (it.unisex == true) "남녀공용" else ""
-                visibility = if (text.isEmpty()) View.GONE else View.VISIBLE
-            }
-            binding.comfort.apply {
-                text = if(it.diaper == true) "기저귀 교환대" else ""
-                visibility = if (text.isEmpty()) View.GONE else View.VISIBLE
-            }
-            binding.comfort.apply {
-                text = if(it.accessible == true) "장애인 화장실" else ""
-                visibility = if (text.isEmpty()) View.GONE else View.VISIBLE
-            }
+            // ChipGroup의 각 Chip 상태 설정
+            binding.chipFullTime.isChecked = it.fullTime == true
+            binding.chipDiaper.isChecked = it.diaper == true
+            binding.chipAccessible.isChecked = it.accessible == true
+            binding.chipUnisex.isChecked = it.unisex == true
+
+            // 기타 정보 설정
+            binding.memoText.text = it.memo ?: "기타 정보가 없습니다."
+            binding.memoText.visibility = if (it.memo.isNullOrEmpty()) View.GONE else View.VISIBLE
 
             restroomId = it.restroomId
         }

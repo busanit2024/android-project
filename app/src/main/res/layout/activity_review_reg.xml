@@ -10,6 +10,7 @@
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F5F5F5"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -155,10 +156,12 @@
                         android:layout_height="100dp"
                         android:hint="@string/review_txt"
                         android:background="@drawable/review_border"/>
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/writeReviewButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/member_button"
                         android:text="작성완료" />
                 </LinearLayout>
             </LinearLayout>

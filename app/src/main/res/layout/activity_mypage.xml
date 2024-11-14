@@ -139,25 +139,25 @@
             android:orientation="horizontal"
             android:gravity="center">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/logout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="로그아웃"
                 android:textSize="16dp"
-                android:backgroundTint="@color/gray"
+                android:background="@drawable/member_button"
                 android:textColor="@color/black"
                 android:layout_marginEnd="4dp" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/delete_account"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="회원탈퇴"
                 android:textSize="16dp"
-                android:backgroundTint="@color/gray"
+                android:background="@drawable/member_button"
                 android:textColor="@color/black"
                 android:layout_marginStart="4dp" />
         </LinearLayout>

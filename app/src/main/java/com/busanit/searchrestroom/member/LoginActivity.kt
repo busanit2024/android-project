@@ -86,8 +86,6 @@ class LoginActivity : AppCompatActivity(){
             viewModel.loginNaver(this)
         }
 
-
-
         // 아이디 찾기 버튼 클릭 시
         binding.findIdBtn.setOnClickListener {
             val intent = Intent(this, FindIdActivity::class.java)

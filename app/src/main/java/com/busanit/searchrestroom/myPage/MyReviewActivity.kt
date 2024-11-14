@@ -21,8 +21,8 @@ import java.sql.Timestamp
 class MyReviewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMyReviewBinding
-    private lateinit var appDatabase: AppDatabase
-    private lateinit var sharedPreferences: SharedPreferences
+    private var appDatabase: AppDatabase? = null
+  private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,11 +32,7 @@ class MyReviewActivity : AppCompatActivity() {
         // SharedPreferences 초기화
         sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
 
-        appDatabase = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java,
-            "search-restroom"
-        ).build()
+      appDatabase = AppDatabase.getDatabase(applicationContext)
 
         // 로그인한 사용자의 member_id 가져오기
         val memberId = sharedPreferences.getInt("member_id", -1)
@@ -58,7 +54,7 @@ class MyReviewActivity : AppCompatActivity() {
 
     private fun loadReviews(memberId: Int) {
         CoroutineScope(Dispatchers.IO).launch {
-            val reviewDao = appDatabase.reviewDao()
+            val reviewDao = appDatabase!!.reviewDao()
             val reviews = reviewDao.getReviewByMemberId(memberId)
 
             withContext(Dispatchers.Main) {
@@ -90,13 +86,13 @@ class MyReviewActivity : AppCompatActivity() {
     }
 
     private fun getReviewImages(reviewId: Int): List<ReviewImage> {
-        val reviewImageDao = appDatabase.reviewImageDao()
+        val reviewImageDao = appDatabase!!.reviewImageDao()
         return reviewImageDao.getReviewImageById(reviewId) // 메소드 이름 수정
     }
 
     private suspend fun getRestroomName(restroomId: Int?): String? {
         restroomId?.let {
-            val restroomDao = appDatabase.restroomDao()
+            val restroomDao = appDatabase!!.restroomDao()
             val restroom = restroomDao.getRestroomById(it)
             return restroom.restroomName
         }

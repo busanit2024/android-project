@@ -95,7 +95,9 @@ class MyReviewActivity : AppCompatActivity() {
                     }
                     binding.root.findViewById<TextView>(R.id.update).setOnClickListener {
                         val newContent = "새로운 리뷰 내용"    // 사용자 입력 받기
-                        updateReview(review.reviewId, newContent)
+                        if (newContent != null) {
+                            updateReview(review.reviewId, newContent)
+                        }
                     }
                 }
             }

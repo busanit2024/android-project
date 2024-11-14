@@ -40,10 +40,21 @@
         android:background="#525252"
         android:layout_marginBottom="16dp" />
 
+    <TextView
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="삭제 요청이 없습니다."
+        android:gravity="center"
+        android:visibility="gone"/>
+
     <!-- 리뷰 목록 RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/delete_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="8dp" />
+
+
 </LinearLayout>

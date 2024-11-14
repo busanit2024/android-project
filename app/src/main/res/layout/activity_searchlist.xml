@@ -12,9 +12,8 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
     android:paddingHorizontal="16dp"
-      android:layout_margin="12dp"
-      app:layout_constraintTop_toTopOf="parent"
-      app:cardCornerRadius="4dp">
+      android:layout_marginBottom="12dp"
+      app:layout_constraintTop_toTopOf="parent">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -37,6 +36,17 @@
 
 
   </androidx.cardview.widget.CardView>
+
+  <TextView
+      android:id="@+id/empty_view"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:paddingVertical="16dp"
+      app:layout_constraintTop_toBottomOf="@id/topPanel"
+      app:layout_constraintStart_toStartOf="parent"
+      android:text="주변에 조건에 맞는 화장실이 없어요!"
+      android:gravity="center"
+      android:visibility="visible"/>
 
   <androidx.recyclerview.widget.RecyclerView
       android:id="@+id/search_recyclerView"

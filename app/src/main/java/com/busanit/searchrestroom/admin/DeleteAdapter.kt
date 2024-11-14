@@ -58,7 +58,6 @@ class DeleteAdapter(
                 setNegativeButton("취소", null)
                 show()
             }
-
         }
     }
 

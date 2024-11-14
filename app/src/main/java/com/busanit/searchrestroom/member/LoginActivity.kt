@@ -43,8 +43,18 @@ class LoginActivity : AppCompatActivity(){
             val email = binding.loginEmail.text.toString()
             val password = binding.loginPassword.text.toString()
 
-            // 로그인 시도
-            viewModel.loginUser(email, password)
+            when {
+                email.isEmpty() -> {
+                    Toast.makeText(this, "이메일을 입력해주세요", Toast.LENGTH_SHORT).show()
+                }
+                password.isEmpty() -> {
+                    Toast.makeText(this, "비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    // 로그인 시도
+                    viewModel.loginUser(email, password)
+                }
+            }
         }
 
 

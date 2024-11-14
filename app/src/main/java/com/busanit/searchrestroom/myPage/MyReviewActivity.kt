@@ -3,10 +3,14 @@ package com.busanit.searchrestroom.myPage
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.room.Room
+import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.databinding.ActivityMyReviewBinding
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.database.Review
@@ -84,7 +88,16 @@ class MyReviewActivity : AppCompatActivity() {
                     restroomName ?: "건물명 없음", // 건물명이 없을 때 대체 텍스트
                     (review.regTime?.let { Timestamp.valueOf(it) } ?: Timestamp(System.currentTimeMillis())).toString(),
                     review.content ?: ""
-                )
+                ).apply {
+                    // 각 리뷰 항목에 대한 클릭 리스너 설정
+                    binding.root.findViewById<TextView>(R.id.delete).setOnClickListener {
+                        deleteReview(review.reviewId)
+                    }
+                    binding.root.findViewById<TextView>(R.id.update).setOnClickListener {
+                        val newContent = "새로운 리뷰 내용"    // 사용자 입력 받기
+                        updateReview(review.reviewId, newContent)
+                    }
+                }
             }
         )
     }
@@ -102,5 +115,51 @@ class MyReviewActivity : AppCompatActivity() {
         }
         return null
     }
+
+    private fun deleteReview(reviewId: Int) {
+        // 코루틴 사용 -> 비동기적으로 삭제
+        AlertDialog.Builder(this)
+            .setTitle("리뷰 삭제")
+            .setMessage("정말로 리뷰를 삭제하시겠습니까?")
+            .setPositiveButton("삭제") { dialog, which ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    val reviewDao = appDatabase.reviewDao()
+                    reviewDao.getReviewById(reviewId)
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@MyReviewActivity, "리뷰가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                        // 삭제 후 화면 갱신
+                        finish()
+                    }
+                }
+            }
+            .setNegativeButton("취소") { dialog, which ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun updateReview(reviewId: Int, newContent: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val reviewDao = appDatabase.reviewDao()
+            val review = reviewDao.getReviewById(reviewId)
+
+            if (review != null) {
+                review.content = newContent
+                reviewDao.getReviewById(reviewId)
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MyReviewActivity, "리뷰가 수정되었습니다.", Toast.LENGTH_SHORT).show()
+                    // 수정 후 화면 갱신
+                    finish()
+                }
+            }
+        }
+    }
+
+
+
+
+
+
 
 }

@@ -40,4 +40,10 @@ class AdminActivity : AppCompatActivity() {
             finish()
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        val deleteRequestCount = db?.DeleteRequestDao()?.getCount() ?: 0
+        binding.badge.text = deleteRequestCount.toString()
+    }
 }

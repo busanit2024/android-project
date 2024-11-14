@@ -1,9 +1,11 @@
 package com.busanit.searchrestroom.myPage
 
+import android.app.AlertDialog
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -21,15 +23,15 @@ import kotlinx.coroutines.withContext
 
 
 class ReviewAdapter(
-    private val reviewList: List<Review>,
+    private val reviewList: MutableList<Review>,
 ) : RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder>() {
 
     inner class ReviewViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val buildingName: TextView = view.findViewById(R.id.building_name)
         val reviewDate: TextView = view.findViewById(R.id.review_date)
         val reviewContent: TextView = view.findViewById(R.id.review_content)
-        val editButton: TextView = view.findViewById(R.id.update)
-        val deleteButton: TextView = view.findViewById(R.id.delete)
+        val editButton: Button = view.findViewById(R.id.update)
+        val deleteButton: Button = view.findViewById(R.id.delete)
         val images: List<ImageView> = listOf(
             view.findViewById(R.id.review_image1),
             view.findViewById(R.id.review_image2),
@@ -55,6 +57,27 @@ class ReviewAdapter(
                 holder.buildingName.text = restRoom?.restroomName
                 holder.reviewDate.text = reviewItem.regTime
                 holder.reviewContent.text = reviewItem.content
+            }
+        }
+
+        holder.editButton.setOnClickListener {
+            Toast.makeText(holder.itemView.context, "수정 버튼 클릭", Toast.LENGTH_SHORT).show()
+        }
+
+        holder.deleteButton.setOnClickListener {
+            AlertDialog.Builder(holder.itemView.context).run {
+                setTitle("리뷰 삭제")
+                setMessage("리뷰를 삭제하시겠습니까?")
+                setPositiveButton("확인") { _, _ ->
+                    val db = AppDatabase.getDatabase(holder.itemView.context)
+                    db!!.reviewDao().delete(reviewItem)
+                    reviewList.removeAt(position)
+                    notifyItemRemoved(position)
+                    notifyItemRangeChanged(position, reviewList.size)
+                    Toast.makeText(holder.itemView.context, "리뷰가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                setNegativeButton("취소", null)
+                show()
             }
         }
     }

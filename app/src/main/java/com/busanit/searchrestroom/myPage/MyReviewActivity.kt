@@ -68,20 +68,16 @@ class MyReviewActivity : AppCompatActivity() {
         binding.myReviewList.layoutManager = LinearLayoutManager(this)
         binding.myReviewList.adapter = ReviewAdapter(
             reviews.map { review ->
-                // 리뷰에 해당하는 이미지 가져오기
-                val reviewImages = getReviewImages(review.reviewId)
-                // 건물명 가져오기
-                val restroomName = getRestroomName(review.restroomId)
 
                 Review(
                     review.reviewId,
                     review.restroomId,
                     review.memberId,
-                    restroomName ?: "건물명 없음", // 건물명이 없을 때 대체 텍스트
+                    review.content ?: "",
                     (review.regTime?.let { Timestamp.valueOf(it) } ?: Timestamp(System.currentTimeMillis())).toString(),
-                    review.content ?: ""
+                    review.updateTime
                 )
-            }
+            }.toMutableList()
         )
     }
 
@@ -90,13 +86,6 @@ class MyReviewActivity : AppCompatActivity() {
         return reviewImageDao.getReviewImageById(reviewId) // 메소드 이름 수정
     }
 
-    private suspend fun getRestroomName(restroomId: Int?): String? {
-        restroomId?.let {
-            val restroomDao = appDatabase!!.restroomDao()
-            val restroom = restroomDao.getRestroomById(it)
-            return restroom.restroomName
-        }
-        return null
-    }
+
 
 }

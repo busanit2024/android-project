@@ -35,7 +35,7 @@ import com.busanit.searchrestroom.member.LoginActivity
 import com.busanit.searchrestroom.MenuHelper
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.AppDatabase
-import com.busanit.searchrestroom.activity.SearchListActivity
+import com.busanit.searchrestroom.mainPage.SearchListActivity
 import com.busanit.searchrestroom.database.DatabaseCopier
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityMainBinding

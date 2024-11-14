@@ -92,8 +92,12 @@ class EditInfoActivity : AppCompatActivity() {
         binding = ActivityEditInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // sharedPreferences에서 memberId를 가져오기
+        val sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
+        val memberId = sharedPreferences.getInt("member_id", -1)
+
         // 로그인한 사용자의 정보를 DB에서 가져오기
-        loadMemberInfo()
+        loadMemberInfo(memberId)
 
         // 프로필 이미지 클릭 시 권한 체크
         binding.profileImage.setOnClickListener {
@@ -116,16 +120,14 @@ class EditInfoActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadMemberInfo() {
+    private fun loadMemberInfo(memberId: Int) {
         // Coroutine을 사용해 데이터베이스에서 회원 정보 불러오기
         CoroutineScope(Dispatchers.IO).launch {
             val db = AppDatabase.getDatabase(this@EditInfoActivity)
 
             // currentMember가 null일 경우 ID를 사용하여 멤버 정보를 가져옴
-            currentMember = if (currentMember == null) {
-                db.memberDao().getMemberById(1) // 기본 아이디
-            } else {
-                db.memberDao().getMemberById(currentMember!!.memberId)
+            if (memberId != -1) {
+                currentMember = db!!.memberDao().getMemberById(memberId)
             }
 
             withContext(Dispatchers.Main) {
@@ -172,10 +174,10 @@ class EditInfoActivity : AppCompatActivity() {
         // 데이터베이스 업데이트 로직
         CoroutineScope(Dispatchers.IO).launch {
             val db = AppDatabase.getDatabase(this@EditInfoActivity)
-            db.memberDao().updateNickname(currentMember!!.memberId, newNickname)    // 닉네임 업데이트
+            db!!.memberDao().updateNickname(currentMember!!.memberId, newNickname)    // 닉네임 업데이트
             if (newPassword.isNotEmpty()) {
                 if (newPassword != currentPassword) {
-                    db.memberDao().updatePassword(currentMember!!.memberId, newPassword)  // 비밀번호 업데이트
+                    db!!.memberDao().updatePassword(currentMember!!.memberId, newPassword)  // 비밀번호 업데이트
                 } else {
                     Toast.makeText(this@EditInfoActivity, "새 비밀번호는 기존 비밀번호와 달라야 합니다!", Toast.LENGTH_SHORT).show()
                     return@launch

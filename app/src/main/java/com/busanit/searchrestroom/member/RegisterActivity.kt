@@ -24,7 +24,7 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val repository = UserRepository(AppDatabase.getDatabase(application).memberDao(), this)
+        val repository = UserRepository(AppDatabase.getDatabase(application)!!.memberDao(), this)
         viewModel = ViewModelProvider(this, RegisterViewModelFactory(repository)).get(
             RegisterViewModel::class.java)
 
@@ -37,6 +37,11 @@ class RegisterActivity : AppCompatActivity() {
             } else {
                 registerUser()
             }
+        }
+
+        // 뒤로 가기 버튼 클릭 시
+        binding.backBtn.setOnClickListener {
+            finish()
         }
 
         // 회원가입 버튼 클릭 시

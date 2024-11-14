@@ -1,278 +1,301 @@
 package com.busanit.searchrestroom.restroomDetail
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.content.pm.PackageManager
+import android.app.AlertDialog
+import android.content.Intent
 import android.location.Geocoder
-import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
 import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
+import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.BuildConfig
 import com.busanit.searchrestroom.database.AppDatabase
+import com.busanit.searchrestroom.database.DeleteRequest
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityRestroomUpdateBinding
+import com.busanit.searchrestroom.mainPage.MainActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-class RestroomUpdateActivity : AppCompatActivity(){
-    private lateinit var binding: ActivityRestroomUpdateBinding
-    private lateinit var db : AppDatabase
-    private var restroomId: Int = 0
+class RestroomUpdateActivity : AppCompatActivity(), OnMapReadyCallback {
+  private lateinit var binding: ActivityRestroomUpdateBinding
+  private var db: AppDatabase? = null
+  private lateinit var map: GoogleMap
+  private var selectedLocation: LatLng? = null
 
-    private lateinit var map: GoogleMap
-    private var selectedLocation: LatLng? = null
+  companion object {
+    private const val DEFAULT_ZOOM_LEVEL = 17f
+  }
 
-    private val PERMISSIONS = arrayOf(
-        android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_FINE_LOCATION
-    )
-    private val REQUEST_PERMISSION_CODE = 1
-    private val DEFAULT_ZOOM_LEVEL = 17f
-    private val DEFAULT_LOCATION = LatLng(35.157696, 129.059116) // 부산 기본 위치
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    binding = ActivityRestroomUpdateBinding.inflate(layoutInflater)
+    setContentView(binding.root)
 
+    // Places API 초기화
+    if (!Places.isInitialized()) {
+      Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityRestroomUpdateBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    db = AppDatabase.getDatabase(applicationContext)
+    val restroom: Restroom? = intent.getParcelableExtra("restroom")
 
-        db = AppDatabase.getDatabase(this)
+    // MapView 초기화
+    binding.mapViewUpdate.onCreate(savedInstanceState)
+    binding.mapViewUpdate.getMapAsync(this)
 
-        restroomId = intent.getIntExtra("restroomId", 0)
+    // 기존 데이터 표시
+    setupExistingData(restroom)
 
-        loadRestroomInfo()
+    // 주소 검색 설정
+    setupLocationInput()
 
-        binding.btnUpdate.setOnClickListener {
-            updateRestroom()
+    // 버튼 설정
+    setupButtons(restroom)
+  }
+  private fun setupButtons(restroom: Restroom?) {
+    // 수정하기 버튼
+    binding.rewriteInfo.setOnClickListener {
+      if (validateInput()) {
+        updateRestroom(restroom)
+      }
+    }
+
+    // 삭제 요청 버튼
+    binding.deleteRequestButton.setOnClickListener {
+      val requestMessage = EditText(this)
+      requestMessage.hint = "요청사유를 입력해주세요."
+
+      AlertDialog.Builder(this).run {
+        setTitle("삭제 요청")
+        setMessage("${restroom?.restroomName ?: "(알수없음)"} 의 삭제를 요청합니다.")
+        setView(requestMessage)
+        setPositiveButton("요청하기") { _, _ ->
+          val message = requestMessage.text.toString()
+          handleDeleteRequest(restroom, message)
         }
+        setNegativeButton("취소", null)
+        show()
+      }
+    }
+  }
+  private fun handleDeleteRequest(restroom: Restroom?, message: String) {
+    val regTime = Date()
+    val outputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    val formattedTime = outputFormat.format(regTime)
 
-        binding.btnClose.setOnClickListener {
+    if (restroom != null) {
+      val request = DeleteRequest(
+        requestId = 0,
+        memberId = AuthHelper.getMemberId(),
+        restroomId = restroom.restroomId,
+        requestMessage = message,
+        regTime = formattedTime.toString()
+      )
+
+      lifecycleScope.launch(Dispatchers.IO) {
+        try {
+          db?.DeleteRequestDao()?.insert(request)
+          withContext(Dispatchers.Main) {
+            Toast.makeText(this@RestroomUpdateActivity, "삭제 요청이 등록되었습니다.", Toast.LENGTH_SHORT).show()
             finish()
+          }
+        } catch (e: Exception) {
+          withContext(Dispatchers.Main) {
+            Toast.makeText(this@RestroomUpdateActivity, "삭제 요청 등록에 실패했습니다.", Toast.LENGTH_SHORT).show()
+          }
         }
+      }
+    } else {
+      Toast.makeText(this, "화장실 정보가 없습니다.", Toast.LENGTH_SHORT).show()
+    }
+  }
+  private fun validateInput(): Boolean {
+    if (binding.editRestroomName.text.toString().trim().isEmpty()) {
+      Toast.makeText(this, "화장실 이름을 입력해주세요", Toast.LENGTH_SHORT).show()
+      return false
+    }
+    if (binding.editLocation.text.toString().trim().isEmpty()) {
+      Toast.makeText(this, "위치를 입력해주세요", Toast.LENGTH_SHORT).show()
+      return false
+    }
+    if (selectedLocation == null) {
+      Toast.makeText(this, "지도에서 위치를 선택해주세요", Toast.LENGTH_SHORT).show()
+      return false
+    }
+    return true
+  }
 
-        // 지도 부분
-//        if (!Places.isInitialized()) {
-//            Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
-//        }
-//
-//        if (!checkPermissions()) {
-//            ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSION_CODE)
-//        }
-//
-//        db = AppDatabase.getDatabase(this)
-//        binding.mapViewRegister.onCreate(savedInstanceState)
-//        binding.mapViewRegister.getMapAsync(this)
+  private fun updateRestroom(oldRestroom: Restroom?) {
+    if (oldRestroom == null) {
+      Toast.makeText(this, "수정할 화장실 정보가 없습니다.", Toast.LENGTH_SHORT).show()
+      return
     }
 
-    private fun loadRestroomInfo(){
-        lifecycleScope.launch {
-            try {
-                // 해당 ID로 화장실 정보 불러오기
-                val restroom = db.restroomDao().getRestroomById(restroomId)
-                restroom?.let{
-                    binding.updateRestroomName.setText(restroom.restroomName)
-                    binding.updateOpenTime.setText(restroom.openTime)
-                    binding.updateMemo.setText(restroom.memo)
-                    binding.checkFullTime.isChecked = restroom.fullTime ?: false
-                    binding.checkUnisex.isChecked = restroom.unisex ?: false
-                    binding.checkDiaper.isChecked = restroom.diaper ?: false
-                    binding.checkAccessible.isChecked = restroom.accessible ?: false
-
-                    //지도 부분!!
-                    selectedLocation = LatLng(it.latitude ?: 0.0, it.longitude ?: 0.0)
-//                  updateMapLocation(selectedLocation ?: DEFAULT_LOCATION)
-                }
-            } catch (e: Exception) {
-                Log.e("EditRestroomActivity", "Error loading restroom info: ${e.message}")
-                Toast.makeText(this@RestroomUpdateActivity, "정보를 불러오는 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
-            }
-        }
+    // selectedLocation이 null이 아닌지 확인
+    if (selectedLocation == null) {
+      Toast.makeText(this, "위치를 선택해주세요", Toast.LENGTH_SHORT).show()
+      return
     }
 
-    // 지도!
-//    private fun setupLocationInput() {
-//        binding.updateLocation.setOnEditorActionListener { _, actionId, _ ->
-//            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-//                val address = binding.updateLocation.text.toString()
-//                if (address.isNotEmpty()) {
-//                    searchLocation(address)
-//                }
-//                true
-//            } else {
-//                false
-//            }
-//        }
-//    }
-//
-//    private fun searchLocation(address: String) {
-//        val geocoder = Geocoder(this)
-//        try {
-//            val addresses = geocoder.getFromLocationName(address, 1)
-//            if (!addresses.isNullOrEmpty()) {
-//                val location = LatLng(addresses[0].latitude, addresses[0].longitude)
-//                selectedLocation = location
-//                updateMapLocation(location)
-//
-//                val fullAddress = addresses[0].getAddressLine(0)
-//                binding.updateLocation.setText(fullAddress)
-//
-//                if (binding.updateRestroomName.text.toString().isEmpty()) {
-//                    val featureName = addresses[0].featureName
-//                    binding.updateRestroomName.setText(featureName)
-//                }
-//            }
-//        } catch (e: Exception) {
-//            Log.e("Geocoding", "Error: ${e.message}")
-//            Toast.makeText(this, "주소를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
-//        }
-//    }
-//
-//    private fun updateMapLocation(latLng: LatLng) {
-//        try {
-//            map.clear()
-//            map.addMarker(MarkerOptions().position(latLng))
-//            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM_LEVEL))
-//        } catch (e: Exception) {
-//            Log.e("RestroomUpdateActivity", "Error updating map location: ${e.message}")
-//        }
-//    }
-//
-//    @SuppressLint("MissingPermission")
-//    override fun onMapReady(googleMap: GoogleMap) {
-//        try {
-//            map = googleMap
-//            map.setOnCameraMoveStartedListener { reason ->
-//                if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-//                    binding.scrollView.requestDisallowInterceptTouchEvent(true)
-//                }
-//            }
-//
-//            map.setOnCameraIdleListener {
-//                binding.scrollView.requestDisallowInterceptTouchEvent(false)
-//            }
-//
-//            if (checkPermissions()) {
-//                map.isMyLocationEnabled = true
-//                updateMapLocation(getMyLocation())
-//            } else {
-//                updateMapLocation(DEFAULT_LOCATION)
-//            }
-//
-//            map.setOnMapClickListener { latLng ->
-//                selectedLocation = latLng
-//                updateMapLocation(latLng)
-//                getAddressFromLocation(latLng)
-//            }
-//        } catch (e: Exception) {
-//            Log.e("RestroomUpdateActivity", "Error in onMapReady: ${e.message}")
-//            Toast.makeText(this, "지도 초기화 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
-//            finish()
-//        }
-//    }
-//
-//    @SuppressLint("MissingPermission")
-//    private fun getMyLocation(): LatLng {
-//        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-//
-//        if (!checkPermissions()) {
-//            return DEFAULT_LOCATION
-//        }
-//
-//        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//            Toast.makeText(this, "GPS를 활성화해주세요", Toast.LENGTH_SHORT).show()
-//            return DEFAULT_LOCATION
-//        }
-//
-//        return try {
-//            val lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-//            if (lastLocation != null) {
-//                LatLng(lastLocation.latitude, lastLocation.longitude)
-//            } else {
-//                DEFAULT_LOCATION
-//            }
-//        } catch (e: SecurityException) {
-//            Log.e("Location", "Error: ${e.message}")
-//            DEFAULT_LOCATION
-//        }
-//    }
-//
-//    private fun getAddressFromLocation(latLng: LatLng) {
-//        val geocoder = Geocoder(this)
-//        try {
-//            val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-//            if (!addresses.isNullOrEmpty()) {
-//                val address = addresses[0].getAddressLine(0)
-//                binding.updateLocation.setText(address)
-//            }
-//        } catch (e: Exception) {
-//            Log.e("Geocoding", "Error: ${e.message}")
-//        }
-//    }
-//
-//    private fun checkPermissions(): Boolean {
-//        return PERMISSIONS.all {
-//            ActivityCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
-//        }
-//    }
-//
-//    @SuppressLint("MissingPermission")
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        if (requestCode == REQUEST_PERMISSION_CODE) {
-//            if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-//                if (::map.isInitialized) {
-//                    map.isMyLocationEnabled = true
-//                    updateMapLocation(getMyLocation())
-//                }
-//            } else {
-//                Toast.makeText(this, "위치 권한이 필요합니다", Toast.LENGTH_SHORT).show()
-//                updateMapLocation(DEFAULT_LOCATION)
-//            }
-//        }
-//    }
+    val updatedRestroom = Restroom(
+      restroomId = oldRestroom.restroomId,
+      restroomName = binding.editRestroomName.text.toString().trim(),
+      location = binding.editLocation.text.toString().trim(),
+      latitude = selectedLocation?.latitude,    // 선택된 위치의 위도
+      longitude = selectedLocation?.longitude,  // 선택된 위치의 경도
+      openTime = binding.editOpenTime.text.toString().trim(),
+      fullTime = binding.chipFullTime.isChecked,
+      unisex = binding.chipUnisex.isChecked,
+      diaper = binding.chipDiaper.isChecked,
+      accessible = binding.chipAccessible.isChecked,
+      memo = binding.editMemo.text.toString().trim()
+    )
 
-//
-    private fun updateRestroom() {
-        val restroom = Restroom(
-            restroomId = restroomId,
-            restroomName = binding.updateRestroomName.text.toString(),
-            location = binding.updateLocation.text.toString(), // 주소는 수정할 필요가 없다면 넘어가도 됨
-            latitude = null, // 현재는 사용하지 않지만, 위치가 변경될 경우 추가로 처리할 수 있음
-            longitude = null,
-            openTime = binding.updateOpenTime.text.toString(),
-            fullTime = binding.checkFullTime.isChecked,
-            unisex = binding.checkUnisex.isChecked,
-            diaper = binding.checkDiaper.isChecked,
-            accessible = binding.checkAccessible.isChecked,
-            memo = binding.updateMemo.text.toString()
-        )
+    lifecycleScope.launch(Dispatchers.IO) {
+      try {
+        db?.restroomDao()?.update(updatedRestroom)
+        withContext(Dispatchers.Main) {
+          Toast.makeText(this@RestroomUpdateActivity, "수정이 완료되었습니다.", Toast.LENGTH_SHORT).show()
 
-        lifecycleScope.launch {
-            try {
-                db.restroomDao().update(restroom)
-                Toast.makeText(this@RestroomUpdateActivity, "수정되었습니다", Toast.LENGTH_SHORT).show()
-                finish() // 수정 후 종료
-            } catch (e: Exception) {
-                Log.e("EditRestroomActivity", "Error updating restroom: ${e.message}")
-                Toast.makeText(this@RestroomUpdateActivity, "수정 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show()
-            }
+          // 메인 화면으로 이동
+          val intent = Intent(this@RestroomUpdateActivity, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+          }
+          startActivity(intent)
+          finish()
         }
+      } catch (e: Exception) {
+        withContext(Dispatchers.Main) {
+          Toast.makeText(this@RestroomUpdateActivity, "수정 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+        }
+      }
+    }
+  }
+
+  private fun setupExistingData(restroom: Restroom?) {
+    restroom?.let {
+      binding.editRestroomName.setText(it.restroomName)
+      binding.editLocation.setText(it.location)
+      binding.editOpenTime.setText(it.openTime)
+      binding.chipFullTime.isChecked = it.fullTime ?: false
+      binding.chipUnisex.isChecked = it.unisex ?: false
+      binding.chipDiaper.isChecked = it.diaper ?: false
+      binding.chipAccessible.isChecked = it.accessible ?: false
+      binding.editMemo.setText(it.memo)
+
+      // 초기 위치 설정
+      selectedLocation = LatLng(it.latitude ?: 0.0, it.longitude ?: 0.0)
+    }
+  }
+
+  private fun setupLocationInput() {
+    binding.editLocation.setOnEditorActionListener { _, actionId, _ ->
+      if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+        val address = binding.editLocation.text.toString()
+        if (address.isNotEmpty()) {
+          searchLocation(address)
+        }
+        true
+      } else {
+        false
+      }
+    }
+  }
+
+  private fun searchLocation(address: String) {
+    val geocoder = Geocoder(this)
+    try {
+      geocoder.getFromLocationName(address, 1)?.let { addresses ->
+        if (addresses.isNotEmpty()) {
+          val location = LatLng(addresses[0].latitude, addresses[0].longitude)
+          selectedLocation = location
+          updateMapLocation(location)
+
+          val fullAddress = addresses[0].getAddressLine(0)
+          binding.editLocation.setText(fullAddress)
+        }
+      }
+    } catch (e: Exception) {
+      Toast.makeText(this, "주소를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
+    }
+  }
+
+  private fun updateMapLocation(latLng: LatLng) {
+    map.clear()
+    map.addMarker(MarkerOptions().position(latLng))
+    map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM_LEVEL))
+  }
+
+  override fun onMapReady(googleMap: GoogleMap) {
+    map = googleMap
+
+    // 스크롤 처리
+    map.setOnCameraMoveStartedListener { reason ->
+      if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+        binding.scrollView.requestDisallowInterceptTouchEvent(true)
+      }
     }
 
+    map.setOnCameraIdleListener {
+      binding.scrollView.requestDisallowInterceptTouchEvent(false)
+    }
 
+    // 초기 위치 표시
+    selectedLocation?.let { updateMapLocation(it) }
 
+    // 지도 클릭 이벤트
+    map.setOnMapClickListener { latLng ->
+      selectedLocation = latLng
+      updateMapLocation(latLng)
+      getAddressFromLocation(latLng)
+    }
+  }
 
+  private fun getAddressFromLocation(latLng: LatLng) {
+    val geocoder = Geocoder(this)
+    try {
+      geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)?.let { addresses ->
+        if (addresses.isNotEmpty()) {
+          val address = addresses[0].getAddressLine(0)
+          binding.editLocation.setText(address)
+        }
+      }
+    } catch (e: Exception) {
+      Toast.makeText(this, "주소를 가져오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+    }
+  }
+
+  // MapView 생명주기 메서드들
+  override fun onResume() {
+    super.onResume()
+    binding.mapViewUpdate.onResume()
+  }
+
+  override fun onPause() {
+    super.onPause()
+    binding.mapViewUpdate.onPause()
+  }
+
+  override fun onDestroy() {
+    binding.mapViewUpdate.onDestroy()
+    super.onDestroy()
+  }
+
+  override fun onLowMemory() {
+    super.onLowMemory()
+    binding.mapViewUpdate.onLowMemory()
+  }
 }

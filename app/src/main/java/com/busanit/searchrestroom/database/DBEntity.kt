@@ -2,9 +2,14 @@ package com.busanit.searchrestroom.database
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import androidx.room.Relation
+import com.busanit.searchrestroom.reviewReg.FilterOptionState
+import com.busanit.searchrestroom.reviewReg.FilterType
 import kotlinx.parcelize.Parcelize
 
 
@@ -128,6 +133,46 @@ data class Bookmark(
   val restroomId: Int?,
   @ColumnInfo(name = "member_id")
   val memberId: Int?
+)
+
+@Entity(
+  tableName = "delete_request",
+  foreignKeys = [
+    ForeignKey(
+      entity = Restroom::class,
+      parentColumns = ["restroom_id"],
+      childColumns = ["restroom_id"],
+      onDelete = ForeignKey.CASCADE
+    ),
+  ForeignKey(
+    entity = Member::class,
+    parentColumns = ["member_id"],
+    childColumns = ["member_id"],
+    onDelete = ForeignKey.SET_NULL
+  )
+  ]
+)
+data class DeleteRequest(
+  @PrimaryKey(autoGenerate = true)
+  @ColumnInfo(name = "request_id")
+  val requestId: Int,
+  @ColumnInfo(name = "restroom_id")
+  val restroomId: Int?,
+  @ColumnInfo(name = "member_id")
+  val memberId: Int?,
+  @ColumnInfo(name = "request_message")
+  val requestMessage: String?,
+  @ColumnInfo(name = "reg_time", defaultValue = "CURRENT_TIMESTAMP")
+  val regTime: String?
+)
+
+data class DeleteRequestWithRestroom(
+  @Embedded val deleteRequest: DeleteRequest,
+  @Relation(
+    parentColumn = "restroom_id",
+    entityColumn = "restroom_id"
+  )
+  val restroom: Restroom?
 )
 
 

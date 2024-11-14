@@ -20,12 +20,12 @@ interface RestroomDao {
 
 
   @Insert
-  fun insert(vararg restroom: Restroom)
+  suspend fun insert(vararg restroom: Restroom)  // suspend 키워드 추가
+
+  @Update
+  suspend fun update(restroom: Restroom)
 
   @Delete
   fun delete(restroom: Restroom)
-
-  @Update
-  fun update(vararg restroom: Restroom)
 
 }

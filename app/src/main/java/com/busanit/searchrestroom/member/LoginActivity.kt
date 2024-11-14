@@ -15,6 +15,7 @@ import com.google.firebase.ktx.Firebase
 import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
 import com.kakao.sdk.user.model.User
+import com.navercorp.nid.NaverIdLoginSDK
 
 class LoginActivity : AppCompatActivity(){
 
@@ -27,18 +28,33 @@ class LoginActivity : AppCompatActivity(){
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val repository = UserRepository(AppDatabase.getDatabase(application).memberDao(), this)
+        val repository = UserRepository(AppDatabase.getDatabase(application)!!.memberDao(), this)
         viewModel = ViewModelProvider(this, LoginViewModelFactory(repository)).get(LoginViewModel::class.java)
 
         auth = Firebase.auth
+
+        // 뒤로 가기 버튼 클릭 시
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
 
         // 로그인 버튼 클릭 시
         binding.loginBtn.setOnClickListener {
             val email = binding.loginEmail.text.toString()
             val password = binding.loginPassword.text.toString()
 
-            // 로그인 시도
-            viewModel.loginUser(email, password)
+            when {
+                email.isEmpty() -> {
+                    Toast.makeText(this, "이메일을 입력해주세요", Toast.LENGTH_SHORT).show()
+                }
+                password.isEmpty() -> {
+                    Toast.makeText(this, "비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    // 로그인 시도
+                    viewModel.loginUser(email, password)
+                }
+            }
         }
 
 
@@ -73,6 +89,23 @@ class LoginActivity : AppCompatActivity(){
                 // 카카오톡이 설치되어 있지 않은 경우 웹 로그인 진행
                 loginWithKaKaoAccount()
             }
+        }
+
+        // Naver 로그인 버튼 클릭 이벤트 (Naver Login Manager 함수 호출)
+        binding.btnNaverLogin.setOnClickListener {
+            viewModel.loginNaver(this)
+        }
+
+        // 아이디 찾기 버튼 클릭 시
+        binding.findIdBtn.setOnClickListener {
+            val intent = Intent(this, FindIdActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 비밀번호 찾기 버튼 클릭 시
+        binding.findpwBtn.setOnClickListener {
+            val intent = Intent(this, FindPwActivity::class.java)
+            startActivity(intent)
         }
 
         // 로그인 결과 관찰

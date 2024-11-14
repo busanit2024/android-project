@@ -11,7 +11,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.Date
 
-class UserRepository(private val memberDao: MemberDao, private val context: Context) {
+class UserRepository(val memberDao: MemberDao, private val context: Context) {
 
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
 
@@ -71,11 +71,12 @@ class UserRepository(private val memberDao: MemberDao, private val context: Cont
             }
     }
     // 로그인 성공 시 member_id를 SharedPreferences에 저장하는 메서드
-    private fun saveUserInfoToPreferences(memberId: Int, email: String, nickname: String) {
+    private fun saveUserInfoToPreferences(memberId: Int, email: String, nickname: String, admin: Boolean) {
         sharedPreferences.edit().apply {
             putInt("member_id", memberId)
             putString("email", email)
             putString("nickname", nickname)
+            putBoolean("admin", admin)
             apply()
         }
     }
@@ -84,16 +85,29 @@ class UserRepository(private val memberDao: MemberDao, private val context: Cont
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // 파이어베이스 로그인 성공 후, 로컬 DB에 있는 사용자 정보를 조회하여 member_id를 저장
+                    // 로그인 성공 시 로컬 DB 처리
                     GlobalScope.launch {
-                        val member = memberDao.getMemberByEmail(email)
-                        member?.let {
-                            saveUserInfoToPreferences(it.memberId, it.email, it.nickname ?: "")  // member_id, email, nickname 저장
+                        var member = memberDao.getMemberByEmail(email)
+                        if (member == null) {
+                            // 로컬 DB에 사용자가 없으면 새롭게 저장
+                            member = Member(
+                                email = email,
+                                password = password,
+                                nickname = "Unknown",
+                                profilePic = null,
+                                regTime = Date().toString(),
+                                updateTime = null,
+                                social = false,
+                                admin = false
+                            )
+                            memberDao.insert(member)
                         }
-                        onComplete(true, null)  // UID가 일치하면 로그인 성공
+                        saveUserInfoToPreferences(member.memberId, member.email, member.nickname ?: "", admin = member.admin)
+                        onComplete(true, null)  // 로그인 성공
                     }
                 } else {
-                    onComplete(false, task.exception?.message)  // 로그인 실패
+                    // 로그인 실패 시 통일된 에러 메시지 표시
+                    onComplete(false, "이메일이나 비밀번호가 틀렸습니다. 다시 확인해주세요.")
                 }
             }
     }
@@ -117,10 +131,10 @@ class UserRepository(private val memberDao: MemberDao, private val context: Cont
                 memberDao.insert(member)
                 val searchMember = memberDao.getMemberByEmail(email)
                 if (searchMember != null) {
-                    saveUserInfoToPreferences(searchMember.memberId, email, member.nickname ?: "")
+                    saveUserInfoToPreferences(searchMember.memberId, email, member.nickname ?: "", member.admin)
                 }
             } else {
-                saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "")
+                saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "", existingMember.admin)
             }
             onComplete(true, null)
         }
@@ -144,12 +158,43 @@ class UserRepository(private val memberDao: MemberDao, private val context: Cont
                 memberDao.insert(member)
                 val searchMember = memberDao.getMemberByEmail(email)
                 if (searchMember != null) {
-                    saveUserInfoToPreferences(searchMember.memberId, email, member.nickname ?: "")
+                    saveUserInfoToPreferences(searchMember.memberId, email, member.nickname ?: "", member.admin)
                 }
             } else {
-                saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "")
+                saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "", existingMember.admin)
             }
             onComplete(true, null)
         }
     }
+
+    fun loginNaverUser(loginResponse: LoginResponse, onComplete: (Boolean, String?) -> Unit) {
+        GlobalScope.launch {
+            val email = getEmailFromNaverApi(loginResponse.accessToken) ?: run {
+                onComplete(false, "이메일 정보를 가져올 수 없습니다.")
+                return@launch
+            }
+
+            val existingMember = memberDao.getMemberByEmail(email)
+
+            if (existingMember == null) {
+                // 새로운 사용자일 경우 로컬 DB에 정보 저장
+                val member = Member(
+                    email = email,
+                    password = "", // 소셜 로그인은 비밀번호 없음
+                    nickname = "네이버 사용자", // 별도의 닉네임 설정
+                    profilePic = null,
+                    regTime = Date().toString(),
+                    updateTime = null,
+                    social = true,
+                    admin = false
+                )
+                memberDao.insert(member)
+                saveUserInfoToPreferences(member.memberId, email, member.nickname ?: "", member.admin)
+            } else {
+                saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "", existingMember.admin)
+            }
+            onComplete(true, null)
+        }
+    }
+
 }

@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import com.busanit.searchrestroom.AuthHelper
@@ -12,6 +13,7 @@ import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.dao.MemberDao
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.database.Member
+import com.busanit.searchrestroom.admin.AdminActivity
 import com.busanit.searchrestroom.mainPage.MainActivity
 import com.busanit.searchrestroom.databinding.ActivityMypageBinding
 import com.busanit.searchrestroom.member.LoginActivity
@@ -37,17 +39,11 @@ class MyPageActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
-        val db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "search-restroom").build()
-        memberDao = db.memberDao()
+        val db = AppDatabase.getDatabase(applicationContext)
+        memberDao = db!!.memberDao()
 
-        // Intent로부터 이메일 받기
-        val email = intent.getStringExtra("email")
-        if (email != null) {
-            handelLoginSuccess(email)   // 로그인 성공 처리
-        } else {
-            // 사용자 정보 불러오기
-            loadUserInfo()
-        }
+        // 사용자 정보 불러오기
+        loadUserInfo()
 
         // 각 버튼의 클릭 리스너 설정
         binding.myReview.setOnClickListener {
@@ -63,10 +59,17 @@ class MyPageActivity : AppCompatActivity() {
             startActivity(Intent(this, FavoriteActivity::class.java))
         }
 
+        if (AuthHelper.isLoggedIn() && AuthHelper.isAdmin()) {
+            binding.adminPage.visibility = View.VISIBLE
+        } else {
+            binding.adminPage.visibility = View.GONE
+        }
+
         binding.adminPage.setOnClickListener {
-            if (AuthHelper.isLoggedIn() && sharedPreferences.getString("userRole", "") == "ADMIN") {
+            startActivity(Intent(this, AdminActivity::class.java))
+            if (AuthHelper.isLoggedIn() && sharedPreferences.getBoolean("admin", false)) {
                 // 관리자 페이지 이동 (관리자로 로그인한 경우에만 보이게 함)
-//                startActivity(Intent(this, AdminPageActivity::class.java))
+                startActivity(Intent(this, AdminActivity::class.java))
             }
         }
 
@@ -76,17 +79,7 @@ class MyPageActivity : AppCompatActivity() {
                 showToast("로그아웃 되었습니다.")
             } else {
                 showToast("로그인 화면으로 이동합니다.")
-                startActivity(Intent(this, LoginActivity::class.java))
-            }
-        }
-
-        binding.editInfo.setOnClickListener {
-            if (AuthHelper.isLoggedIn()) {
-                startActivity(Intent(this, EditInfoActivity::class.java))
-            } else {
-                showToast("로그인이 필요합니다.")
-                // 로그인 화면으로 이동
-                startActivity(Intent(this, LoginActivity::class.java))
+                startActivity(Intent(this, LoginActivity::class.java))  // 로그인 화면으로 이동
             }
         }
 
@@ -106,25 +99,6 @@ class MyPageActivity : AppCompatActivity() {
                 deleteAccount()
             } else {
                 startActivity(Intent(this, RegisterActivity::class.java))  // 회원가입 화면으로 이동
-            }
-        }
-
-        // BottomNavigationView 설정
-        findViewById<BottomNavigationView>(R.id.bottom_navigation).setOnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.menu_home -> {
-                    startActivity(Intent(this, MainActivity::class.java))
-                    true
-                }
-                R.id.my_favorite -> {
-                    startActivity(Intent(this, FavoriteActivity::class.java))
-                    true
-                }
-                R.id.menu_mypage -> {
-                    // 현재 페이지 유지(지금이 마이페이지)
-                    true
-                }
-                else -> false
             }
         }
     }
@@ -153,7 +127,7 @@ class MyPageActivity : AppCompatActivity() {
     }
 
     private fun updateUI() {
-        val isAdmin = sharedPreferences.getString("userRole", "") == "ADMIN"
+        val isAdmin = AuthHelper.isAdmin()
         val isLoggedIn = AuthHelper.isLoggedIn()
 
         binding.logout.text = if (isLoggedIn) "로그아웃" else "로그인"
@@ -183,7 +157,36 @@ class MyPageActivity : AppCompatActivity() {
     }
 
     private fun deleteAccount() {
-        // 회원탈퇴 로직 구현
+        // 회원탈퇴
+        if (currentMember != null) {
+            // 확인용 다이얼로그
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("회원 탈퇴")
+            builder.setMessage("정말로 탈퇴하시겠습니까?")
+
+            // 확인 버튼
+            builder.setPositiveButton("확인") { dialog, which ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    memberDao.delete(currentMember!!) // 회원 정보 삭제
+                    withContext(Dispatchers.Main) {
+                        showToast("회원 탈퇴가 완료되었습니다.")
+                        AuthHelper.logout() // 로그아웃 처리
+                        startActivity(Intent(this@MyPageActivity, LoginActivity::class.java))   // 로그인 화면으로 이동
+                        finish()
+                    }
+                }
+            }
+
+            // 취소 버튼
+            builder.setNegativeButton("취소") { dialog, which ->
+                dialog.dismiss()
+            }
+
+            // 다이얼로그 표시
+            val alertDialog = builder.create()
+            alertDialog.show()
+
+        }
     }
 
     private fun showToast(message: String) {

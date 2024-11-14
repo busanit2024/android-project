@@ -6,14 +6,13 @@ import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.kakao.sdk.user.UserApiClient
+import com.navercorp.nid.NaverIdLoginSDK
 
 object AuthHelper {
   private lateinit var preferences: SharedPreferences
   private lateinit var googleSignInClient: GoogleSignInClient
   private lateinit var auth: FirebaseAuth
 
-  private var isFirebaseLoggedIn = false
-  private var isKakaoLoggedIn = false
 
 
   fun initialize(context: Context, googleSignInClient: GoogleSignInClient) {
@@ -33,7 +32,6 @@ object AuthHelper {
         Log.e("authHelper", "카카오 로그아웃 실패: $error")
       } else {
         Log.i("authHelper", "카카오 로그아웃 성공")
-        isKakaoLoggedIn = false
       }
     }
   }
@@ -41,19 +39,25 @@ object AuthHelper {
   fun logoutGmail() {
     googleSignInClient.signOut().addOnCompleteListener {
       Log.i("authHelper", "구글 로그아웃 성공")
-      isFirebaseLoggedIn = false
+
     }
   }
 
   fun logoutFirebase() {
     auth.signOut()
-    isFirebaseLoggedIn = false
+    Log.i("authHelper", "파이어베이스 로그아웃 성공")
+  }
+
+  fun logoutNaver() {
+    NaverIdLoginSDK.logout()
+    Log.i("authHelper", "네이버 로그아웃 성공")
   }
 
   fun logout() {
     logoutFirebase()
     logoutKakao()
     logoutGmail()
+    logoutNaver()
     preferences.edit().apply {
       remove("member_id")
       remove("email")
@@ -82,6 +86,10 @@ object AuthHelper {
 
   fun getNickname() : String {
     return preferences.getString("nickname", "") ?: ""
+  }
+
+  fun isAdmin() : Boolean {
+    return preferences.getBoolean("admin", false)
   }
 
 }

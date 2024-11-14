@@ -9,6 +9,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.busanit.searchrestroom.dao.BookmarkDao
+import com.busanit.searchrestroom.dao.DeleteRequestDao
 import com.busanit.searchrestroom.dao.MemberDao
 import com.busanit.searchrestroom.dao.RestroomDao
 import com.busanit.searchrestroom.dao.ReviewDao
@@ -18,6 +19,7 @@ import com.busanit.searchrestroom.database.Member
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.database.Review
 import com.busanit.searchrestroom.database.ReviewImage
+import com.busanit.searchrestroom.reviewReg.Converters
 
 @Database(entities = [Restroom::class, Member::class, Bookmark::class, Review::class, ReviewImage::class ], version = 4, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
@@ -32,17 +34,10 @@ abstract class AppDatabase : RoomDatabase() {
     private var INSTANCE: AppDatabase? = null
 
     @JvmField
-    val MIGRATION_1_2 : Migration = object : Migration(1, 2) {
-      override fun migrate(db: SupportSQLiteDatabase) {
-        Log.d("test", "migrate")
-      }
-    }
-
-    @JvmField
-    val MIGRATION_2_3 : Migration = object : Migration(2, 3) {
+    val MIGRATION_3_4 : Migration = object : Migration(3, 4) {
       override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("""
-        CREATE TABLE review_filter_option (
+        CREATE TABLE IF NOT EXISTS review_filter_option (
             option_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             review_id INTEGER NOT NULL,
             filter_type TEXT CHECK(filter_type IN ('0', '1', '2')) NOT NULL,
@@ -51,11 +46,19 @@ abstract class AppDatabase : RoomDatabase() {
                 ON DELETE CASCADE
                 ON UPDATE NO ACTION )
     """)
+        db.execSQL("""create table if not exists delete_request (
+          request_id integer primary key autoincrement not null, 
+          member_id integer null, request_message text null, 
+          reg_time text null DEFAULT CURRENT_TIMESTAMP, 
+          restroom_id integer null, 
+          foreign key(member_id) references member(member_id) on delete set null, 
+          foreign key(restroom_id) references restroom(restroom_id) on delete cascade)
+          """)
       }
     }
 
     @JvmField
-    val MIGRATION_3_4 : Migration = object : Migration(3, 4) {
+    val MIGRATION_4_5 : Migration = object : Migration(3, 4) {
       override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("ALTER TABLE Review ADD COLUMN toilet_paper_option INTEGER")
         db.execSQL("ALTER TABLE Review ADD COLUMN how_many_option INTEGER")
@@ -66,18 +69,24 @@ abstract class AppDatabase : RoomDatabase() {
 
 
     // getDatabase 메서드 추가
-    fun getDatabase(context: Context): AppDatabase {
-      return INSTANCE ?: synchronized(this) {
-        val instance = Room.databaseBuilder(
-          context.applicationContext,
-          AppDatabase::class.java,
-          "search-restroom"
-        )
-          .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4) // 마이그레이션 적용
-          .build()
-        INSTANCE = instance
-        instance
+    fun getDatabase(context: Context): AppDatabase? {
+      if(INSTANCE == null) {
+        Log.d("AppDatabase", "instance null")
+        synchronized(AppDatabase::class) {
+          INSTANCE = Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            "search-restroom"
+          )
+            .addMigrations(MIGRATION_4_5)
+            .allowMainThreadQueries()
+            .build()
+        }
       }
+      else {
+        Log.d("AppDatabase", "instance not null")
+      }
+      return INSTANCE
     }
   }
 }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ReviewViewModel(application: Application) : AndroidViewModel(application) {
-    private val reviewDao = AppDatabase.getDatabase(application).reviewDao()
+    private val reviewDao = AppDatabase.getDatabase(application)!!.reviewDao()
 
     private val _reviews = MutableLiveData<List<ReviewWithMemberAndFilter>>()
     val reviews: LiveData<List<ReviewWithMemberAndFilter>> = _reviews

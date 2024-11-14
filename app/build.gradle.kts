@@ -27,7 +27,7 @@ android {
     versionName = "1.0"
 
     buildConfigField("String", "MAPS_API_KEY", properties.getProperty("MAPS_API_KEY") )
-     //Naver
+    //Naver
     buildConfigField("String", "CLIENT_ID", properties.getProperty("NAVER_CLIENT_ID"))
     buildConfigField("String", "CLIENT_SECRET", properties.getProperty("NAVER_CLIENT_SECRET"))
 
@@ -87,8 +87,7 @@ dependencies {
   implementation(libs.places)
   implementation(libs.androidx.databinding.runtime)
   implementation(libs.firebase.common.ktx)
-    implementation(libs.androidx.material3.android)
-    testImplementation(libs.junit)
+  testImplementation(libs.junit)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
   implementation("com.google.android.gms:play-services-maps:19.0.0")

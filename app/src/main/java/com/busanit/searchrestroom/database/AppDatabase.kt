@@ -18,10 +18,8 @@ import com.busanit.searchrestroom.database.Member
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.database.Review
 import com.busanit.searchrestroom.database.ReviewImage
-import com.busanit.searchrestroom.reviewReg.Converters
 
-@Database(entities = [Restroom::class, Member::class, Bookmark::class, Review::class, ReviewImage::class, ReviewFilterOption::class ], version = 3, exportSchema = false)
-@TypeConverters(Converters::class)
+@Database(entities = [Restroom::class, Member::class, Bookmark::class, Review::class, ReviewImage::class ], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
   abstract fun restroomDao(): RestroomDao
   abstract fun memberDao(): MemberDao
@@ -56,6 +54,16 @@ abstract class AppDatabase : RoomDatabase() {
       }
     }
 
+    @JvmField
+    val MIGRATION_3_4 : Migration = object : Migration(3, 4) {
+      override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE Review ADD COLUMN toiletPaperOption INTEGER")
+        db.execSQL("ALTER TABLE Review ADD COLUMN howManyOption INTEGER")
+        db.execSQL("ALTER TABLE Review ADD COLUMN cleanlinessOption INTEGER")
+        db.execSQL("DROP TABLE IF EXIST review_filter_option")
+      }
+    }
+
 
     // getDatabase 메서드 추가
     fun getDatabase(context: Context): AppDatabase {
@@ -65,8 +73,7 @@ abstract class AppDatabase : RoomDatabase() {
           AppDatabase::class.java,
           "search-restroom"
         )
-          .addMigrations(MIGRATION_1_2) // 마이그레이션 적용
-          .addMigrations(MIGRATION_2_3)
+          .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4) // 마이그레이션 적용
           .build()
         INSTANCE = instance
         instance

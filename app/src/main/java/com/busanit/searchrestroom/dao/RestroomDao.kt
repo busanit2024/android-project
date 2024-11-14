@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.busanit.searchrestroom.database.Restroom
 
 @Dao
@@ -23,5 +24,8 @@ interface RestroomDao {
 
   @Delete
   fun delete(restroom: Restroom)
+
+  @Update
+  fun update(vararg restroom: Restroom)
 
 }

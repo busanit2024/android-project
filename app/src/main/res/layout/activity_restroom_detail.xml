@@ -155,8 +155,6 @@
 
             </LinearLayout>
 
-
-
             <LinearLayout
                 android:id="@+id/memberOnlyBtn"
                 android:layout_width="wrap_content"
@@ -196,13 +194,13 @@
                 android:layout_centerInParent="true"
                 android:background="#313030"/>
 
-
             <!-- 리뷰 레이아웃 -->
             <LinearLayout
                 android:id="@+id/reviewContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" >
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -212,13 +210,21 @@
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:layout_marginTop="10dp"/>
-                <!-- 리뷰  -->
+
+                <!-- RecyclerView를 리뷰 목록 표시용으로 사용 -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/reviewRecyclerView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"/>
 
-                </androidx.recyclerview.widget.RecyclerView>
+                <!-- 전체 리뷰 보기 버튼을 RecyclerView 밖으로 이동 -->
+                <Button
+                    android:id="@+id/viewAllReviewsButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="전체 리뷰 보기"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

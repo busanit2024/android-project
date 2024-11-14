@@ -25,13 +25,7 @@
                 android:textAlignment="center"
                 android:textSize="18sp"/>
 
-            <ImageButton
-                android:id="@+id/btnClose"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/icon_close"
-                android:contentDescription="닫기"/>
+
 
         </LinearLayout>
 

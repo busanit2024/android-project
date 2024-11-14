@@ -17,7 +17,7 @@ class FilterViewModel(application: Application) : AndroidViewModel(application) 
     private val _filterOptions = MutableLiveData<List<FilterOptionState>>()
     val filterOptions: LiveData<List<FilterOptionState>> get() = _filterOptions
 
-    private val reviewDao: ReviewDao = AppDatabase.getDatabase(application).reviewDao()
+    private val reviewDao: ReviewDao = AppDatabase.getDatabase(application)!!.reviewDao()
 
     fun insertReview(review: Review) {
         viewModelScope.launch {

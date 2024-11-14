@@ -3,17 +3,23 @@ package com.busanit.searchrestroom.admin
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.databinding.ActivityAdminBinding
 
 class AdminActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAdminBinding
+    private var db: AppDatabase? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityAdminBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        db = AppDatabase.getDatabase(this)
+        val deleteRequestCount = db?.DeleteRequestDao()?.getCount() ?: 0
+        binding.badge.text = deleteRequestCount.toString()
 
         binding.deleteBtn.setOnClickListener {
             val intent = Intent(this, AdminDeleteActivity::class.java)

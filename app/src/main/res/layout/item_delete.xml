@@ -28,6 +28,21 @@
                 android:layout_weight="1"
                 android:text="건물명"
                 android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/request_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="요청일자" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="15dp"
+            android:layout_marginBottom="15dp"
+            android:gravity="center_vertical">
             <TextView
                 android:id="@+id/building_address"
                 android:layout_width="match_parent"
@@ -36,12 +51,6 @@
                 android:text="상세주소"
                 android:textSize="14sp"
                 android:textColor="#757575"/>
-            <TextView
-                android:id="@+id/request_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="요청일자" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -59,6 +68,28 @@
                 android:text="요청사유"
                 android:textSize="16sp" />
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/deleteItemButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="15dp"
+            android:layout_marginBottom="15dp"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
+            <Button
+                android:id="@+id/detailButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="상세 페이지"
+                android:layout_marginHorizontal="8dp"/>
+            <Button
+                android:id="@+id/cancelButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="요청 취소"
+                android:layout_marginHorizontal="8dp"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

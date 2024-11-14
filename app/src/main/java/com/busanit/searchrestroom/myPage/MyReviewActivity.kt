@@ -51,7 +51,7 @@ class MyReviewActivity : AppCompatActivity() {
             return
         }
 
-        // 리뷰 로드
+        // 리뷰 로드하기
         loadReviews(memberId)
 
         // 뒤로 가기 버튼 클릭 시

@@ -88,6 +88,7 @@ class RestroomDetailActivity : AppCompatActivity() {
         //정보 수정 버튼 클릭 이벤트
         binding.rewriteInfo.setOnClickListener {
             val intent = Intent(this, RestroomUpdateActivity::class.java)
+            intent.putExtra("restroom", restroom)
             startActivity(intent)
         }
 

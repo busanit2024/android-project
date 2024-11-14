@@ -15,6 +15,7 @@ import com.google.firebase.ktx.Firebase
 import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
 import com.kakao.sdk.user.model.User
+import com.navercorp.nid.NaverIdLoginSDK
 
 class LoginActivity : AppCompatActivity(){
 
@@ -79,6 +80,13 @@ class LoginActivity : AppCompatActivity(){
                 loginWithKaKaoAccount()
             }
         }
+
+        // Naver 로그인 버튼 클릭 이벤트 (Naver Login Manager 함수 호출)
+        binding.btnNaverLogin.setOnClickListener {
+            viewModel.loginNaver(this)
+        }
+
+
 
         // 아이디 찾기 버튼 클릭 시
         binding.findIdBtn.setOnClickListener {

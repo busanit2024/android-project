@@ -39,7 +39,7 @@ class MyReviewActivity : AppCompatActivity() {
         ).build()
 
         // 로그인한 사용자의 member_id 가져오기
-        val memberId = sharedPreferences.getInt("member_id", -1)
+        val memberId = sharedPreferences.getInt("member", -1)
         if (memberId == -1) {
             Toast.makeText(this, "로그인이 필요합니다!", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this, LoginActivity::class.java))

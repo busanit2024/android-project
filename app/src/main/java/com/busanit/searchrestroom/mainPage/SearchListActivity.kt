@@ -2,6 +2,7 @@ package com.busanit.searchrestroom.mainPage
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,8 +43,20 @@ class SearchListActivity : AppCompatActivity() {
     val layoutManager = LinearLayoutManager(this)
     binding.searchRecyclerView.layoutManager = layoutManager
     adapter = RestroomAdapter(datas!!, currentLat, currentLong)
-    binding.searchRecyclerView.adapter = adapter
-    binding.searchRecyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
+
+    runOnUiThread {
+      if (datas!!.isEmpty()) {
+        binding.emptyView.visibility = View.VISIBLE
+        binding.searchRecyclerView.visibility = View.GONE
+      } else {
+        binding.emptyView.visibility = View.GONE
+        binding.searchRecyclerView.visibility = View.VISIBLE
+        binding.searchRecyclerView.adapter = adapter
+        binding.searchRecyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
+      }
+    }
+
+
 
     //메뉴바 아이템 연결
     binding.bottomNavigation.setOnItemSelectedListener { item ->

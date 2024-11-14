@@ -58,7 +58,8 @@
     <activity android:name=".myPage.EditInfoActivity"/>
     <activity android:name=".myPage.MyReviewActivity"/>
     <activity android:name=".myPage.MyToiletActivity"/>
-    <activity android:name=".admin.AdminActivity"/>
+    <activity android:name=".admin.AdminActivity"
+        android:launchMode="singleTask"/>
     <activity android:name=".admin.AdminDeleteActivity"/>
     <activity android:name=".reviewReg.ReviewRegActivity" />
     <activity android:name=".restroomDetail.RestroomUpdateActivity"

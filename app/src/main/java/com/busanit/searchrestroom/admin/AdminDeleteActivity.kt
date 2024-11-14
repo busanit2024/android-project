@@ -1,6 +1,8 @@
 package com.busanit.searchrestroom.admin
 
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.room.Room
@@ -26,11 +28,20 @@ class AdminDeleteActivity : AppCompatActivity() {
         db = AppDatabase.getDatabase(applicationContext)
 
         CoroutineScope(Dispatchers.IO).launch {
-            deleteItems = db!!.DeleteRequestDao().getDeleteRequestWithRestroom()
+            deleteItems = db?.DeleteRequestDao()?.getDeleteRequestWithRestroom() ?: emptyList()
 
-            // RecyclerView 설정
-            binding.deleteList.layoutManager = LinearLayoutManager(this@AdminDeleteActivity)
-            binding.deleteList.adapter = DeleteAdapter(deleteItems)
+            runOnUiThread{
+                if (deleteItems.isEmpty()) {
+                        binding.emptyView.visibility = View.VISIBLE
+                        binding.deleteList.visibility = View.GONE
+                } else {
+                        binding.emptyView.visibility = View.GONE
+                        binding.deleteList.visibility = View.VISIBLE
+                        binding.deleteList.layoutManager = LinearLayoutManager(this@AdminDeleteActivity)
+                        binding.deleteList.adapter = DeleteAdapter(deleteItems)
+                }
+            }
+
         }
 
         // 뒤로 가기 버튼 클릭 시

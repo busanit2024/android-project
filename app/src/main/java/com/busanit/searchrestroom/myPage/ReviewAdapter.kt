@@ -28,6 +28,8 @@ class ReviewAdapter(
         val buildingName: TextView = view.findViewById(R.id.building_name)
         val reviewDate: TextView = view.findViewById(R.id.review_date)
         val reviewContent: TextView = view.findViewById(R.id.review_content)
+        val editButton: TextView = view.findViewById(R.id.update)
+        val deleteButton: TextView = view.findViewById(R.id.delete)
         val images: List<ImageView> = listOf(
             view.findViewById(R.id.review_image1),
             view.findViewById(R.id.review_image2),

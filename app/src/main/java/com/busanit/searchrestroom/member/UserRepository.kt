@@ -189,9 +189,9 @@ class UserRepository(val memberDao: MemberDao, private val context: Context) {
                     admin = false
                 )
                 memberDao.insert(member)
-                saveUserInfoToPreferences(member.memberId, email, member.nickname ?: "")
+                saveUserInfoToPreferences(member.memberId, email, member.nickname ?: "", member.admin)
             } else {
-                saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "")
+                saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "", existingMember.admin)
             }
             onComplete(true, null)
         }

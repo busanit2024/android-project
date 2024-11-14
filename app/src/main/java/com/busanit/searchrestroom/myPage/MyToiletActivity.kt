@@ -49,6 +49,7 @@ class MyToiletActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun loadBookmarkedRestrooms() {
         if (AuthHelper.isLoggedIn()) {
             val memberId = AuthHelper.getMemberId()

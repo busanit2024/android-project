@@ -11,16 +11,12 @@ import com.busanit.searchrestroom.R
 
 class ReviewAdapter(
     private val reviewList: List<MyReview>,
-    private val onEditClick: (position: Int) -> Unit,
-    private val onDeleteClick: (position: Int) -> Unit
 ) : RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder>() {
 
     inner class ReviewViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val buildingName: TextView = view.findViewById(R.id.building_name)
         val reviewDate: TextView = view.findViewById(R.id.review_date)
         val reviewContent: TextView = view.findViewById(R.id.review_content)
-        val editButton: TextView = view.findViewById(R.id.update)
-        val deleteButton: TextView = view.findViewById(R.id.delete)
         val images: List<ImageView> = listOf(
             view.findViewById(R.id.review_image1),
             view.findViewById(R.id.review_image2),
@@ -39,15 +35,6 @@ class ReviewAdapter(
         holder.reviewDate.text = reviewItem.reg_time.toString()
         holder.reviewContent.text = reviewItem.reviewContent
 
-        holder.editButton.setOnClickListener {
-            Toast.makeText(holder.itemView.context, "수정되었습니다.", Toast.LENGTH_SHORT).show()
-            onEditClick(position)
-        }
-
-        holder.deleteButton.setOnClickListener {
-            Toast.makeText(holder.itemView.context, "삭제되었습니다.", Toast.LENGTH_SHORT).show()
-            onDeleteClick(position)
-        }
     }
 
     override fun getItemCount(): Int = reviewList.size

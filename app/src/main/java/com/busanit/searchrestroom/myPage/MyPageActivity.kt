@@ -83,16 +83,6 @@ class MyPageActivity : AppCompatActivity() {
             }
         }
 
-        binding.editInfo.setOnClickListener {
-            if (AuthHelper.isLoggedIn()) {
-                startActivity(Intent(this, EditInfoActivity::class.java))
-            } else {
-                showToast("로그인이 필요합니다.")
-                // 로그인 화면으로 이동
-                startActivity(Intent(this, LoginActivity::class.java))
-            }
-        }
-
         binding.editIcon.setOnClickListener {
             if (AuthHelper.isLoggedIn()) {
                 startActivity(Intent(this, EditInfoActivity::class.java))

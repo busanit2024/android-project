@@ -238,6 +238,20 @@ class RestroomDetailActivity : AppCompatActivity() {
         }
     }
 
+//    fun onReviewEdit(review: ReviewWithMemberAndFilter) {
+//        if (review.memberId == memberId) {
+//            val intent = Intent(this@RestroomDetailActivity, ReviewUpdateActivity::class.java).apply {
+//                putExtra("reviewId", review.reviewId)
+//                putExtra("restroomId", restroomId)
+//                putExtra("content", review.reviewText)
+//                putExtra("toiletPaperOption", review.toiletPaperOption)
+//                putExtra("howManyOption", review.howManyOption)
+//                putExtra("cleanlinessOption", review.cleanlinessOption)
+//            }
+//            startActivity(intent)
+//        }
+//    }
+
     override fun onResume() {
         super.onResume()
         if (AuthHelper.isLoggedIn()) {

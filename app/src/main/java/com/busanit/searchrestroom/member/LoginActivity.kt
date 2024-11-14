@@ -43,6 +43,12 @@ class LoginActivity : AppCompatActivity(){
             val email = binding.loginEmail.text.toString()
             val password = binding.loginPassword.text.toString()
 
+            // 입력란 공란 체크
+            if (email.isBlank() || password.isBlank()) {
+                Toast.makeText(this, "모든 정보를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             // 로그인 시도
             viewModel.loginUser(email, password)
         }

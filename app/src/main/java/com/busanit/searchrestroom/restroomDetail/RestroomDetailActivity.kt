@@ -101,7 +101,12 @@ class RestroomDetailActivity : AppCompatActivity() {
 
         displayReviews(binding)
     }
-
+    override fun onResume() {
+        super.onResume()
+        if (AuthHelper.isLoggedIn()) {
+            setupBookmarkButton()
+        }
+    }
     private fun setupUI(restroom: Restroom?) {
         restroom?.let {
             binding.restroomName.text = it.restroomName
@@ -128,10 +133,17 @@ class RestroomDetailActivity : AppCompatActivity() {
     private fun setupBookmarkButton() {
         lifecycleScope.launch {
             try {
-                isBookmarked = bookmarkRepository.isBookmarked(memberId, restroomId)
+                isBookmarked = withContext(Dispatchers.IO) {
+                    bookmarkRepository.isBookmarked(memberId, restroomId)
+                }
                 binding.restroomBookmark.isChecked = isBookmarked
             } catch (e: Exception) {
                 Log.e("RestroomDetail", "Error checking bookmark status", e)
+                Toast.makeText(
+                    this@RestroomDetailActivity,
+                    "북마크 상태 확인 중 오류가 발생했습니다",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -145,17 +157,26 @@ class RestroomDetailActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                val memberId = AuthHelper.getMemberId()
-                if (isChecked) {
-                    bookmarkRepository.addBookmark(memberId, restroomId)
-                    Toast.makeText(this@RestroomDetailActivity,
-                        "북마크에 추가되었습니다", Toast.LENGTH_SHORT).show()
-                } else {
-                    bookmarkRepository.removeBookmark(memberId, restroomId)
-                    Toast.makeText(this@RestroomDetailActivity,
-                        "북마크가 해제되었습니다", Toast.LENGTH_SHORT).show()
+                // 현재 북마크 상태 확인
+                val currentBookmarkStatus = withContext(Dispatchers.IO) {
+                    bookmarkRepository.isBookmarked(memberId, restroomId)
                 }
-                isBookmarked = isChecked
+
+                // 상태가 변경되었을 때만 처리
+                if (currentBookmarkStatus != isChecked) {
+                    withContext(Dispatchers.IO) {
+                        if (isChecked) {
+                            bookmarkRepository.addBookmark(memberId, restroomId)
+                        } else {
+                            bookmarkRepository.removeBookmark(memberId, restroomId)
+                        }
+                    }
+
+                    isBookmarked = isChecked
+                    val message = if (isChecked) "북마크에 추가되었습니다" else "북마크가 해제되었습니다"
+                    Toast.makeText(this@RestroomDetailActivity, message, Toast.LENGTH_SHORT).show()
+                }
+
             } catch (e: Exception) {
                 Log.e("RestroomDetail", "Error toggling bookmark", e)
                 binding.restroomBookmark.isChecked = !isChecked

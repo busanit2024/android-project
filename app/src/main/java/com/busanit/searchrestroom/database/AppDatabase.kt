@@ -19,7 +19,7 @@ import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.database.Review
 import com.busanit.searchrestroom.database.ReviewImage
 
-@Database(entities = [Restroom::class, Member::class, Bookmark::class, Review::class, ReviewImage::class ], version = 3, exportSchema = false)
+@Database(entities = [Restroom::class, Member::class, Bookmark::class, Review::class, ReviewImage::class ], version = 4, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
   abstract fun restroomDao(): RestroomDao
   abstract fun memberDao(): MemberDao
@@ -57,10 +57,10 @@ abstract class AppDatabase : RoomDatabase() {
     @JvmField
     val MIGRATION_3_4 : Migration = object : Migration(3, 4) {
       override fun migrate(db: SupportSQLiteDatabase) {
-        db.execSQL("ALTER TABLE Review ADD COLUMN toiletPaperOption INTEGER")
-        db.execSQL("ALTER TABLE Review ADD COLUMN howManyOption INTEGER")
-        db.execSQL("ALTER TABLE Review ADD COLUMN cleanlinessOption INTEGER")
-        db.execSQL("DROP TABLE IF EXIST review_filter_option")
+        db.execSQL("ALTER TABLE Review ADD COLUMN toilet_paper_option INTEGER")
+        db.execSQL("ALTER TABLE Review ADD COLUMN how_many_option INTEGER")
+        db.execSQL("ALTER TABLE Review ADD COLUMN cleanliness_option INTEGER")
+        db.execSQL("DROP TABLE IF EXISTS review_filter_option")
       }
     }
 

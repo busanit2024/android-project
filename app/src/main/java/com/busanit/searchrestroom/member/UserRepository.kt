@@ -166,4 +166,35 @@ class UserRepository(val memberDao: MemberDao, private val context: Context) {
             onComplete(true, null)
         }
     }
+
+    fun loginNaverUser(loginResponse: LoginResponse, onComplete: (Boolean, String?) -> Unit) {
+        GlobalScope.launch {
+            val email = getEmailFromNaverApi(loginResponse.accessToken) ?: run {
+                onComplete(false, "이메일 정보를 가져올 수 없습니다.")
+                return@launch
+            }
+
+            val existingMember = memberDao.getMemberByEmail(email)
+
+            if (existingMember == null) {
+                // 새로운 사용자일 경우 로컬 DB에 정보 저장
+                val member = Member(
+                    email = email,
+                    password = "", // 소셜 로그인은 비밀번호 없음
+                    nickname = "네이버 사용자", // 별도의 닉네임 설정
+                    profilePic = null,
+                    regTime = Date().toString(),
+                    updateTime = null,
+                    social = true,
+                    admin = false
+                )
+                memberDao.insert(member)
+                saveUserInfoToPreferences(member.memberId, email, member.nickname ?: "")
+            } else {
+                saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "")
+            }
+            onComplete(true, null)
+        }
+    }
+
 }

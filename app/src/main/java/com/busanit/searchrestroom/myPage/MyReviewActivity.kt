@@ -39,7 +39,7 @@ class MyReviewActivity : AppCompatActivity() {
         ).build()
 
         // 로그인한 사용자의 member_id 가져오기
-        val memberId = sharedPreferences.getInt("memberId", -1)
+        val memberId = sharedPreferences.getInt("member_id", -1)
         if (memberId == -1) {
             Toast.makeText(this, "로그인이 필요합니다!", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this, LoginActivity::class.java))
@@ -79,10 +79,11 @@ class MyReviewActivity : AppCompatActivity() {
 
                 Review(
                     review.reviewId,
+                    review.restroomId,
+                    review.memberId,
                     restroomName ?: "건물명 없음", // 건물명이 없을 때 대체 텍스트
-                    review.regTime?.let { Timestamp.valueOf(it) } ?: Timestamp(System.currentTimeMillis()),
-                    review.content ?: "",
-                    reviewImages.map { it.fileName ?: "" }  // 이미지 파일 이름 리스트
+                    (review.regTime?.let { Timestamp.valueOf(it) } ?: Timestamp(System.currentTimeMillis())).toString(),
+                    review.content ?: ""
                 )
             }
         )
@@ -97,7 +98,7 @@ class MyReviewActivity : AppCompatActivity() {
         restroomId?.let {
             val restroomDao = appDatabase.restroomDao()
             val restroom = restroomDao.getRestroomById(it)
-            return restroom?.restroomName
+            return restroom.restroomName
         }
         return null
     }

@@ -86,7 +86,7 @@ data class Review (
   @Ignore
   var selectedOptions: List<FilterOptionState> = emptyList()
 ){
-  constructor(reviewId: Int, s: String, timestamp: Timestamp, s1: String, map: List<String>) : this(0, 0, 0, "", "", null)
+  constructor() : this(0, 0, 0, "", "", null)
 }
 
 @Entity(

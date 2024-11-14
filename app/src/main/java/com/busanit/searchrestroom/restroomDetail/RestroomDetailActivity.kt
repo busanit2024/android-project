@@ -243,5 +243,7 @@ class RestroomDetailActivity : AppCompatActivity() {
         if (AuthHelper.isLoggedIn()) {
             setupBookmarkButton()
         }
+
+        viewModel.loadLatestReviews(restroomId)
     }
 }

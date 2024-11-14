@@ -11,7 +11,6 @@ import androidx.room.Relation
 import com.busanit.searchrestroom.reviewReg.FilterOptionState
 import com.busanit.searchrestroom.reviewReg.FilterType
 import kotlinx.parcelize.Parcelize
-import java.sql.Timestamp
 
 
 @Parcelize
@@ -86,7 +85,7 @@ data class Review (
   @Ignore
   var selectedOptions: List<FilterOptionState> = emptyList()
 ){
-  constructor() : this(0, 0, 0, "", "", null)
+  constructor(): this(0, 0, 0, "", "", null)
 }
 
 @Entity(

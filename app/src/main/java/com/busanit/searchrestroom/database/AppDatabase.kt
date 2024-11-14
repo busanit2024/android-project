@@ -77,6 +77,7 @@ abstract class AppDatabase : RoomDatabase() {
             .addMigrations(MIGRATION_3_4)
             .addMigrations(MIGRATION_4_5)
             .allowMainThreadQueries()
+            .fallbackToDestructiveMigration()
             .build()
         }
       }

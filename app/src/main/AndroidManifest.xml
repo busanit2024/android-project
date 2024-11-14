@@ -56,8 +56,9 @@
     <activity android:name=".myPage.MyReviewActivity"/>
     <activity android:name=".myPage.MyToiletActivity"/>
     <activity android:name=".review.ReviewRegActivity" />
+    <activity android:name=".review.ReviewUpdateActivity" />
     <activity android:name=".restroomDetail.RestroomUpdateActivity" />
-
+    <activity android:name=".review.ReviewListAllActivity" />
 
     <provider
         android:authorities="com.busanit.searchrestroom.fileprovider"

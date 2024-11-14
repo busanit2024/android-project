@@ -24,6 +24,7 @@ import androidx.lifecycle.lifecycleScope
 import com.busanit.searchrestroom.review.ReviewAdapter
 import com.busanit.searchrestroom.review.ReviewListAllActivity
 import com.busanit.searchrestroom.review.ReviewRegActivity
+import com.busanit.searchrestroom.review.ReviewUpdateActivity
 import com.busanit.searchrestroom.review.ReviewWithMemberAndFilter
 
 
@@ -123,7 +124,7 @@ class RestroomDetailActivity : AppCompatActivity() {
                 listener = object : ReviewAdapter.ReviewActionListener {
                     override fun onReviewEdit(review: ReviewWithMemberAndFilter) {
                         if (review.memberId == memberId) {
-                            val intent = Intent(this@RestroomDetailActivity, ReviewRegActivity::class.java).apply {
+                            val intent = Intent(this@RestroomDetailActivity, ReviewUpdateActivity::class.java).apply {
                                 putExtra("reviewId", review.reviewId)
                                 putExtra("restroomId", restroomId)
                                 putExtra("isEdit", true)
@@ -237,20 +238,6 @@ class RestroomDetailActivity : AppCompatActivity() {
             }
         }
     }
-
-//    fun onReviewEdit(review: ReviewWithMemberAndFilter) {
-//        if (review.memberId == memberId) {
-//            val intent = Intent(this@RestroomDetailActivity, ReviewUpdateActivity::class.java).apply {
-//                putExtra("reviewId", review.reviewId)
-//                putExtra("restroomId", restroomId)
-//                putExtra("content", review.reviewText)
-//                putExtra("toiletPaperOption", review.toiletPaperOption)
-//                putExtra("howManyOption", review.howManyOption)
-//                putExtra("cleanlinessOption", review.cleanlinessOption)
-//            }
-//            startActivity(intent)
-//        }
-//    }
 
     override fun onResume() {
         super.onResume()

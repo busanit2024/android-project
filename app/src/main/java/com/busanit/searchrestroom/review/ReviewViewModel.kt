@@ -48,6 +48,21 @@ class ReviewViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun updateReview(review: Review) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                reviewDao.updateReview(review)
+
+                // 리뷰 목록 갱신
+                review.restroomId?.let { restroomId ->
+                    loadLatestReviews(restroomId)
+                }
+            } catch (e: Exception) {
+                Log.e("ReviewViewModel", "Error updating review", e)
+            }
+        }
+    }
+
     fun deleteReview(reviewId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {

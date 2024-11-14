@@ -5,6 +5,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.libraries.places.api.Places
 import com.kakao.sdk.common.KakaoSdk
+import com.navercorp.nid.NaverIdLoginSDK
+import timber.log.Timber
 
 class MyApplication : Application() {
   override fun onCreate() {
@@ -15,5 +17,14 @@ class MyApplication : Application() {
     }
     // Kakao SDK 초기화
     KakaoSdk.init(this, "d7727a5bab2cc3b7b496c87da534ffc8")
+
+    // Naver
+    Timber.plant(Timber.DebugTree())
+    NaverIdLoginSDK.initialize(
+      this,
+      BuildConfig.NAVER_CLIENT_ID,
+      BuildConfig.NAVER_CLIENT_SECRET,
+      "사용자",
+    )
   }
 }

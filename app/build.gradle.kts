@@ -27,6 +27,9 @@ android {
     versionName = "1.0"
 
     buildConfigField("String", "MAPS_API_KEY", properties.getProperty("MAPS_API_KEY") )
+    // Naver
+    buildConfigField("String", "CLIENT_ID", properties.getProperty("NAVER_CLIENT_ID"))
+    buildConfigField("String", "CLIENT_SECRET", properties.getProperty("NAVER_CLIENT_SECRET"))
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     multiDexEnabled = true // 파이어베이스 인증, 플레이 서비스 인증 라이브러리 추가 및 앱 빌드 시 오류 막기 위해
@@ -35,11 +38,17 @@ android {
   buildTypes {
     debug {
       buildConfigField("String", "MAPS_API_KEY", "\"${project.properties["MAPS_API_KEY"]}\"")
+      buildConfigField("String", "CLIENT_ID", "\"${project.properties["NAVER_CLIENT_ID"]}\"")
+      buildConfigField("String", "CLIENT_SECRET", "\"${project.properties["NAVER_CLIENT_SECRET"]}\"")
     }
     release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       buildConfigField("String", "MAPS_API_KEY", "\"${project.properties["MAPS_API_KEY"]}\"")
+      // Naver
+      buildConfigField("String", "CLIENT_ID", "\"${project.properties["NAVER_CLIENT_ID"]}\"")
+      buildConfigField("String", "CLIENT_SECRET", "\"${project.properties["NAVER_CLIENT_SECRET"]}\"")
+
     }
   }
 
@@ -134,6 +143,25 @@ dependencies {
   implementation ("com.kakao.sdk:v2-friend:2.20.0") // 피커 API 모듈
   implementation ("com.kakao.sdk:v2-navi:2.20.0") // 카카오내비 API 모듈
   implementation ("com.kakao.sdk:v2-cert:2.20.0") // 카카오톡 인증 서비스 API 모듈
+
+  // naver
+  implementation(files("libs/oauth-5.10.0.aar"))
+  implementation ("org.jetbrains.kotlin:kotlin-stdlib:1.6.21")
+  implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+  implementation ("androidx.appcompat:appcompat:1.3.1")
+  implementation ("androidx.legacy:legacy-support-core-utils:1.0.0")
+  implementation ("androidx.browser:browser:1.4.0")
+  implementation ("androidx.constraintlayout:constraintlayout:1.1.3")
+  implementation ("androidx.security:security-crypto:1.1.0-alpha06")
+  implementation ("androidx.core:core-ktx:1.3.0")
+  implementation ("androidx.fragment:fragment-ktx:1.3.6")
+  implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
+  implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+  implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+  implementation ("com.squareup.moshi:moshi-kotlin:1.11.0")
+  implementation ("com.squareup.okhttp3:logging-interceptor:4.2.1")
+  implementation ("com.airbnb.android:lottie:3.1.0")
+  implementation ("com.jakewharton.timber:timber:5.0.1") // 최신 버전으로 추가
 }
 
 secrets {

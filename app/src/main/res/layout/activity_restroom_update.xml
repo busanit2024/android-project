@@ -115,7 +115,7 @@
                     android:maxLines="1"
                     android:singleLine="true" />
                 <Button
-                    android:id="@+id/writeReview"
+                    android:id="@+id/deleteRequestButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="삭제요청"

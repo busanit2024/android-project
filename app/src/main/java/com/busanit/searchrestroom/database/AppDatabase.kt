@@ -55,8 +55,9 @@ abstract class AppDatabase : RoomDatabase() {
     @JvmField
     val MIGRATION_3_4 : Migration = object : Migration(3, 4) {
       override fun migrate(db: SupportSQLiteDatabase) {
+        Log.d("AppDatabase", "migration 3 to 4")
         db.execSQL("""
-        CREATE TABLE review_filter_option (
+        CREATE TABLE IF NOT EXISTS review_filter_option (
             option_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             review_id INTEGER NOT NULL,
             filter_type TEXT CHECK(filter_type IN ('0', '1', '2')) NOT NULL,

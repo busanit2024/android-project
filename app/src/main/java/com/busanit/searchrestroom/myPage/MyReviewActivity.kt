@@ -17,19 +17,14 @@ import java.sql.Timestamp
 class MyReviewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMyReviewBinding
-    private lateinit var appDatabase: AppDatabase
+    private var appDatabase: AppDatabase? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMyReviewBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        appDatabase = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java,
-            "search-restroom"
-        ).build()
-
+        appDatabase = AppDatabase.getDatabase(applicationContext)
         // 샘플 데이터
         val reviewItems = listOf(
             MyReview(1, "건물명", Timestamp.valueOf("2024-11-07 12:00:00"), "리뷰 내용1", listOf(R.drawable.empty_image, R.drawable.empty_image, R.drawable.empty_image)),
@@ -61,7 +56,7 @@ class MyReviewActivity : AppCompatActivity() {
     private fun deleteReview(reviewId: Int) {
         // 코루틴 사용 -> 비동기적으로 삭제
         CoroutineScope(Dispatchers.IO).launch {
-            val reviewDao = appDatabase.reviewDao()
+            val reviewDao = appDatabase!!.reviewDao()
             reviewDao.getReviewById(reviewId)
             withContext(Dispatchers.Main) {
                 Toast.makeText(this@MyReviewActivity, "리뷰가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
@@ -73,7 +68,7 @@ class MyReviewActivity : AppCompatActivity() {
 
     private fun updateReview(reviewId: Int, newContent: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val reviewDao = appDatabase.reviewDao()
+            val reviewDao = appDatabase!!.reviewDao()
             val review = reviewDao.getReviewById(reviewId)
 
             if (review != null) {

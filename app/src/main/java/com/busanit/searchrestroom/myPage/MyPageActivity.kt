@@ -39,8 +39,8 @@ class MyPageActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
-        val db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "search-restroom").build()
-        memberDao = db.memberDao()
+        val db = AppDatabase.getDatabase(applicationContext)
+        memberDao = db!!.memberDao()
 
         // 사용자 정보 불러오기
         loadUserInfo()

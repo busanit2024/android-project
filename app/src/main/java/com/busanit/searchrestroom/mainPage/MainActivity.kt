@@ -70,7 +70,9 @@ import java.util.Collections
 import kotlin.math.cos
 
 class MainActivity : AppCompatActivity(){
-
+  companion object {
+    private const val RESTROOM_DETAIL_REQUEST = 1001
+  }
   private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
   // 지도 초기화
   private val PERMISSIONS = arrayOf(
@@ -295,7 +297,21 @@ class MainActivity : AppCompatActivity(){
     })
   }
 
+  // Activity 결과 처리를 위한 메서드 추가
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    if (requestCode == RESTROOM_DETAIL_REQUEST && resultCode == RESULT_OK) {
+      // 화장실 정보가 삭제되었으므로 지도 새로고침
+      updateLocations()
 
+      // 커스텀 마커 뷰가 표시되어 있다면 제거
+      if (::customMarkerView.isInitialized && isCustomMarkerVisible) {
+        val layout = findViewById<ConstraintLayout>(R.id.main)
+        layout.removeView(customMarkerView)
+        isCustomMarkerVisible = false
+      }
+    }
+  }
 
 
   override fun onRequestPermissionsResult(
@@ -411,6 +427,7 @@ class MainActivity : AppCompatActivity(){
 
             titleTextView?.text = marker.title
 
+
             detailsButton?.setOnClickListener {
               Log.d("test", "detailsButton clicked")
               val id = marker.tag as Int
@@ -418,8 +435,9 @@ class MainActivity : AppCompatActivity(){
               val intent = Intent(context, RestroomDetailActivity::class.java)
               intent.putExtra("restroom_id", id)
               intent.putExtra("restroom", restroom)
-              startActivity(intent)
+              startActivityForResult(intent, RESTROOM_DETAIL_REQUEST)  // startActivity 대신 사용
             }
+
 
             val markerPosition = marker.position
             val projection = googleMap?.projection

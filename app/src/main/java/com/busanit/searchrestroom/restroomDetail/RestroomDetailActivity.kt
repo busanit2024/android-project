@@ -222,6 +222,7 @@ class RestroomDetailActivity : AppCompatActivity() {
                     Toast.makeText(this@RestroomDetailActivity,
                         "화장실 정보가 삭제되었습니다.",
                         Toast.LENGTH_SHORT).show()
+                    setResult(RESULT_OK)  // 삭제 성공 결과 설정
                     finish()  // 액티비티 종료
                 }
             } catch (e: Exception) {

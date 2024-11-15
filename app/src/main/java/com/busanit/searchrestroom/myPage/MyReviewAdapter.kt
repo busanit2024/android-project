@@ -2,7 +2,6 @@ package com.busanit.searchrestroom.myPage
 
 import android.app.AlertDialog
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,11 +9,9 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.R
-import com.busanit.searchrestroom.dao.ReviewDao
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.database.Review
@@ -25,9 +22,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class ReviewAdapter(
+class MyReviewAdapter(
     private val reviewList: MutableList<Review>,
-) : RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder>() {
+) : RecyclerView.Adapter<MyReviewAdapter.ReviewViewHolder>() {
 
     inner class ReviewViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val buildingName: TextView = view.findViewById(R.id.building_name)

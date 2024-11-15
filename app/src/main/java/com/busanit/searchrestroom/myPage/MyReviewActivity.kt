@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.room.Room
 import com.busanit.searchrestroom.databinding.ActivityMyReviewBinding
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.database.Review
@@ -16,7 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.sql.Timestamp
 
 class MyReviewActivity : AppCompatActivity() {
 
@@ -66,7 +64,7 @@ class MyReviewActivity : AppCompatActivity() {
 
     private suspend fun setupRecyclerView(reviews: List<Review>) {
         binding.myReviewList.layoutManager = LinearLayoutManager(this)
-        binding.myReviewList.adapter = ReviewAdapter(
+        binding.myReviewList.adapter = MyReviewAdapter(
             reviews.toMutableList()
         )
     }

@@ -9,8 +9,35 @@ import com.busanit.searchrestroom.database.Review
 import com.busanit.searchrestroom.review.ReviewWithMemberAndFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ReviewViewModel(application: Application) : AndroidViewModel(application) {
+    companion object {
+        fun formatDateForDisplay(dateStr: String?): String {
+            return try {
+                if (dateStr.isNullOrEmpty()) {
+                    Log.d("ReviewViewModel", "Date string is null or empty")
+                    return ""
+                }
+
+                val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+                val outputFormat = SimpleDateFormat("yy.MM.dd HH:mm:ss", Locale.getDefault())
+
+                val date = inputFormat.parse(dateStr)
+                if (date == null) {
+                    return dateStr
+                }
+
+                val formattedDate = outputFormat.format(date)
+                formattedDate
+
+            } catch (e: Exception) {
+                dateStr ?: ""
+            }
+        }
+    }
     private val reviewDao = AppDatabase.getDatabase(application)!!.reviewDao()
 
     private val _reviews = MutableLiveData<List<ReviewWithMemberAndFilter>>()

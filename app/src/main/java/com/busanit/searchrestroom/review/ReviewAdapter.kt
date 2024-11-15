@@ -1,5 +1,6 @@
 package com.busanit.searchrestroom.review
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,26 +37,17 @@ class ReviewAdapter(
 
     override fun getItemCount() = reviewList.size
 
-    private fun formatDate(dateStr: String?): String {
-        return try {
-            if (dateStr.isNullOrEmpty()) return ""
-
-            val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-            val outputFormat = SimpleDateFormat("yy.MM.dd HH:mm", Locale.getDefault())
-            val date = inputFormat.parse(dateStr)
-            date?.let { outputFormat.format(it) } ?: ""
-        } catch (e: Exception) {
-            dateStr ?: ""
-        }
-    }
-
     inner class ReviewViewHolder(private val binding: ItemReviewViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(review: ReviewWithMemberAndFilter) {
             binding.apply {
                 reviewNickname.text = review.nickname
-                reviewRegDate.text = formatDate(review.regDate)
+
+                val formattedDate = ReviewViewModel.formatDateForDisplay(review.regDate)
+                Log.d("ReviewAdapter", "Setting date text: $formattedDate")
+                reviewRegDate.text = formattedDate.ifEmpty { "작성일자" }
+
                 reviewText.text = review.reviewText
 
                 // 필터 옵션 표시

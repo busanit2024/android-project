@@ -54,11 +54,13 @@
     <activity android:name=".myPage.FavoriteActivity"/>
     <activity android:name=".myPage.EditInfoActivity"/>
     <activity android:name=".myPage.MyReviewActivity"/>
-    <activity android:name=".myPage.MyToiletActivity"/>
     <activity android:name=".review.ReviewRegActivity" />
     <activity android:name=".review.ReviewUpdateActivity" />
     <activity android:name=".restroomDetail.RestroomUpdateActivity" />
     <activity android:name=".review.ReviewListAllActivity" />
+    <activity android:name=".admin.AdminActivity"
+        android:launchMode="singleTask"/>
+    <activity android:name=".admin.AdminDeleteActivity"/>
 
     <provider
         android:authorities="com.busanit.searchrestroom.fileprovider"

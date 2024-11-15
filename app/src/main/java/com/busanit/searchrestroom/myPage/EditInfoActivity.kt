@@ -171,11 +171,8 @@ class EditInfoActivity : AppCompatActivity() {
             }
         }
 
-        // 바꿀 비밀번호가 비어있거나 기존 비밀번호와 같으면 리턴
-        if (newPassword.isEmpty()) {
-            Toast.makeText(this, "새 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
-            return
-        } else if (newPassword == currentPassword) {
+        // 바꿀 비밀번호가 기존 비밀번호와 같으면 리턴(빈 값일 때는 그냥 넘김)
+         if (newPassword == currentPassword) {
             Toast.makeText(this, "새 비밀번호는 기존 비밀번호와 달라야 합니다!", Toast.LENGTH_SHORT).show()
             return
         }
@@ -183,6 +180,7 @@ class EditInfoActivity : AppCompatActivity() {
         // 데이터베이스 업데이트 로직
         CoroutineScope(Dispatchers.IO).launch {
             val db = AppDatabase.getDatabase(this@EditInfoActivity)
+
             db!!.memberDao().updateNickname(currentMember!!.memberId, newNickname)    // 닉네임 업데이트
             if (newPassword.isNotEmpty()) {
                 if (newPassword != currentPassword) {
@@ -191,13 +189,11 @@ class EditInfoActivity : AppCompatActivity() {
                     Toast.makeText(this@EditInfoActivity, "새 비밀번호는 기존 비밀번호와 달라야 합니다!", Toast.LENGTH_SHORT).show()
                     return@launch
                 }
-            } else {
-                Toast.makeText(this@EditInfoActivity, "새 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
-                return@launch
             }
 
             withContext(Dispatchers.Main) {
                 Toast.makeText(this@EditInfoActivity, "정보가 수정되었습니다.", Toast.LENGTH_SHORT).show()
+                setResult(RESULT_OK)    // 결과 설정
                 finish()  // 수정 후 액티비티 종료
             }
         }

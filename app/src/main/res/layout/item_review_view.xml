@@ -29,26 +29,30 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1"/>
-        <TextView
-            android:id="@+id/btnDeleteReview"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="삭제"
-            android:textSize="15sp" />
-        <View
-            android:id="@+id/divisionLine"
-            android:layout_width="1dp"
-            android:layout_height="15dp"
-            android:layout_gravity="center_vertical"
-            android:background="@color/black"
-            android:layout_marginRight="3dp"
-            android:layout_marginLeft="3dp"/>
-        <TextView
-            android:id="@+id/btnEditReview"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="수정"
-            android:textSize="15sp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView
+                android:id="@+id/btnDeleteReview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="삭제"
+                android:textSize="15sp" />
+            <View
+                android:id="@+id/divisionLine"
+                android:layout_width="1dp"
+                android:layout_height="12dp"
+                android:background="@color/black"
+                android:layout_marginHorizontal="8dp" />
+            <TextView
+                android:id="@+id/btnEditReview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="수정"
+                android:textSize="15sp"/>
+        </LinearLayout>
     </LinearLayout>
 
     <!-- 리뷰 내용과 필터 옵션 -->

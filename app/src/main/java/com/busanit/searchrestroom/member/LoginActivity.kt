@@ -4,6 +4,7 @@ import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -97,16 +98,51 @@ class LoginActivity : AppCompatActivity(){
         }
 
         // 아이디 찾기 버튼 클릭 시
-        binding.findIdBtn.setOnClickListener {
+        binding.findIdTxt.setOnClickListener {
             val intent = Intent(this, FindIdActivity::class.java)
             startActivity(intent)
         }
 
         // 비밀번호 찾기 버튼 클릭 시
-        binding.findpwBtn.setOnClickListener {
+        binding.findpwTxt.setOnClickListener {
             val intent = Intent(this, FindPwActivity::class.java)
             startActivity(intent)
         }
+
+        // TextView 클릭 효과 추가 (선택사항)
+        binding.apply {
+            findIdTxt.apply {
+                isClickable = true
+                setOnTouchListener { v, event ->
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            alpha = 0.5f
+                        }
+                        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                            alpha = 1.0f
+                        }
+                    }
+                    false
+                }
+            }
+
+            findpwTxt.apply {
+                isClickable = true
+                setOnTouchListener { v, event ->
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            alpha = 0.5f
+                        }
+                        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                            alpha = 1.0f
+                        }
+                    }
+                    false
+                }
+            }
+        }
+
+
 
         // 로그인 결과 관찰
         viewModel.loginResult.observe(this) { (success, message) ->

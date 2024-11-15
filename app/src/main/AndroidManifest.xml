@@ -5,8 +5,6 @@
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
   <uses-permission android:name="android.permission.INTERNET"/>
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-  <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
   <application
       android:name=".MyApplication"
@@ -47,27 +45,22 @@
           android:scheme="@string/scheme_kakao_app_key" />
       </intent-filter>
     </activity>
-    <activity android:name=".member.LoginActivity"/>
+    <activity android:name=".mainPage.SearchListActivity"/>
+    <activity android:name=".member.LoginActivity" />
     <activity android:name=".member.RegisterActivity" />
     <activity android:name=".member.GoogleLogin" />
-    <activity android:name=".member.FindIdActivity"/>
-    <activity android:name=".member.FindPwActivity"/>
     <activity android:name=".restroomDetail.RestroomDetailActivity" />
     <activity android:name=".myPage.MyPageActivity"/>
     <activity android:name=".myPage.FavoriteActivity"/>
     <activity android:name=".myPage.EditInfoActivity"/>
     <activity android:name=".myPage.MyReviewActivity"/>
-    <activity android:name=".myPage.MyToiletActivity"/>
+    <activity android:name=".review.ReviewRegActivity" />
+    <activity android:name=".review.ReviewUpdateActivity" />
+    <activity android:name=".restroomDetail.RestroomUpdateActivity" />
+    <activity android:name=".review.ReviewListAllActivity" />
     <activity android:name=".admin.AdminActivity"
         android:launchMode="singleTask"/>
     <activity android:name=".admin.AdminDeleteActivity"/>
-    <activity android:name=".reviewReg.ReviewRegActivity" />
-    <activity android:name=".restroomDetail.RestroomUpdateActivity"
-        tools:ignore="Instantiatable" />
-    <activity
-        android:name=".mainPage.SearchListActivity"
-        android:exported="false" />
-
 
     <provider
         android:authorities="com.busanit.searchrestroom.fileprovider"

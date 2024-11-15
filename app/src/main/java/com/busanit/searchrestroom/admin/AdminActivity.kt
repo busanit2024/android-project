@@ -26,13 +26,24 @@ class AdminActivity : AppCompatActivity() {
             val intent = Intent(this, AdminDeleteActivity::class.java)
             startActivity(intent)
         }
+//
+//        binding.userBtn.setOnClickListener {
+//
+//        }
+//
+//        binding.reviewBtn.setOnClickListener {
+//
+//        }
 
-        binding.userBtn.setOnClickListener {
-
+        // 뒤로 가기 버튼 클릭 시
+        binding.backBtn.setOnClickListener {
+            finish()
         }
+    }
 
-        binding.reviewBtn.setOnClickListener {
-
-        }
+    override fun onResume() {
+        super.onResume()
+        val deleteRequestCount = db?.DeleteRequestDao()?.getCount() ?: 0
+        binding.badge.text = deleteRequestCount.toString()
     }
 }

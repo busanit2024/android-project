@@ -67,17 +67,7 @@ class MyReviewActivity : AppCompatActivity() {
     private suspend fun setupRecyclerView(reviews: List<Review>) {
         binding.myReviewList.layoutManager = LinearLayoutManager(this)
         binding.myReviewList.adapter = ReviewAdapter(
-            reviews.map { review ->
-
-                Review(
-                    review.reviewId,
-                    review.restroomId,
-                    review.memberId,
-                    review.content ?: "",
-                    (review.regTime?.let { Timestamp.valueOf(it) } ?: Timestamp(System.currentTimeMillis())).toString(),
-                    review.updateTime
-                )
-            }.toMutableList()
+            reviews.toMutableList()
         )
     }
 

@@ -48,6 +48,7 @@ class EditInfoActivity : AppCompatActivity() {
     private var photoUri: Uri? = null
     private lateinit var sharedPreferences: SharedPreferences
 
+
     // 카메라로 사진 촬영
     private val requestCameraLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()) { result ->
@@ -100,6 +101,9 @@ class EditInfoActivity : AppCompatActivity() {
         // sharedPreferences에서 memberId를 가져오기
         sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
         val memberId = sharedPreferences.getInt("member_id", -1)
+        photoUri = Uri.parse(sharedPreferences.getString("profileImageUri", null))
+
+        binding.profileImage.setImageURI(photoUri)
 
         // 로그인한 사용자의 정보를 DB에서 가져오기
         loadMemberInfo(memberId)

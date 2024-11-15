@@ -61,9 +61,9 @@ class ReviewRegActivity : AppCompatActivity() {
             }
 
             val review = Review(
-                reviewId = 0,
+                reviewId = reviewId,
                 //restroomId = restroom?.restroomId ?: 0,
-                restroomId = 1,
+                restroomId = restroom?.restroomId,
                 memberId = memberId,
                 regTime = System.currentTimeMillis().toString(),
                 updateTime = System.currentTimeMillis().toString(),

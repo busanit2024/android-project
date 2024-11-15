@@ -117,6 +117,7 @@ class RestroomDetailActivity : AppCompatActivity() {
         binding.reviewRecyclerView.layoutManager = LinearLayoutManager(this)
 
         viewModel.loadLatestReviews(restroomId)
+        Log.d("test", "${restroomId}")
         viewModel.latestReviews.observe(this) { reviews ->
             reviewAdapter = ReviewAdapter(
                 reviewList = reviews,

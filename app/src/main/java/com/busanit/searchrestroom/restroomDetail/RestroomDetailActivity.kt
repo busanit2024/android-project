@@ -1,33 +1,31 @@
 package com.busanit.searchrestroom.restroomDetail
 
 import BookmarkRepository
-import android.annotation.SuppressLint
+import ReviewViewModel
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.busanit.searchrestroom.AuthHelper
-import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.dao.BookmarkDao
 import com.busanit.searchrestroom.dao.ReviewDao
 import com.busanit.searchrestroom.database.AppDatabase
-import com.busanit.searchrestroom.database.Bookmark
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.databinding.ActivityRestroomDetailBinding
-import com.busanit.searchrestroom.reviewReg.FilterOption
-import com.busanit.searchrestroom.reviewReg.FilterOptionState
-import com.busanit.searchrestroom.reviewReg.ReviewAdapter
-import com.busanit.searchrestroom.reviewReg.ReviewRegActivity
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
+import com.busanit.searchrestroom.review.ReviewAdapter
+import com.busanit.searchrestroom.review.ReviewListAllActivity
+import com.busanit.searchrestroom.review.ReviewRegActivity
+import com.busanit.searchrestroom.review.ReviewUpdateActivity
+import com.busanit.searchrestroom.review.ReviewWithMemberAndFilter
 
 
 class RestroomDetailActivity : AppCompatActivity() {
@@ -38,6 +36,8 @@ class RestroomDetailActivity : AppCompatActivity() {
     private var isBookmarked = false
     private var memberId: Int = 0
     private var restroomId: Int = 0
+    private lateinit var viewModel: ReviewViewModel
+    private lateinit var reviewAdapter: ReviewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,33 +49,40 @@ class RestroomDetailActivity : AppCompatActivity() {
         bookmarkDao = db.bookmarkDao()
         bookmarkRepository = BookmarkRepository(bookmarkDao, db.restroomDao())
 
-        // 메인에서 인텐트로 데이터 받기
+        initializeData()
+        setupRestroom()
+        setupReviewRecyclerView()
+        setupButtons()
+    }
+
+    private fun initializeData() {
+        restroomId = intent.getIntExtra("restroomId", -1)
+        memberId = AuthHelper.getMemberId()
+        viewModel = ViewModelProvider(this)[ReviewViewModel::class.java]
+    }
+
+    private fun setupRestroom() {
         val restroom: Restroom? = intent.getParcelableExtra("restroom")
         restroomId = intent.getIntExtra("restroomId", 0)
 
-        // 현재 로그인한 사용자 정보 가져오기
         if (AuthHelper.isLoggedIn()) {
             memberId = AuthHelper.getMemberId()
-            // 북마크 상태 체크 및 버튼 설정
             setupBookmarkButton()
-
-            // 로그인한 경우 버튼들 보이기
-            binding.restroomBookmark.visibility = View.VISIBLE
-            binding.rewriteInfo.visibility = View.VISIBLE
-            binding.writeReview.visibility = View.VISIBLE
+            binding.apply {
+                restroomBookmark.visibility = View.VISIBLE
+                rewriteInfo.visibility = View.VISIBLE
+                writeReview.visibility = View.VISIBLE
+            }
         } else {
-            // 로그인하지 않은 경우 버튼들 숨기기
-            binding.restroomBookmark.visibility = View.GONE
-            binding.rewriteInfo.visibility = View.GONE
-            binding.writeReview.visibility = View.GONE
-
-            Toast.makeText(this, "로그인 후 이용 가능합니다", Toast.LENGTH_SHORT).show()
+            binding.apply {
+                restroomBookmark.visibility = View.GONE
+                rewriteInfo.visibility = View.GONE
+                writeReview.visibility = View.GONE
+            }
         }
 
-        // UI 설정
         setupUI(restroom)
 
-        // 북마크 체크박스 클릭 이벤트
         binding.restroomBookmark.setOnCheckedChangeListener { _, isChecked ->
             if (!AuthHelper.isLoggedIn()) {
                 Toast.makeText(this, "로그인이 필요한 서비스입니다", Toast.LENGTH_SHORT).show()
@@ -84,48 +91,97 @@ class RestroomDetailActivity : AppCompatActivity() {
             }
             toggleBookmark(isChecked)
         }
-
-        //정보 수정 버튼 클릭 이벤트
-        binding.rewriteInfo.setOnClickListener {
-            val intent = Intent(this, RestroomUpdateActivity::class.java)
-            intent.putExtra("restroom", restroom)
-            startActivity(intent)
-        }
-
-        // 리뷰작성 버튼 클릭 이벤트
-        binding.writeReview.setOnClickListener {
-            val intent = Intent(this, ReviewRegActivity::class.java)
-            intent.putExtra("restroomId", restroomId)
-            intent.putExtra("restroom", restroom)
-            startActivity(intent)
-        }
-
-        displayReviews(binding)
-    }
-    override fun onResume() {
-        super.onResume()
-        if (AuthHelper.isLoggedIn()) {
-            setupBookmarkButton()
-        }
     }
 
     private fun setupUI(restroom: Restroom?) {
         restroom?.let {
-            binding.restroomName.text = it.restroomName
-            binding.location.text = it.location
-            binding.openTime.text = it.openTime
+            binding.apply {
+                restroomName.text = it.restroomName
+                location.text = it.location
+                openTime.text = it.openTime
 
-            // ChipGroup의 각 Chip 상태 설정
-            binding.chipFullTime.isChecked = it.fullTime == true
-            binding.chipDiaper.isChecked = it.diaper == true
-            binding.chipAccessible.isChecked = it.accessible == true
-            binding.chipUnisex.isChecked = it.unisex == true
+                chipFullTime.isChecked = it.fullTime == true
+                chipDiaper.isChecked = it.diaper == true
+                chipAccessible.isChecked = it.accessible == true
+                chipUnisex.isChecked = it.unisex == true
 
-            // 기타 정보 설정
-            binding.memoText.text = it.memo ?: "기타 정보가 없습니다."
-            binding.memoText.visibility = if (it.memo.isNullOrEmpty()) View.GONE else View.VISIBLE
-
+                memoText.text = it.memo ?: "기타 정보가 없습니다."
+                memoText.visibility = if (it.memo.isNullOrEmpty()) View.GONE else View.VISIBLE
+            }
             restroomId = it.restroomId
+        }
+    }
+
+    private fun setupReviewRecyclerView() {
+        binding.reviewRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        viewModel.loadLatestReviews(restroomId)
+        Log.d("test", "${restroomId}")
+        viewModel.latestReviews.observe(this) { reviews ->
+            reviewAdapter = ReviewAdapter(
+                reviewList = reviews,
+                currentMemberId = memberId,
+                listener = object : ReviewAdapter.ReviewActionListener {
+                    override fun onReviewEdit(review: ReviewWithMemberAndFilter) {
+                        if (review.memberId == memberId) {
+                            val intent = Intent(this@RestroomDetailActivity, ReviewUpdateActivity::class.java).apply {
+                                putExtra("reviewId", review.reviewId)
+                                putExtra("restroomId", restroomId)
+                                putExtra("memberId",memberId)
+                                putExtra("content", review.reviewText)
+                                putExtra("toiletPaperOption", review.toiletPaperOption)
+                                putExtra("howManyOption", review.howManyOption)
+                                putExtra("cleanlinessOption", review.cleanlinessOption)
+                                putExtra("restroomName", binding.restroomName.text.toString())
+                                putExtra("location", binding.location.text.toString())
+                            }
+                            startActivity(intent)
+                        }
+                    }
+
+                    override fun onReviewDelete(review: ReviewWithMemberAndFilter) {
+                        if (review.memberId == memberId) {
+                            review.reviewId?.let { reviewId ->
+                                AlertDialog.Builder(this@RestroomDetailActivity)
+                                    .setTitle("리뷰 삭제")
+                                    .setMessage("이 리뷰를 삭제하시겠습니까?")
+                                    .setPositiveButton("삭제") { _, _ ->
+                                        viewModel.deleteReview(reviewId)
+                                    }
+                                    .setNegativeButton("취소", null)
+                                    .show()
+                            }
+                        }
+                    }
+                }
+            )
+            binding.reviewRecyclerView.adapter = reviewAdapter
+        }
+    }
+
+    private fun setupButtons() {
+        val restroom: Restroom? = intent.getParcelableExtra("restroom")
+
+        binding.rewriteInfo.setOnClickListener {
+            val intent = Intent(this, RestroomUpdateActivity::class.java).apply {
+                putExtra("restroom", restroom)
+            }
+            startActivity(intent)
+        }
+
+        binding.writeReview.setOnClickListener {
+            val intent = Intent(this, ReviewRegActivity::class.java).apply {
+                putExtra("restroomId", restroomId)
+                putExtra("restroom", restroom)
+            }
+            startActivity(intent)
+        }
+
+        binding.viewAllReviewsButton.setOnClickListener {
+            val intent = Intent(this, ReviewListAllActivity::class.java).apply {
+                putExtra("restroomId", restroomId)
+            }
+            startActivity(intent)
         }
     }
 
@@ -156,12 +212,10 @@ class RestroomDetailActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                // 현재 북마크 상태 확인
                 val currentBookmarkStatus = withContext(Dispatchers.IO) {
                     bookmarkRepository.isBookmarked(memberId, restroomId)
                 }
 
-                // 상태가 변경되었을 때만 처리
                 if (currentBookmarkStatus != isChecked) {
                     withContext(Dispatchers.IO) {
                         if (isChecked) {
@@ -175,7 +229,6 @@ class RestroomDetailActivity : AppCompatActivity() {
                     val message = if (isChecked) "북마크에 추가되었습니다" else "북마크가 해제되었습니다"
                     Toast.makeText(this@RestroomDetailActivity, message, Toast.LENGTH_SHORT).show()
                 }
-
             } catch (e: Exception) {
                 Log.e("RestroomDetail", "Error toggling bookmark", e)
                 binding.restroomBookmark.isChecked = !isChecked
@@ -187,49 +240,13 @@ class RestroomDetailActivity : AppCompatActivity() {
             }
         }
     }
-        // 로그인 여부에 따라 삭제, 수정 나오도록 하기
 
-
-
-    // 리뷰 불러오기
-    private fun displayReviews(binding: ActivityRestroomDetailBinding) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val reviews = reviewDao.getLatestReviewsWithFilterByRestroomId(restroomId)
-
-            // 각 리뷰에 대해 필터 옵션을 설정
-            val reviewWithSelectedOptions = reviews.map { review ->
-                val filterOptions = reviewDao.getFilterOptionsForReview(review.reviewId)
-                val selectedOptions = filterOptions.mapNotNull { filterOption ->
-                    val option = FilterOption.findByTypeAndName(filterOption.filterType, filterOption.optionName)
-                    option?.let { FilterOptionState(option = it) }
-                }
-                review to selectedOptions
-            }
-
-            withContext(Dispatchers.Main) {
-                // 어댑터에 매핑된 리뷰와 필터 옵션 리스트 전달
-                val reviewAdapter = ReviewAdapter(reviewWithSelectedOptions)
-                binding.reviewRecyclerView.layoutManager = LinearLayoutManager(this@RestroomDetailActivity)
-                binding.reviewRecyclerView.adapter = reviewAdapter
-            }
+    override fun onResume() {
+        super.onResume()
+        if (AuthHelper.isLoggedIn()) {
+            setupBookmarkButton()
         }
-    }
 
-
-    @SuppressLint("MissingInflatedId")
-    private fun createReviewLayout(review: ReviewDao.ReviewWithFilter): View {
-        val reviewLayout = layoutInflater.inflate(R.layout.item_review_view, null)
-
-        // 리뷰 데이터 매핑
-        val reviewTextView = reviewLayout.findViewById<TextView>(R.id.reviewText)
-        reviewTextView.text = review.content
-
-        val reviewerInfoTextView = reviewLayout.findViewById<TextView>(R.id.reviewerInfo)
-        reviewerInfoTextView.text = "${review.nickname} / ${review.regTime}"
-
-//        val filterOptionsTextView = reviewLayout.findViewById<TextView>(R.id.filterOptions)
-//        filterOptionsTextView.text = review.selectedOptions.joinToString(", ") { it.optionName }
-
-        return reviewLayout
+        viewModel.loadLatestReviews(restroomId)
     }
 }

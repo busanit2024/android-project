@@ -1,17 +1,12 @@
 package com.busanit.searchrestroom.dao
 
-import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Ignore
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Relation
-import androidx.room.Transaction
+import androidx.room.Update
 import com.busanit.searchrestroom.database.Review
-import com.busanit.searchrestroom.database.ReviewFilterOption
-import com.busanit.searchrestroom.reviewReg.FilterOptionState
+import com.busanit.searchrestroom.review.ReviewWithMemberAndFilter
 
 @Dao
 interface ReviewDao {
@@ -28,47 +23,60 @@ interface ReviewDao {
   fun getReviewByRestroomId(restroomId: Int): List<Review>
 
   @Insert
-  fun insert(vararg review: Review) : List<Long>
+  fun insert(vararg review: Review)
 
   @Delete
   fun delete(review: Review)
 
-  @Insert
-  fun insertReviewFilterOptions(options: List<ReviewFilterOption>) // ReviewFilterOption 삽입
+  @Query("DELETE FROM review WHERE review_id = :reviewId")
+  suspend fun deleteReviewById(reviewId: Int)
 
-  @Transaction
+  @Update
+  fun update(review: Review)
+
+  @Query("SELECT * FROM review WHERE restroom_id = :restroomId ORDER BY review_id DESC LIMIT 3")
+  fun getLatestReviewsByRestroomId(restroomId: Int): List<Review>
+
+  @Query("SELECT * FROM review WHERE restroom_id = :restroomId")
+  fun getAllReviewsByRestroomId(restroomId: Int): List<Review>
+
   @Query("""
-    SELECT review.review_id, review.restroom_id, review.member_id, review.content, review.reg_time, 
-           member.nickname 
-    FROM review 
-    JOIN member ON review.member_id = member.member_id
-    LEFT JOIN review_filter_option ON review.review_id = review_filter_option.review_id
-    WHERE review.restroom_id = :restroomId 
-    ORDER BY review.reg_time DESC 
-    LIMIT 3
-""")
-  fun getLatestReviewsWithFilterByRestroomId(restroomId: Int): List<ReviewWithFilter>
+        SELECT 
+            r.review_id as reviewId,
+            r.restroom_id as restroomId,
+            r.member_id as memberId,
+            m.nickname as nickname,
+            r.content as reviewText,
+            r.reg_time as regDate,
+            r.toilet_paper_option as toiletPaperOption,
+            r.how_many_option as howManyOption,
+            r.cleanliness_option as cleanlinessOption
+        FROM review r
+        INNER JOIN member m ON r.member_id = m.member_id
+        WHERE r.restroom_id = :restroomId
+        ORDER BY r.reg_time DESC
+    """)
+  suspend fun getReviewsWithMember(restroomId: Int): List<ReviewWithMemberAndFilter>
 
-  data class ReviewWithFilter(
-    @ColumnInfo(name = "review_id")
-    var reviewId: Int,
+  // 최근 3개의 리뷰만 조회
+  @Query("""
+        SELECT 
+            r.review_id as reviewId,
+            r.restroom_id as restroomId,
+            r.member_id as memberId,
+            m.nickname as nickname,
+            r.content as reviewText,
+            r.reg_time as regDate,
+            r.toilet_paper_option as toiletPaperOption,
+            r.how_many_option as howManyOption,
+            r.cleanliness_option as cleanlinessOption
+        FROM review r
+        INNER JOIN member m ON r.member_id = m.member_id
+        WHERE r.restroom_id = :restroomId
+        ORDER BY r.reg_time DESC
+        LIMIT 3
+    """)
+  suspend fun getLatestReviewsWithMember(restroomId: Int): List<ReviewWithMemberAndFilter>
 
-    @ColumnInfo(name = "restroom_id")
-    var restroomId: Int?,
 
-    @ColumnInfo(name = "member_id")
-    var memberId: Int?,
-
-    var content: String?,
-
-    @ColumnInfo(name = "reg_time")
-    var regTime: String?,
-
-    @ColumnInfo(name = "nickname")
-    var nickname: String?
-
-  )
-
-  @Query("SELECT * FROM review_filter_option WHERE review_id = :reviewId")
-  fun getFilterOptionsForReview(reviewId: Int): List<ReviewFilterOption>
 }

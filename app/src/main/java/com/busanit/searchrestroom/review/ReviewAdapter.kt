@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.busanit.searchrestroom.database.Review
 import com.busanit.searchrestroom.databinding.ItemReviewViewBinding
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ReviewAdapter(
     private val reviewList: List<ReviewWithMemberAndFilter>,
@@ -17,6 +19,7 @@ class ReviewAdapter(
         fun onReviewEdit(review: ReviewWithMemberAndFilter)
         fun onReviewDelete(review: ReviewWithMemberAndFilter)
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReviewViewHolder {
         val binding = ItemReviewViewBinding.inflate(
@@ -33,13 +36,26 @@ class ReviewAdapter(
 
     override fun getItemCount() = reviewList.size
 
+    private fun formatDate(dateStr: String?): String {
+        return try {
+            if (dateStr.isNullOrEmpty()) return ""
+
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("yy.MM.dd HH:mm", Locale.getDefault())
+            val date = inputFormat.parse(dateStr)
+            date?.let { outputFormat.format(it) } ?: ""
+        } catch (e: Exception) {
+            dateStr ?: ""
+        }
+    }
+
     inner class ReviewViewHolder(private val binding: ItemReviewViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(review: ReviewWithMemberAndFilter) {
             binding.apply {
                 reviewNickname.text = review.nickname
-                reviewRegDate.text = review.regDate
+                reviewRegDate.text = formatDate(review.regDate)
                 reviewText.text = review.reviewText
 
                 // 필터 옵션 표시

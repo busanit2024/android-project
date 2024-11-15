@@ -1,5 +1,6 @@
 package com.busanit.searchrestroom.myPage
 
+import android.app.ComponentCaller
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -36,6 +37,17 @@ class MyPageActivity : AppCompatActivity() {
     private lateinit var memberDao: MemberDao
     private var currentMember: Member? = null
     private lateinit var userRepository: UserRepository
+
+    companion object {
+        private const val EDIT_INFO_REQUEST_CODE = 1
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?, ) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == EDIT_INFO_REQUEST_CODE && resultCode == RESULT_OK) {
+            loadUserInfo()  // 사용자 정보 새롭게 로드
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,7 +97,7 @@ class MyPageActivity : AppCompatActivity() {
 
         binding.editIcon.setOnClickListener {
             if (AuthHelper.isLoggedIn()) {
-                startActivity(Intent(this, EditInfoActivity::class.java))
+                startActivityForResult(Intent(this, EditInfoActivity::class.java), EDIT_INFO_REQUEST_CODE)   // 요청 코드 전달
             } else {
                 showToast("로그인이 필요합니다.")
                 // 로그인 화면으로 이동
@@ -155,6 +167,7 @@ class MyPageActivity : AppCompatActivity() {
 
     private fun logout() {
         AuthHelper.logout()
+        currentMember = null    // 로그아웃 후 currentMember 초기화
         updateUI()
     }
 

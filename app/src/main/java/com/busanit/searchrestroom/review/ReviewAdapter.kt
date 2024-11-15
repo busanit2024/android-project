@@ -1,11 +1,14 @@
 package com.busanit.searchrestroom.review
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.busanit.searchrestroom.database.Review
 import com.busanit.searchrestroom.databinding.ItemReviewViewBinding
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ReviewAdapter(
     private val reviewList: List<ReviewWithMemberAndFilter>,
@@ -17,6 +20,7 @@ class ReviewAdapter(
         fun onReviewEdit(review: ReviewWithMemberAndFilter)
         fun onReviewDelete(review: ReviewWithMemberAndFilter)
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReviewViewHolder {
         val binding = ItemReviewViewBinding.inflate(
@@ -39,7 +43,11 @@ class ReviewAdapter(
         fun bind(review: ReviewWithMemberAndFilter) {
             binding.apply {
                 reviewNickname.text = review.nickname
-                reviewRegDate.text = review.regDate
+
+                val formattedDate = ReviewViewModel.formatDateForDisplay(review.regDate)
+                Log.d("ReviewAdapter", "Setting date text: $formattedDate")
+                reviewRegDate.text = formattedDate.ifEmpty { "작성일자" }
+
                 reviewText.text = review.reviewText
 
                 // 필터 옵션 표시

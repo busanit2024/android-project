@@ -23,7 +23,7 @@ class MyReviewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMyReviewBinding
     private var appDatabase: AppDatabase? = null
-  private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,7 +94,4 @@ class MyReviewActivity : AppCompatActivity() {
             dateStr ?: ""
         }
     }
-
-
-
 }

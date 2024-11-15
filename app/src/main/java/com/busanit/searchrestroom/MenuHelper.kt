@@ -7,7 +7,7 @@ object MenuHelper {
     val loginItem = menu.findItem(R.id.menu_login)
     val mypageItem = menu.findItem(R.id.menu_mypage)
 
-      mypageItem.isVisible = isLoggedIn
+    mypageItem.isVisible = isLoggedIn
     loginItem.isVisible = !isLoggedIn
 
   }

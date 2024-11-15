@@ -3,6 +3,7 @@ package com.busanit.searchrestroom.myPage
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,12 +16,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class MyReviewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMyReviewBinding
     private var appDatabase: AppDatabase? = null
-  private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +68,8 @@ class MyReviewActivity : AppCompatActivity() {
     private suspend fun setupRecyclerView(reviews: List<Review>) {
         binding.myReviewList.layoutManager = LinearLayoutManager(this)
         binding.myReviewList.adapter = MyReviewAdapter(
-            reviews.toMutableList()
+            reviews.toMutableList(),
+            formatDate = ::formatDate
         )
     }
 
@@ -74,6 +78,20 @@ class MyReviewActivity : AppCompatActivity() {
         return reviewImageDao.getReviewImageById(reviewId) // 메소드 이름 수정
     }
 
+    // 나의 리뷰 리뷰등록날짜 형식 포맷 함수
+    private fun formatDate(dateStr: String?): String {
+        return try {
+            if (dateStr.isNullOrEmpty()) return ""
 
+            val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+            val outputFormat = SimpleDateFormat("yy.MM.dd HH:mm:ss", Locale.getDefault())
 
+            val date = inputFormat.parse(dateStr)
+            date?.let { outputFormat.format(it) } ?: dateStr
+
+        } catch (e: Exception) {
+            Log.e("MyReviewActivity", "Date formatting error: $dateStr", e)
+            dateStr ?: ""
+        }
+    }
 }

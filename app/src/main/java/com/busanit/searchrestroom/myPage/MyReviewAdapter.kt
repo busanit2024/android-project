@@ -24,6 +24,7 @@ import kotlinx.coroutines.withContext
 
 class MyReviewAdapter(
     private val reviewList: MutableList<Review>,
+    private val formatDate: (String?) -> String
 ) : RecyclerView.Adapter<MyReviewAdapter.ReviewViewHolder>() {
 
     inner class ReviewViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -56,7 +57,7 @@ class MyReviewAdapter(
 
             withContext(Dispatchers.Main) {
                 holder.buildingName.text = restRoom?.restroomName
-                holder.reviewDate.text = reviewItem.regTime.toString()
+                holder.reviewDate.text = formatDate(reviewItem.regTime)
                 holder.reviewContent.text = reviewItem.content
             }
         }
@@ -86,7 +87,7 @@ class MyReviewAdapter(
                     notifyItemRemoved(position)
                     notifyItemRangeChanged(position, reviewList.size)
                     Toast.makeText(holder.itemView.context, "리뷰가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
-                    }
+                }
                 setNegativeButton("취소", null)
                 show()
             }

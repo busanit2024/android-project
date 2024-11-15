@@ -114,8 +114,8 @@ class MainActivity : AppCompatActivity(){
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
 
-      MenuHelper.updateMenuItems(binding.bottomNavigation.menu, AuthHelper.isLoggedIn())
-      binding.bottomNavigation.invalidate()
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, AuthHelper.isLoggedIn())
+    binding.bottomNavigation.invalidate()
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 

@@ -5,7 +5,9 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +24,7 @@ import com.busanit.searchrestroom.member.LoginActivity
 import com.busanit.searchrestroom.member.RegisterActivity
 import com.busanit.searchrestroom.member.UserRepository
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.kakao.sdk.user.model.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,6 +37,7 @@ class MyPageActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var memberDao: MemberDao
     private var currentMember: Member? = null
+    private lateinit var userRepository: UserRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +47,7 @@ class MyPageActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
         val db = AppDatabase.getDatabase(applicationContext)
         memberDao = db!!.memberDao()
+        userRepository = UserRepository(memberDao, this)
 
         // 사용자 정보 불러오기
         loadUserInfo()
@@ -57,7 +62,7 @@ class MyPageActivity : AppCompatActivity() {
         binding.myReview.setOnClickListener {
             startActivity(Intent(this, MyReviewActivity::class.java))
         }
-        
+
         binding.myFavorite.setOnClickListener {
             startActivity(Intent(this, FavoriteActivity::class.java))
         }
@@ -139,6 +144,8 @@ class MyPageActivity : AppCompatActivity() {
             binding.profileImage.setImageURI(uri)
         }
 
+        binding.username.text = if (isLoggedIn) currentMember?.nickname ?: "" else "Unknown"    // 닉네임
+        binding.email.text = if (isLoggedIn) currentMember?.email ?: "" else "Unknown@email.com"    // 이메일
         binding.logout.text = if (isLoggedIn) "로그아웃" else "로그인"
         binding.deleteAccount.text = if (isLoggedIn) "회원탈퇴" else "회원가입"
 
@@ -166,35 +173,91 @@ class MyPageActivity : AppCompatActivity() {
     }
 
     private fun deleteAccount() {
-        // 회원탈퇴
         if (currentMember != null) {
-            // 확인용 다이얼로그
             val builder = AlertDialog.Builder(this)
             builder.setTitle("회원 탈퇴")
             builder.setMessage("정말로 탈퇴하시겠습니까?")
 
-            // 확인 버튼
             builder.setPositiveButton("확인") { dialog, which ->
-                CoroutineScope(Dispatchers.IO).launch {
-                    memberDao.delete(currentMember!!) // 회원 정보 삭제
-                    withContext(Dispatchers.Main) {
-                        showToast("회원 탈퇴가 완료되었습니다.")
-                        AuthHelper.logout() // 로그아웃 처리
-                        startActivity(Intent(this@MyPageActivity, LoginActivity::class.java))   // 로그인 화면으로 이동
-                        finish()
+                currentMember?.let { member ->
+                    when {
+                        !member.social -> {
+                            // 일반 로그인 사용자
+                            showPasswordConfirmationDialog(member.email)
+                        }
+                        member.email.contains("kakao") -> {
+                            // 카카오 로그인 사용자
+                            proceedWithDeletion(member.email, socialType = "KAKAO")
+                        }
+                        member.email.contains("naver") -> {
+                            // 네이버 로그인 사용자
+                            proceedWithDeletion(member.email, socialType = "NAVER")
+                        }
+                        else -> {
+                            // 구글 로그인 사용자
+                            proceedWithDeletion(member.email, isSocial = true)
+                        }
                     }
                 }
             }
 
-            // 취소 버튼
             builder.setNegativeButton("취소") { dialog, which ->
                 dialog.dismiss()
             }
 
-            // 다이얼로그 표시
             val alertDialog = builder.create()
             alertDialog.show()
+        }
+    }
 
+    private fun proceedWithDeletion(email: String, password: String? = null, isSocial: Boolean = false, socialType: String? = null) {
+        userRepository.deleteUser(email, password, isSocial, socialType) { success, error ->
+            runOnUiThread {
+                if (success) {
+                    showToast("회원 탈퇴가 완료되었습니다.")
+                    AuthHelper.logout()
+                    startActivity(Intent(this@MyPageActivity, LoginActivity::class.java))
+                    finish()
+                } else {
+                    showToast("회원 탈퇴 실패: $error")
+                }
+            }
+        }
+    }
+
+    private fun showPasswordConfirmationDialog(email: String) {
+        val passwordInput = EditText(this).apply {
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            hint = "비밀번호를 입력하세요"
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("비밀번호 확인")
+            .setView(passwordInput)
+            .setPositiveButton("확인") { dialog, which ->
+                val password = passwordInput.text.toString()
+                if (password.isNotEmpty()) {
+                    proceedWithDeletion(email, password)
+                } else {
+                    showToast("비밀번호를 입력해주세요")
+                }
+            }
+            .setNegativeButton("취소", null)
+            .show()
+    }
+
+    private fun proceedWithDeletion(email: String, password: String? = null) {
+        userRepository.deleteUser(email, password) { success, error ->
+            runOnUiThread {
+                if (success) {
+                    showToast("회원 탈퇴가 완료되었습니다.")
+                    AuthHelper.logout()
+                    startActivity(Intent(this@MyPageActivity, LoginActivity::class.java))
+                    finish()
+                } else {
+                    showToast("회원 탈퇴 실패: $error")
+                }
+            }
         }
     }
 
@@ -207,3 +270,5 @@ class MyPageActivity : AppCompatActivity() {
         updateUI()
     }
 }
+
+

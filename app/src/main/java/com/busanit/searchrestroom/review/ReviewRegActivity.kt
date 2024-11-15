@@ -17,7 +17,10 @@ import com.busanit.searchrestroom.restroomDetail.RestroomDetailActivity
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
+import okhttp3.internal.format
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 class ReviewRegActivity : AppCompatActivity() {
     private lateinit var viewModel: ReviewViewModel
@@ -66,8 +69,8 @@ class ReviewRegActivity : AppCompatActivity() {
                 //restroomId = restroom?.restroomId ?: 0,
                 restroomId = restroom?.restroomId?:0,
                 memberId = memberId,
-                regTime = Date().toString(),
-                updateTime = Date().toString(),
+                regTime = formatDate(),
+                updateTime = formatDate(),
                 content = binding.reviewContent.text.toString(),
                 toiletPaperOption = toiletPaperOption,
                 howManyOption = howManyOption,
@@ -84,6 +87,12 @@ class ReviewRegActivity : AppCompatActivity() {
         binding.backBtn.setOnClickListener {
             finish()
         }
+    }
+
+    private fun formatDate(): String {
+        val date = Date()
+        val outputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        return outputFormat.format(date)
     }
 }
 

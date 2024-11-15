@@ -53,7 +53,7 @@
                     android:id="@+id/editLocation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="주소 검색"
+                    android:hint="주소"
                     android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:maxLines="1"

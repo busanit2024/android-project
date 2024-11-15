@@ -18,7 +18,6 @@ interface RestroomDao {
   @Query("SELECT * FROM restroom WHERE latitude BETWEEN :minLat AND :maxLat AND longitude BETWEEN :minLong AND :maxLong")
   fun getRestroomsWithinArea(minLat: Double, maxLat: Double, minLong: Double, maxLong: Double): List<Restroom>
 
-
   @Insert
   suspend fun insert(vararg restroom: Restroom)  // suspend 키워드 추가
 

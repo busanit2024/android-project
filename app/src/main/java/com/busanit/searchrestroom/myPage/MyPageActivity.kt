@@ -49,12 +49,7 @@ class MyPageActivity : AppCompatActivity() {
         binding.myReview.setOnClickListener {
             startActivity(Intent(this, MyReviewActivity::class.java))
         }
-
-        binding.myRestroom.setOnClickListener {
-            // 등록한 화장실 화면으로 이동
-            startActivity(Intent(this, MyToiletActivity::class.java))
-        }
-
+        
         binding.myFavorite.setOnClickListener {
             startActivity(Intent(this, FavoriteActivity::class.java))
         }

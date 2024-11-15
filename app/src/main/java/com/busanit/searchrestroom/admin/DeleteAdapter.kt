@@ -15,7 +15,7 @@ import com.busanit.searchrestroom.database.DeleteRequestWithRestroom
 import com.busanit.searchrestroom.restroomDetail.RestroomDetailActivity
 
 class DeleteAdapter(
-    private val deleteList: List<DeleteRequestWithRestroom>
+    private val deleteList: MutableList<DeleteRequestWithRestroom>
 ) : RecyclerView.Adapter<DeleteAdapter.DeleteViewHolder>() {
 
     private val sortedList = deleteList.sortedBy { it.restroom?.restroomId }
@@ -52,7 +52,7 @@ class DeleteAdapter(
                 setPositiveButton("확인") { _, _ ->
                     val db = AppDatabase.getDatabase(holder.itemView.context)
                     db!!.DeleteRequestDao().delete(deleteItem.deleteRequest)
-                    deleteList.toMutableList().removeAt(position)
+                    deleteList.removeAt(position)
                     notifyItemRemoved(position)
                 }
                 setNegativeButton("취소", null)

@@ -38,7 +38,7 @@ class AdminDeleteActivity : AppCompatActivity() {
                         binding.emptyView.visibility = View.GONE
                         binding.deleteList.visibility = View.VISIBLE
                         binding.deleteList.layoutManager = LinearLayoutManager(this@AdminDeleteActivity)
-                        binding.deleteList.adapter = DeleteAdapter(deleteItems)
+                        binding.deleteList.adapter = DeleteAdapter(deleteItems.toMutableList())
                 }
             }
 

@@ -80,5 +80,9 @@ class ReviewRegActivity : AppCompatActivity() {
             finish()
 
         }
+
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
     }
 }

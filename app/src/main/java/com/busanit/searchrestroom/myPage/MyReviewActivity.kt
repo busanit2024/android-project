@@ -22,7 +22,7 @@ class MyReviewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMyReviewBinding
     private var appDatabase: AppDatabase? = null
-    private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +32,7 @@ class MyReviewActivity : AppCompatActivity() {
         // SharedPreferences 초기화
         sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
 
-        appDatabase = AppDatabase.getDatabase(applicationContext)
+      appDatabase = AppDatabase.getDatabase(applicationContext)
 
         // 로그인한 사용자의 member_id 가져오기
         val memberId = sharedPreferences.getInt("member_id", -1)

@@ -25,10 +25,10 @@ interface MemberDao {
 
   // 닉네임 업데이트
   @Query("UPDATE member SET nickname = :newNickname WHERE member_id = :memberId")
-  fun updateNickname(memberId: Int, newNickname: String)
+  suspend fun updateNickname(memberId: Int, newNickname: String)
 
   // 비밀번호 업데이트
   @Query("UPDATE member SET password = :newPassword WHERE member_id = :memberId")
-  fun updatePassword(memberId: Int, newPassword: String)
+  suspend fun updatePassword(memberId: Int, newPassword: String)
 
 }

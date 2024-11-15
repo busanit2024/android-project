@@ -90,12 +90,16 @@
 
                     <RadioButton
                         android:id="@+id/toilet_paper_Y"
-                        android:layout_width="match_parent"
+                        android:layout_width="100dp"
                         android:layout_height="wrap_content"
+                        android:button="@null"
                         android:text="휴지 있음"
+                        android:gravity="center"
                         android:layout_gravity="center_vertical"
                         android:layout_marginTop="3dp"
-                        android:layout_marginEnd="30dp" />
+                        android:layout_marginEnd="30dp"
+                        android:background="@drawable/selector_radio_button"
+                        android:textColor="@drawable/selector_radio_text"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -115,26 +119,46 @@
                             android:id="@+id/how_many_1"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:button="@null"
                             android:text="1칸"
-                            android:layout_weight="1" />
+                            android:gravity="center"
+                            android:layout_weight="1"
+                            android:background="@drawable/selector_radio_button"
+                            android:textColor="@drawable/selector_radio_text"
+                            android:layout_marginRight="3dp"/>
                         <RadioButton
                             android:id="@+id/how_many_2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:button="@null"
                             android:text="2칸"
-                            android:layout_weight="1" />
+                            android:gravity="center"
+                            android:layout_weight="1"
+                            android:background="@drawable/selector_radio_button"
+                            android:textColor="@drawable/selector_radio_text"
+                            android:layout_marginRight="3dp" />
                         <RadioButton
                             android:id="@+id/how_many_3"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:button="@null"
                             android:text="3칸"
-                            android:layout_weight="1" />
+                            android:gravity="center"
+                            android:layout_weight="1"
+                            android:background="@drawable/selector_radio_button"
+                            android:textColor="@drawable/selector_radio_text"
+                            android:layout_marginRight="3dp"/>
                         <RadioButton
                             android:id="@+id/how_many_4"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:button="@null"
                             android:text="4칸 이상"
-                            android:layout_weight="1" />
+                            android:gravity="center"
+                            android:layout_weight="1"
+                            android:background="@drawable/selector_radio_button"
+                            android:textColor="@drawable/selector_radio_text"
+                           />
                     </RadioGroup>
 
                     <TextView
@@ -142,7 +166,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/review_cleanliness"
                         android:layout_marginTop="5dp"
-                        android:layout_marginBottom="3dp" />
+                        android:layout_marginBottom="3dp"
+                        android:layout_marginRight="3dp"/>
+
                     <RadioGroup
                         android:id="@+id/cleanliness"
                         android:layout_width="match_parent"
@@ -154,20 +180,34 @@
                         android:id="@+id/cleanliness_clean"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:button="@null"
                         android:text="깨끗함"
-                        android:layout_weight="1" />
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:background="@drawable/selector_radio_button"
+                        android:textColor="@drawable/selector_radio_text"
+                        android:layout_marginRight="3dp"/>
                     <RadioButton
                         android:id="@+id/cleanliness_soso"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:button="@null"
                         android:text="무난함"
-                        android:layout_weight="1" />
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:background="@drawable/selector_radio_button"
+                        android:textColor="@drawable/selector_radio_text"
+                        android:layout_marginRight="3dp"/>
                     <RadioButton
                         android:id="@+id/cleanliness_dirty"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:button="@null"
                         android:text="더러움"
-                        android:layout_weight="1" />
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:background="@drawable/selector_radio_button"
+                        android:textColor="@drawable/selector_radio_text"/>
                     </RadioGroup>
                 </LinearLayout>
 

@@ -17,6 +17,7 @@ import com.busanit.searchrestroom.restroomDetail.RestroomDetailActivity
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
+import java.util.Date
 
 class ReviewRegActivity : AppCompatActivity() {
     private lateinit var viewModel: ReviewViewModel
@@ -61,12 +62,12 @@ class ReviewRegActivity : AppCompatActivity() {
             }
 
             val review = Review(
-                reviewId = reviewId,
+                reviewId = 0,
                 //restroomId = restroom?.restroomId ?: 0,
-                restroomId = restroom?.restroomId,
+                restroomId = restroom?.restroomId?:0,
                 memberId = memberId,
-                regTime = System.currentTimeMillis().toString(),
-                updateTime = System.currentTimeMillis().toString(),
+                regTime = Date().toString(),
+                updateTime = Date().toString(),
                 content = binding.reviewContent.text.toString(),
                 toiletPaperOption = toiletPaperOption,
                 howManyOption = howManyOption,

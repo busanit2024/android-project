@@ -32,7 +32,7 @@ interface ReviewDao {
   suspend fun deleteReviewById(reviewId: Int)
 
   @Update
-  fun updateReview(review: Review)
+  fun update(review: Review)
 
   @Query("SELECT * FROM review WHERE restroom_id = :restroomId ORDER BY review_id DESC LIMIT 3")
   fun getLatestReviewsByRestroomId(restroomId: Int): List<Review>

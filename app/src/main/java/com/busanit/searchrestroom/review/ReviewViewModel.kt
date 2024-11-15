@@ -51,7 +51,7 @@ class ReviewViewModel(application: Application) : AndroidViewModel(application) 
     fun updateReview(review: Review) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                reviewDao.updateReview(review)
+                reviewDao.update(review)
 
                 // 리뷰 목록 갱신
                 review.restroomId?.let { restroomId ->

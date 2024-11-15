@@ -2,6 +2,7 @@ package com.busanit.searchrestroom.review
 
 import ReviewViewModel
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +13,7 @@ import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.database.Review
 import com.busanit.searchrestroom.databinding.ActivityReviewRegBinding
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class ReviewUpdateActivity : AppCompatActivity() {
     private lateinit var binding: ActivityReviewRegBinding
@@ -29,8 +31,9 @@ class ReviewUpdateActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[ReviewViewModel::class.java]
 
         // 인텐트에서 데이터 받아오기
-        reviewId = intent.getIntExtra("reviewId", -1)
-        restroomId = intent.getIntExtra("restroomId", -1)
+        reviewId = intent.getIntExtra("reviewId", 0)
+        restroomId = intent.getIntExtra("restroomId", 0)
+        memberId = intent.getIntExtra("memberId", 0)
         binding.apply {
             reviewContent.setText(intent.getStringExtra("content"))
             toiletPaperY.isChecked = intent.getBooleanExtra("toiletPaperY", false)
@@ -49,8 +52,8 @@ class ReviewUpdateActivity : AppCompatActivity() {
         binding.toolbar.findViewById<TextView>(R.id.toolbarTitle).text = "리뷰 수정하기"
 
         // 건물 정보 설정
-        binding.UdpateRestroomName.text = intent.getStringExtra("restroomName") ?: "건물명"
-        binding.UpdateRestroomLocation.text = intent.getStringExtra("location") ?: "상세주소"
+        binding.UdpateRestroomName.text = intent.getStringExtra("restroomName") ?: restroom?.restroomName
+        binding.UpdateRestroomLocation.text = intent.getStringExtra("location") ?: restroom?.location
 
         // 작성완료 버튼 텍스트 변경 및 클릭 리스너 설정
         binding.writeReviewButton.text = "수정완료"
@@ -64,18 +67,31 @@ class ReviewUpdateActivity : AppCompatActivity() {
         binding.apply {
             reviewContent.setText(intent.getStringExtra("content"))
 
-            toiletPaperY.isChecked = intent.getBooleanExtra("toiletPaperY", false)
+            val toiletPaper = intent.getIntExtra("toiletPaperOption", 1)
+            when (toiletPaper) {
+                1 -> toiletPaperY.isChecked = true
+            }
 
-            val selectedHowMany = intent.getIntExtra("selectedHowMany", 0)
-            howMany.check(selectedHowMany)
+            val howManyOption = intent.getIntExtra("howManyOption", 1)
+            when (howManyOption) {
+                1 -> howMany1.isChecked = true
+                2 -> howMany2.isChecked = true
+                3 -> howMany3.isChecked = true
+                4 -> howMany4.isChecked = true
+            }
 
-            val selectedCleanliness = intent.getIntExtra("selectedCleanliness", 0)
-            cleanliness.check(selectedCleanliness)
+            val cleanlinessOption = intent.getIntExtra("cleanlinessOption", 1)
+            when (cleanlinessOption) {
+                1 -> cleanlinessClean.isChecked = true
+                2 -> cleanlinessSoso.isChecked = true
+                3 -> cleanlinessDirty.isChecked = true
+            }
         }
     }
 
     private fun updateReview() {
         val content = binding.reviewContent.text.toString()
+
 
         val toiletPaperOption = if (binding.toiletPaperY.isChecked) 1 else 2
 
@@ -94,17 +110,17 @@ class ReviewUpdateActivity : AppCompatActivity() {
         }
 
         val review = Review(
-            reviewId = 0,
-            restroomId = restroom?.restroomId ?: 0,
+            reviewId = reviewId,
+            restroomId = restroomId,
             memberId = memberId,
-            regTime = System.currentTimeMillis().toString(),
-            updateTime = System.currentTimeMillis().toString(),
-            content = binding.reviewContent.text.toString(),
+            regTime = intent.getStringExtra("regTime") ?: Date().toString(),
+            updateTime = Date().toString(),
+            content = content,
             toiletPaperOption = toiletPaperOption,
             howManyOption = howManyOption,
             cleanlinessOption = cleanlinessOption
         )
-        viewModel.insertReview(review)
+        viewModel.updateReview(review)
 
 
         lifecycleScope.launch {

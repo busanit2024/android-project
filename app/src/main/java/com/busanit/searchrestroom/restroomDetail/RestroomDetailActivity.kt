@@ -79,7 +79,6 @@ class RestroomDetailActivity : AppCompatActivity() {
                 rewriteInfo.visibility = View.GONE
                 writeReview.visibility = View.GONE
             }
-            Toast.makeText(this, "로그인 후 이용 가능합니다", Toast.LENGTH_SHORT).show()
         }
 
         setupUI(restroom)
@@ -128,11 +127,13 @@ class RestroomDetailActivity : AppCompatActivity() {
                             val intent = Intent(this@RestroomDetailActivity, ReviewUpdateActivity::class.java).apply {
                                 putExtra("reviewId", review.reviewId)
                                 putExtra("restroomId", restroomId)
-                                putExtra("isEdit", true)
+                                putExtra("memberId",memberId)
                                 putExtra("content", review.reviewText)
                                 putExtra("toiletPaperOption", review.toiletPaperOption)
                                 putExtra("howManyOption", review.howManyOption)
                                 putExtra("cleanlinessOption", review.cleanlinessOption)
+                                putExtra("restroomName", binding.restroomName.text.toString())
+                                putExtra("location", binding.location.text.toString())
                             }
                             startActivity(intent)
                         }

@@ -4,8 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.busanit.searchrestroom.dao.MemberDao
 import com.busanit.searchrestroom.database.Member
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.kakao.sdk.user.UserApiClient
 import com.kakao.sdk.user.model.User
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -195,6 +197,87 @@ class UserRepository(val memberDao: MemberDao, private val context: Context) {
             }
             onComplete(true, null)
         }
+    }
+
+    fun deleteUser(email: String, password: String? = null, isSocial: Boolean = false, socialType: String? = null, onComplete: (Boolean, String?) -> Unit) {
+        // 소셜 로그인 타입 확인
+        when (socialType) {
+            "KAKAO" -> {
+                // 카카오 연동 해제
+                UserApiClient.instance.unlink { error ->
+                    if (error != null) {
+                        onComplete(false, "카카오 연동 해제 실패: ${error.message}")
+                    } else {
+                        deleteLocalUser(email, onComplete)
+                    }
+                }
+            }
+            "NAVER" -> {
+                // 네이버 연동 해제 후 로컬 DB에서 삭제
+                deleteLocalUser(email, onComplete)
+            }
+            else -> {
+                // Firebase 사용자(일반 로그인, 구글 로그인)
+                val firebaseUser = FirebaseAuth.getInstance().currentUser
+                if (firebaseUser != null) {
+                    if (!isSocial && password != null) {
+                        // 일반 로그인 사용자 재인증
+                        val credential = EmailAuthProvider.getCredential(email, password)
+                        firebaseUser.reauthenticate(credential)
+                            .addOnCompleteListener { reauthTask ->
+                                if (reauthTask.isSuccessful) {
+                                    proceedWithDeletion(firebaseUser, email, onComplete)
+                                } else {
+                                    onComplete(false, "재인증 실패: ${reauthTask.exception?.message}")
+                                }
+                            }
+                    } else {
+                        // 구글 로그인 사용자
+                        proceedWithDeletion(firebaseUser, email, onComplete)
+                    }
+                } else {
+                    deleteLocalUser(email, onComplete)
+                }
+            }
+        }
+    }
+
+    // 로컬 DB에서만 삭제하는 메서드
+    private fun deleteLocalUser(email: String, onComplete: (Boolean, String?) -> Unit) {
+        GlobalScope.launch {
+            try {
+                val member = memberDao.getMemberByEmail(email)
+                if (member != null) {
+                    memberDao.delete(member)
+                    onComplete(true, null)
+                } else {
+                    onComplete(false, "사용자를 찾을 수 없습니다")
+                }
+            } catch (e: Exception) {
+                onComplete(false, "로컬 DB 삭제 실패: ${e.message}")
+            }
+        }
+    }
+
+    private fun proceedWithDeletion(firebaseUser: FirebaseUser, email: String, onComplete: (Boolean, String?) -> Unit) {
+        firebaseUser.delete()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    GlobalScope.launch {
+                        try {
+                            val member = memberDao.getMemberByEmail(email)
+                            if (member != null) {
+                                memberDao.delete(member)
+                            }
+                            onComplete(true, null)
+                        } catch (e: Exception) {
+                            onComplete(false, "로컬 DB 삭제 실패: ${e.message}")
+                        }
+                    }
+                } else {
+                    onComplete(false, "Firebase 삭제 실패: ${task.exception?.message}")
+                }
+            }
     }
 
 }

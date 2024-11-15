@@ -153,6 +153,8 @@ class MyPageActivity : AppCompatActivity() {
         if (uriString != null) {
             val uri = Uri.parse(uriString)
             binding.profileImage.setImageURI(uri)
+        } else {
+            binding.profileImage.setImageResource(R.drawable.profile)
         }
         binding.username.text = if (isLoggedIn) currentMember?.nickname ?: "" else "Unknown"    // 닉네임
         binding.email.text = if (isLoggedIn) currentMember?.email ?: "" else "Unknown@email.com"    // 이메일

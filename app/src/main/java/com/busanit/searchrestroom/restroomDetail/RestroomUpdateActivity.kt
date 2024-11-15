@@ -65,6 +65,10 @@ class RestroomUpdateActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // 버튼 설정
     setupButtons(restroom)
+
+    binding.backBtn.setOnClickListener {
+      finish()
+    }
   }
   private fun setupButtons(restroom: Restroom?) {
     // 수정하기 버튼

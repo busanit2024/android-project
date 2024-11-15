@@ -16,6 +16,7 @@
             android:id="@+id/reviewNickname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
             android:text="사용자명"
             android:textSize="15sp"/>
         <TextView

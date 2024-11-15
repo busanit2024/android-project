@@ -150,12 +150,10 @@ class MyPageActivity : AppCompatActivity() {
         val isAdmin = AuthHelper.isAdmin()
         val isLoggedIn = AuthHelper.isLoggedIn()
         val uriString = sharedPreferences.getString("profileImageUri", null)
-
         if (uriString != null) {
             val uri = Uri.parse(uriString)
             binding.profileImage.setImageURI(uri)
         }
-
         binding.username.text = if (isLoggedIn) currentMember?.nickname ?: "" else "Unknown"    // 닉네임
         binding.email.text = if (isLoggedIn) currentMember?.email ?: "" else "Unknown@email.com"    // 이메일
         binding.logout.text = if (isLoggedIn) "로그아웃" else "로그인"
@@ -181,7 +179,6 @@ class MyPageActivity : AppCompatActivity() {
 
     private fun logout() {
         AuthHelper.logout()
-        currentMember = null    // 로그아웃 후 currentMember 초기화
         updateUI()
     }
 

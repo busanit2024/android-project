@@ -29,6 +29,13 @@ abstract class AppDatabase : RoomDatabase() {
     @Volatile
     private var INSTANCE: AppDatabase? = null
 
+      @JvmField
+      val MIGRATION_2_3 : Migration = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+          //
+        }
+      }
+
     @JvmField
     val MIGRATION_3_4 : Migration = object : Migration(3, 4) {
       override fun migrate(db: SupportSQLiteDatabase) {
@@ -74,8 +81,7 @@ abstract class AppDatabase : RoomDatabase() {
             AppDatabase::class.java,
             "search-restroom"
           )
-            .addMigrations(MIGRATION_3_4)
-            .addMigrations(MIGRATION_4_5)
+            .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
             .allowMainThreadQueries()
             .build()
         }

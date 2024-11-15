@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -21,6 +22,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.room.Room
+import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.dao.MemberDao
 import com.busanit.searchrestroom.database.AppDatabase
@@ -31,6 +33,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -71,14 +74,14 @@ class EditInfoActivity : AppCompatActivity() {
                 val option = BitmapFactory.Options()
                 option.inSampleSize = calRatio
 
-                photoUri = it.data?.data
-
                 val inputStream = contentResolver.openInputStream(it.data!!.data!!)
                 val bitmap = BitmapFactory.decodeStream(inputStream, null, option)
                 inputStream?.close()
 
-                photoUri?.let {
-                    binding.profileImage.setImageURI(photoUri)
+                bitmap?.let {
+                    val imagePath = saveBitmapToFile(bitmap, "profile_image.jpg")
+                    photoUri = Uri.parse(imagePath)
+                    binding.profileImage.setImageBitmap(bitmap)
                 } ?: run {
                     Log.d("test", "bitmap null")
                     Toast.makeText(this, "이미지 로드에 실패했습니다.", Toast.LENGTH_SHORT).show()
@@ -93,6 +96,15 @@ class EditInfoActivity : AppCompatActivity() {
         }
     }
 
+    private fun saveBitmapToFile(bitmap: Bitmap, fileName: String): String {
+        val file = File(filesDir, fileName)
+        val outputStream = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        outputStream.flush()
+        outputStream.close()
+        return file.absolutePath
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityEditInfoBinding.inflate(layoutInflater)
@@ -100,10 +112,12 @@ class EditInfoActivity : AppCompatActivity() {
 
         // sharedPreferences에서 memberId를 가져오기
         sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
-        val memberId = sharedPreferences.getInt("member_id", -1)
-        photoUri = Uri.parse(sharedPreferences.getString("profileImageUri", null))
-
-        binding.profileImage.setImageURI(photoUri)
+        val memberId = AuthHelper.getMemberId()
+        val uriString = sharedPreferences.getString("profileImageUri", null)
+        if (uriString != null) {
+            photoUri = Uri.parse(uriString)
+            binding.profileImage.setImageURI(photoUri)
+        }
 
         // 로그인한 사용자의 정보를 DB에서 가져오기
         loadMemberInfo(memberId)
@@ -119,10 +133,6 @@ class EditInfoActivity : AppCompatActivity() {
 
         // 정보 업데이트 버튼 클릭 시
         binding.infoUpdate.setOnClickListener {
-            with(sharedPreferences.edit()) {
-                putString("profileImageUri", photoUri.toString())
-                apply()
-            }
             validateAndUpdateInfo()
         }
 
@@ -196,6 +206,10 @@ class EditInfoActivity : AppCompatActivity() {
             }
 
             withContext(Dispatchers.Main) {
+                with(sharedPreferences.edit()) {
+                    putString("profileImageUri", photoUri.toString())
+                    apply()
+                }
                 Toast.makeText(this@EditInfoActivity, "정보가 수정되었습니다.", Toast.LENGTH_SHORT).show()
                 setResult(RESULT_OK)    // 결과 설정
                 finish()  // 수정 후 액티비티 종료

@@ -89,7 +89,7 @@ class ReviewAdapter(
                     notifyItemRemoved(position)
                     notifyItemRangeChanged(position, reviewList.size)
                     Toast.makeText(holder.itemView.context, "리뷰가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
-                    }
+                }
                 setNegativeButton("취소", null)
                 show()
             }

@@ -37,12 +37,13 @@
         android:layout_marginHorizontal="20dp"
         android:background="@drawable/edittext_round_border"
         android:hint="email" />
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/find_button"
         android:layout_width="170dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="50dp"
+        android:background="@drawable/member_button"
         android:text="찾기"
         android:textSize="18dp" />
 </LinearLayout>

@@ -54,6 +54,7 @@ class ReviewAdapter(
                 val isAuthor = review.memberId == currentMemberId
                 btnEditReview.visibility = if (isAuthor) View.VISIBLE else View.GONE
                 btnDeleteReview.visibility = if (isAuthor) View.VISIBLE else View.GONE
+                divisionLine.visibility = if(isAuthor) View.VISIBLE else View.GONE
 
                 // 버튼 클릭 리스너는 버튼이 보일 때만 동작
                 if (isAuthor) {

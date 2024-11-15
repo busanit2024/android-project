@@ -33,6 +33,10 @@ class ReviewListAllActivity : AppCompatActivity(), ReviewAdapter.ReviewActionLis
 
         setupViewModel()
         observeReviews()
+
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
     }
 
     private fun setupViewModel() {

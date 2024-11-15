@@ -24,7 +24,7 @@ interface RestroomDao {
   @Update
   suspend fun update(restroom: Restroom)
 
-  @Delete
-  fun delete(restroom: Restroom)
+  @Query("DELETE FROM restroom WHERE restroom_id = :restroomId")
+  suspend fun deleteRestroomById(restroomId: Int)
 
 }

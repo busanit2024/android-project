@@ -241,6 +241,22 @@
                     android:maxLines="1"
                     android:singleLine="true"
                     android:layout_marginBottom="10dp"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/deleteRestroom"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/member_button"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="삭제"
+                    android:textColor="#FF0000"
+                    android:textSize="20sp"
+                    android:visibility="visible"
+                    android:padding="8dp" />
             </LinearLayout>
 
             <View

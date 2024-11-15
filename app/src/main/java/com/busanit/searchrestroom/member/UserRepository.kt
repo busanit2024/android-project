@@ -85,7 +85,7 @@ class UserRepository(val memberDao: MemberDao, private val context: Context) {
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // 파이어베이스 로그인 성공 후, 로컬 DB에 있는 사용자 정보를 조회하여 member_id를 저장
+                    // 로그인 성공 시 로컬 DB 처리
                     GlobalScope.launch {
                         var member = memberDao.getMemberByEmail(email)
                         if (member == null) {
@@ -93,7 +93,7 @@ class UserRepository(val memberDao: MemberDao, private val context: Context) {
                             member = Member(
                                 email = email,
                                 password = password,
-                                nickname = "Unknown", // 닉네임이 없는 경우 임시로 설정
+                                nickname = "Unknown",
                                 profilePic = null,
                                 regTime = Date().toString(),
                                 updateTime = null,
@@ -102,12 +102,12 @@ class UserRepository(val memberDao: MemberDao, private val context: Context) {
                             )
                             memberDao.insert(member)
                         }
-                        saveUserInfoToPreferences(member.memberId, member.email, member.nickname ?: "", admin = member.admin)  // member_id, email, nickname 저장
-
-                        onComplete(true, null)  // UID가 일치하면 로그인 성공
+                        saveUserInfoToPreferences(member.memberId, member.email, member.nickname ?: "", admin = member.admin)
+                        onComplete(true, null)  // 로그인 성공
                     }
                 } else {
-                    onComplete(false, task.exception?.message)  // 로그인 실패
+                    // 로그인 실패 시 통일된 에러 메시지 표시
+                    onComplete(false, "이메일이나 비밀번호가 틀렸습니다. 다시 확인해주세요.")
                 }
             }
     }
@@ -194,36 +194,6 @@ class UserRepository(val memberDao: MemberDao, private val context: Context) {
                 saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "", existingMember.admin)
             }
             onComplete(true, null)
-        }
-    }
-
-    fun deleteUser(email: String, onComplete: (Boolean, String?) -> Unit) {
-        val firebaseUser = FirebaseAuth.getInstance().currentUser
-
-        if (firebaseUser != null) {
-            // Firebase에서 사용자 삭제
-            firebaseUser.delete()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        // Firebase 삭제 성공
-                        GlobalScope.launch {
-                            try {
-                                // 로컬 DB에서도 사용자 삭제
-                                val member = memberDao.getMemberByEmail(email)
-                                if (member != null) {
-                                    memberDao.delete(member)
-                                }
-                                onComplete(true, null)
-                            } catch (e: Exception) {
-                                onComplete(false, "로컬 DB 삭제 실패: ${e.message}")
-                            }
-                        }
-                    } else {
-                        onComplete(false, "Firebase 삭제 실패: ${task.exception?.message}")
-                    }
-                }
-        } else {
-            onComplete(false, "로그인된 사용자를 찾을 수 없습니다")
         }
     }
 

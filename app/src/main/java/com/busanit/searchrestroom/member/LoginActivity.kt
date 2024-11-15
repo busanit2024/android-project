@@ -43,8 +43,18 @@ class LoginActivity : AppCompatActivity(){
             val email = binding.loginEmail.text.toString()
             val password = binding.loginPassword.text.toString()
 
-            // 로그인 시도
-            viewModel.loginUser(email, password)
+            when {
+                email.isEmpty() -> {
+                    Toast.makeText(this, "이메일을 입력해주세요", Toast.LENGTH_SHORT).show()
+                }
+                password.isEmpty() -> {
+                    Toast.makeText(this, "비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    // 로그인 시도
+                    viewModel.loginUser(email, password)
+                }
+            }
         }
 
 
@@ -85,8 +95,6 @@ class LoginActivity : AppCompatActivity(){
         binding.btnNaverLogin.setOnClickListener {
             viewModel.loginNaver(this)
         }
-
-
 
         // 아이디 찾기 버튼 클릭 시
         binding.findIdBtn.setOnClickListener {
@@ -140,7 +148,7 @@ class LoginActivity : AppCompatActivity(){
 
                 // 이메일 미인증 시 동의창 띄우기
                 if (isEmailVerified) {
-                   // 이미 인증된 경우 바로 ViewModel을 통해 저장
+                    // 이미 인증된 경우 바로 ViewModel을 통해 저장
                     saveUserInfo(user)
                 } else {
                     // 인증되지 않은 경우 추가 동의 요청

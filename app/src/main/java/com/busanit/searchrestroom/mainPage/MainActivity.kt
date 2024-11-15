@@ -58,6 +58,7 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.auth.FirebaseAuth
+import com.kakao.sdk.common.util.Utility
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -87,7 +88,6 @@ class MainActivity : AppCompatActivity(){
 
   private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-  private var db: AppDatabase? = null
   private lateinit var job: Job
 
   private val searchViewModel : SearchViewModel by viewModels()
@@ -114,8 +114,8 @@ class MainActivity : AppCompatActivity(){
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
 
-      MenuHelper.updateMenuItems(binding.bottomNavigation.menu, AuthHelper.isLoggedIn())
-      binding.bottomNavigation.invalidate()
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, AuthHelper.isLoggedIn())
+    binding.bottomNavigation.invalidate()
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -152,7 +152,6 @@ class MainActivity : AppCompatActivity(){
     binding.checkAccessible.isChecked = filterAccessible
     binding.checkUnisex.isChecked = filterUnisex
 
-    val db = AppDatabase.getDatabase(context = applicationContext)
     lifecycleScope.launch {
       try {
         val db = AppDatabase.getDatabase(context = applicationContext)

@@ -5,11 +5,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import com.busanit.searchrestroom.reviewReg.FilterOptionState
-import com.busanit.searchrestroom.reviewReg.FilterType
 import kotlinx.parcelize.Parcelize
 
 
@@ -69,46 +66,24 @@ data class Member (
     )]
 )
 data class Review (
-  @PrimaryKey(autoGenerate = true)
   @ColumnInfo(name = "review_id")
+  @PrimaryKey(autoGenerate = true)
   var reviewId: Int,
-    @ColumnInfo(name = "restroom_id")
+  @ColumnInfo(name = "restroom_id")
   var restroomId: Int?,
-    @ColumnInfo(name = "member_id")
+  @ColumnInfo(name = "member_id")
   var memberId: Int?,
-    var content: String?,
-    @ColumnInfo(name = "reg_time", defaultValue = "CURRENT_TIMESTAMP")
+  var content: String?,
+  @ColumnInfo(name = "reg_time", defaultValue = "CURRENT_TIMESTAMP")
   var regTime: String?,
-    @ColumnInfo(name = "update_time", defaultValue = "CURRENT_TIMESTAMP")
+  @ColumnInfo(name = "update_time", defaultValue = "CURRENT_TIMESTAMP")
   var updateTime: String?,
-
-  @Ignore
-  var selectedOptions: List<FilterOptionState> = emptyList()
-){
-  constructor() : this(0, 0, 0, "", "", null)
-}
-
-@Entity(
-  tableName = "review_filter_option",
-  foreignKeys = [
-    ForeignKey(
-      entity = Review::class,
-      parentColumns = ["review_id"],
-      childColumns = ["review_id"],
-      onDelete = ForeignKey.CASCADE
-    )
-  ]
-)
-data class ReviewFilterOption(
-  @PrimaryKey(autoGenerate = true)
-  @ColumnInfo(name = "option_id")
-  var optionId: Int = 0,
-  @ColumnInfo(name = "review_id")
-  var reviewId: Int, // 해당 리뷰 ID
-  @ColumnInfo(name = "filter_type")
-  var filterType: FilterType, // 필터 유형
-  @ColumnInfo(name = "option_name")
-  var optionName: String // 옵션 이름
+  @ColumnInfo(name = "toilet_paper_option")
+  var toiletPaperOption: Int? = null,  // 1: 휴지 있음(디폴트), 2: 휴지 없음
+  @ColumnInfo(name="how_many_option")
+  var howManyOption: Int? = null,      // 1: 1칸(디폴트), 2: 2칸, 3: 3칸, 4: 4칸 이상
+  @ColumnInfo(name="cleanliness_option")
+  var cleanlinessOption: Int? = null   // 1: 깨끗함(디폴트), 2: 무난함, 3: 더러움
 )
 
 
@@ -166,12 +141,12 @@ data class Bookmark(
       childColumns = ["restroom_id"],
       onDelete = ForeignKey.CASCADE
     ),
-  ForeignKey(
-    entity = Member::class,
-    parentColumns = ["member_id"],
-    childColumns = ["member_id"],
-    onDelete = ForeignKey.SET_NULL
-  )
+    ForeignKey(
+      entity = Member::class,
+      parentColumns = ["member_id"],
+      childColumns = ["member_id"],
+      onDelete = ForeignKey.SET_NULL
+    )
   ]
 )
 data class DeleteRequest(
@@ -196,6 +171,3 @@ data class DeleteRequestWithRestroom(
   )
   val restroom: Restroom?
 )
-
-
-

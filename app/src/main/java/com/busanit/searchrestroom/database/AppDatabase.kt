@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.busanit.searchrestroom.dao.BookmarkDao
@@ -14,15 +13,9 @@ import com.busanit.searchrestroom.dao.MemberDao
 import com.busanit.searchrestroom.dao.RestroomDao
 import com.busanit.searchrestroom.dao.ReviewDao
 import com.busanit.searchrestroom.dao.ReviewImageDao
-import com.busanit.searchrestroom.database.Bookmark
-import com.busanit.searchrestroom.database.Member
-import com.busanit.searchrestroom.database.Restroom
-import com.busanit.searchrestroom.database.Review
-import com.busanit.searchrestroom.database.ReviewImage
-import com.busanit.searchrestroom.reviewReg.Converters
 
-@Database(entities = [Restroom::class, Member::class, Bookmark::class, Review::class, ReviewImage::class, ReviewFilterOption::class, DeleteRequest::class ], version = 4, exportSchema = false)
-@TypeConverters(Converters::class)
+
+@Database(entities = [Restroom::class, Member::class, Bookmark::class, Review::class, ReviewImage::class, DeleteRequest::class ], version = 5, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
   abstract fun restroomDao(): RestroomDao
   abstract fun memberDao(): MemberDao
@@ -30,6 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
   abstract fun reviewDao(): ReviewDao
   abstract fun reviewImageDao(): ReviewImageDao
   abstract fun DeleteRequestDao() : DeleteRequestDao
+
 
   companion object {
     @Volatile
@@ -59,6 +53,16 @@ abstract class AppDatabase : RoomDatabase() {
       }
     }
 
+    @JvmField
+    val MIGRATION_4_5 : Migration = object : Migration(4, 5) {
+      override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE Review ADD COLUMN toilet_paper_option INTEGER NULL")
+        db.execSQL("ALTER TABLE Review ADD COLUMN how_many_option INTEGER NULL")
+        db.execSQL("ALTER TABLE Review ADD COLUMN cleanliness_option INTEGER NULL")
+        db.execSQL("DROP TABLE IF EXISTS review_filter_option")
+      }
+    }
+
 
     // getDatabase 메서드 추가
     fun getDatabase(context: Context): AppDatabase? {
@@ -71,6 +75,7 @@ abstract class AppDatabase : RoomDatabase() {
             "search-restroom"
           )
             .addMigrations(MIGRATION_3_4)
+            .addMigrations(MIGRATION_4_5)
             .allowMainThreadQueries()
             .build()
         }

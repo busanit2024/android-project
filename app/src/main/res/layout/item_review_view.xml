@@ -6,6 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
+
+    <!-- 리뷰 작성자 정보 및 삭제, 수정 버튼 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,13 +15,13 @@
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp">
         <TextView
-            android:id="@+id/reviewerInfo"
+            android:id="@+id/reviewNickname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="사용자명"
             android:textSize="15sp"/>
         <TextView
-            android:id="@+id/review_reg_date"
+            android:id="@+id/reviewRegDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="작성일자"
@@ -27,13 +29,12 @@
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            />
+            android:layout_weight="1"/>
         <TextView
-            android:id="@+id/review_delete"
+            android:id="@+id/btnDeleteReview"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="삭제 "
+            android:text="삭제"
             android:textSize="15sp" />
         <View
             android:layout_width="1dp"
@@ -42,27 +43,37 @@
             android:layout_marginRight="3dp"
             android:layout_marginLeft="3dp"/>
         <TextView
-            android:id="@+id/review_update"
+            android:id="@+id/btnEditReview"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="수정"
             android:textSize="15sp"/>
     </LinearLayout>
+
+    <!-- 리뷰 내용과 필터 옵션 -->
     <LinearLayout
         android:id="@+id/reviewBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <!-- 필터 옵션 표시 -->
         <TextView
             android:id="@+id/filterOptions"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="필터 옵션"/>
+            android:text="필터 옵션"
+            android:background="@drawable/capsule_box"
+            android:textSize="12sp" />
+
+        <!-- 리뷰 내용 -->
         <TextView
             android:id="@+id/reviewText"
             android:text="댓글 내용"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="20dp"
+            android:textSize="14sp"/>
     </LinearLayout>
+
 </LinearLayout>

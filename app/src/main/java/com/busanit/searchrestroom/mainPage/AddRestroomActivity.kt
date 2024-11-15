@@ -121,6 +121,9 @@ class AddRestroomActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
+        binding.btnClose.setOnClickListener {
+            finish()
+        }
     }
 
     private fun setupLocationInput() {

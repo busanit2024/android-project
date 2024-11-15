@@ -27,7 +27,7 @@ android {
     versionName = "1.0"
 
     buildConfigField("String", "MAPS_API_KEY", properties.getProperty("MAPS_API_KEY") )
-    //Naver
+    // Naver
     buildConfigField("String", "CLIENT_ID", properties.getProperty("NAVER_CLIENT_ID"))
     buildConfigField("String", "CLIENT_SECRET", properties.getProperty("NAVER_CLIENT_SECRET"))
 

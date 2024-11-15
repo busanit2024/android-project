@@ -43,18 +43,8 @@ class LoginActivity : AppCompatActivity(){
             val email = binding.loginEmail.text.toString()
             val password = binding.loginPassword.text.toString()
 
-            when {
-                email.isEmpty() -> {
-                    Toast.makeText(this, "이메일을 입력해주세요", Toast.LENGTH_SHORT).show()
-                }
-                password.isEmpty() -> {
-                    Toast.makeText(this, "비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
-                }
-                else -> {
-                    // 로그인 시도
-                    viewModel.loginUser(email, password)
-                }
-            }
+            // 로그인 시도
+            viewModel.loginUser(email, password)
         }
 
 
@@ -95,6 +85,8 @@ class LoginActivity : AppCompatActivity(){
         binding.btnNaverLogin.setOnClickListener {
             viewModel.loginNaver(this)
         }
+
+
 
         // 아이디 찾기 버튼 클릭 시
         binding.findIdBtn.setOnClickListener {

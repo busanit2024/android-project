@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.location.Geocoder
 import android.os.Bundle
+import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
@@ -68,7 +69,9 @@ class RestroomUpdateActivity : AppCompatActivity(), OnMapReadyCallback {
   private fun setupButtons(restroom: Restroom?) {
     // 수정하기 버튼
     binding.rewriteInfo.setOnClickListener {
+      Log.d("RestroomUpdate", "수정 버튼 클릭됨")
       if (validateInput()) {
+        Log.d("RestroomUpdate", "입력값 검증 통과")
         updateRestroom(restroom)
       }
     }
@@ -169,15 +172,10 @@ class RestroomUpdateActivity : AppCompatActivity(), OnMapReadyCallback {
         db?.restroomDao()?.update(updatedRestroom)
         withContext(Dispatchers.Main) {
           Toast.makeText(this@RestroomUpdateActivity, "수정이 완료되었습니다.", Toast.LENGTH_SHORT).show()
-
-          // 메인 화면으로 이동
-          val intent = Intent(this@RestroomUpdateActivity, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-          }
-          startActivity(intent)
           finish()
         }
       } catch (e: Exception) {
+        Log.e("RestroomUpdate", "DB 업데이트 실패", e)
         withContext(Dispatchers.Main) {
           Toast.makeText(this@RestroomUpdateActivity, "수정 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
         }

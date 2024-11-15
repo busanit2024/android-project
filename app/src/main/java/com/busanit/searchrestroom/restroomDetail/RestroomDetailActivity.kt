@@ -21,6 +21,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.review.ReviewAdapter
 import com.busanit.searchrestroom.review.ReviewListAllActivity
 import com.busanit.searchrestroom.review.ReviewRegActivity
@@ -38,22 +39,28 @@ class RestroomDetailActivity : AppCompatActivity() {
     private var restroomId: Int = 0
     private lateinit var viewModel: ReviewViewModel
     private lateinit var reviewAdapter: ReviewAdapter
+    private var db: AppDatabase? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRestroomDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val db = AppDatabase.getDatabase(application)
+        db = AppDatabase.getDatabase(application)
         reviewDao = db!!.reviewDao()
-        bookmarkDao = db.bookmarkDao()
-        bookmarkRepository = BookmarkRepository(bookmarkDao, db.restroomDao())
+        bookmarkDao = db!!.bookmarkDao()
+        bookmarkRepository = BookmarkRepository(bookmarkDao, db!!.restroomDao())
 
         initializeData()
         setupRestroom()
         setupReviewRecyclerView()
         setupButtons()
+
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
     }
+
 
     private fun initializeData() {
         restroomId = intent.getIntExtra("restroomId", -1)
@@ -72,6 +79,7 @@ class RestroomDetailActivity : AppCompatActivity() {
                 restroomBookmark.visibility = View.VISIBLE
                 rewriteInfo.visibility = View.VISIBLE
                 writeReview.visibility = View.VISIBLE
+
             }
         } else {
             binding.apply {
@@ -116,7 +124,6 @@ class RestroomDetailActivity : AppCompatActivity() {
         binding.reviewRecyclerView.layoutManager = LinearLayoutManager(this)
 
         viewModel.loadLatestReviews(restroomId)
-        Log.d("test", "${restroomId}")
         viewModel.latestReviews.observe(this) { reviews ->
             reviewAdapter = ReviewAdapter(
                 reviewList = reviews,
@@ -243,10 +250,26 @@ class RestroomDetailActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val updatedRestroom = db?.restroomDao()?.getRestroomById(restroomId)
+                withContext(Dispatchers.Main) {
+                    updatedRestroom?.let {
+                        intent.removeExtra("restroom")  // 기존 데이터 제거
+                        intent.putExtra("restroom", it)  // 새 데이터 추가
+
+                        setupUI(it)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("RestroomDetail", "Error loading updated restroom info", e)
+            }
+        }
         if (AuthHelper.isLoggedIn()) {
             setupBookmarkButton()
         }
 
         viewModel.loadLatestReviews(restroomId)
+
     }
 }

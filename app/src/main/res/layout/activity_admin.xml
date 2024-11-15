@@ -53,25 +53,25 @@
             android:background="@drawable/badge"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
-        android:id="@+id/user_btn"
-        android:layout_width="fill_parent"
-        android:layout_height="100dp"
-        android:gravity="left|center"
-        android:layout_marginHorizontal="10dp"
-        android:backgroundTint="@color/white"
-        android:textColor="@color/black"
-        android:text="유저관리"
-        android:textSize="18dp" />
-    <Button
-        android:id="@+id/review_btn"
-        android:layout_width="fill_parent"
-        android:layout_height="100dp"
-        android:gravity="left|center"
-        android:layout_marginHorizontal="10dp"
-        android:backgroundTint="@color/white"
-        android:textColor="@color/black"
-        android:text="리뷰관리"
-        android:textSize="18dp" />
+    <!--    <Button-->
+    <!--        android:id="@+id/user_btn"-->
+    <!--        android:layout_width="fill_parent"-->
+    <!--        android:layout_height="100dp"-->
+    <!--        android:gravity="left|center"-->
+    <!--        android:layout_marginHorizontal="10dp"-->
+    <!--        android:backgroundTint="@color/white"-->
+    <!--        android:textColor="@color/black"-->
+    <!--        android:text="유저관리"-->
+    <!--        android:textSize="18dp" />-->
+    <!--    <Button-->
+    <!--        android:id="@+id/review_btn"-->
+    <!--        android:layout_width="fill_parent"-->
+    <!--        android:layout_height="100dp"-->
+    <!--        android:gravity="left|center"-->
+    <!--        android:layout_marginHorizontal="10dp"-->
+    <!--        android:backgroundTint="@color/white"-->
+    <!--        android:textColor="@color/black"-->
+    <!--        android:text="리뷰관리"-->
+    <!--        android:textSize="18dp" />-->
 
 </LinearLayout>

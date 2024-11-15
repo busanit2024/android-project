@@ -29,8 +29,8 @@ class SearchListActivity : AppCompatActivity() {
     binding = ActivitySearchlistBinding.inflate(layoutInflater)
     setContentView(binding.root)
 
-      MenuHelper.updateMenuItems(binding.bottomNavigation.menu, AuthHelper.isLoggedIn())
-      binding.bottomNavigation.invalidate()
+    MenuHelper.updateMenuItems(binding.bottomNavigation.menu, AuthHelper.isLoggedIn())
+    binding.bottomNavigation.invalidate()
 
     binding.backButton.setOnClickListener {
       finish()

@@ -184,7 +184,7 @@ class LoginActivity : AppCompatActivity(){
 
                 // 이메일 미인증 시 동의창 띄우기
                 if (isEmailVerified) {
-                   // 이미 인증된 경우 바로 ViewModel을 통해 저장
+                    // 이미 인증된 경우 바로 ViewModel을 통해 저장
                     saveUserInfo(user)
                 } else {
                     // 인증되지 않은 경우 추가 동의 요청

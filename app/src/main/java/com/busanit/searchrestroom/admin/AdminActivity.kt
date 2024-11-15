@@ -26,14 +26,14 @@ class AdminActivity : AppCompatActivity() {
             val intent = Intent(this, AdminDeleteActivity::class.java)
             startActivity(intent)
         }
-
-        binding.userBtn.setOnClickListener {
-
-        }
-
-        binding.reviewBtn.setOnClickListener {
-
-        }
+//
+//        binding.userBtn.setOnClickListener {
+//
+//        }
+//
+//        binding.reviewBtn.setOnClickListener {
+//
+//        }
 
         // 뒤로 가기 버튼 클릭 시
         binding.backBtn.setOnClickListener {

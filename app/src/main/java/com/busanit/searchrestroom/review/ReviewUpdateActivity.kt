@@ -45,6 +45,10 @@ class ReviewUpdateActivity : AppCompatActivity() {
         setupUI()
         // 기존 리뷰 데이터 설정
         setupExistingReview()
+
+        binding.backBtn.setOnClickListener{
+            finish()
+        }
     }
 
     private fun setupUI() {

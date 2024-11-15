@@ -1,10 +1,15 @@
 package com.busanit.searchrestroom.review
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.Review
 import com.busanit.searchrestroom.databinding.ItemReviewViewBinding
 import java.text.SimpleDateFormat
@@ -45,17 +50,32 @@ class ReviewAdapter(
                 reviewNickname.text = review.nickname
 
                 val formattedDate = ReviewViewModel.formatDateForDisplay(review.regDate)
-                Log.d("ReviewAdapter", "Setting date text: $formattedDate")
                 reviewRegDate.text = formattedDate.ifEmpty { "작성일자" }
 
                 reviewText.text = review.reviewText
 
-                // 필터 옵션 표시
+                filterOptionsContainer.removeAllViews() // 기존 뷰 모두 제거
+
                 if (review.filterOptions.isNotEmpty()) {
-                    filterOptions.text = review.filterOptions.joinToString(", ")
-                    filterOptions.visibility = View.VISIBLE
+                    filterOptionsContainer.visibility = View.VISIBLE
+
+                    review.filterOptions.forEach { option ->
+                        val optionView = TextView(itemView.context).apply {
+                            text = option
+                            textSize = 12f
+                            setPadding(15, 0, 16, 8)
+                            background = ContextCompat.getDrawable(context, R.drawable.capsule_box)
+                            layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            ).apply {
+                                marginEnd = 8.dpToPx(context)  // 옵션 사이 간격
+                            }
+                        }
+                        filterOptionsContainer.addView(optionView)
+                    }
                 } else {
-                    filterOptions.visibility = View.GONE
+                    filterOptionsContainer.visibility = View.GONE
                 }
 
                 // 현재 로그인한 사용자가 리뷰 작성자인 경우에만 수정/삭제 버튼 표시
@@ -75,5 +95,9 @@ class ReviewAdapter(
                 }
             }
         }
+    }
+
+    private fun Int.dpToPx(context: Context): Int {
+        return (this * context.resources.displayMetrics.density).toInt()
     }
 }

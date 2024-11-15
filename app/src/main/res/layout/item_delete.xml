@@ -78,16 +78,18 @@
             android:layout_marginBottom="15dp"
             android:orientation="horizontal"
             android:gravity="center_horizontal">
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/detailButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/member_button"
                 android:text="상세 페이지"
                 android:layout_marginHorizontal="8dp"/>
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/cancelButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/member_button"
                 android:text="요청 취소"
                 android:layout_marginHorizontal="8dp"/>
         </LinearLayout>

@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#F5F5F5"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -208,7 +209,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="25dp">
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/rewriteInfo"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -217,11 +218,11 @@
                     android:textSize="20sp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/member_button"
                     android:maxLines="1"
                     android:singleLine="true" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/writeReview"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -229,7 +230,7 @@
                     android:textSize="20sp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/member_button"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:layout_marginBottom="10dp"/>

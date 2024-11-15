@@ -190,8 +190,50 @@ class RestroomDetailActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
+
+        // 관리자 권한 확인 및 삭제 버튼 표시
+        lifecycleScope.launch(Dispatchers.IO) {
+            val isAdmin = db?.memberDao()?.getMemberById(AuthHelper.getMemberId())?.admin ?: false
+            withContext(Dispatchers.Main) {
+                binding.deleteRestroom.visibility = if (isAdmin) View.VISIBLE else View.GONE
+            }
+        }
+
+        // 삭제 버튼 클릭 리스너
+        binding.deleteRestroom.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("화장실 정보 삭제")
+                .setMessage("이 화장실 정보를 삭제하시겠습니까?\n관련된 모든 리뷰도 함께 삭제됩니다.")
+                .setPositiveButton("삭제") { _, _ ->
+                    deleteRestroom()
+                }
+                .setNegativeButton("취소", null)
+                .show()
+        }
     }
 
+    private fun deleteRestroom() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                // 화장실 정보 삭제 (외래키 제약으로 인해 관련 리뷰도 자동 삭제됨)
+                db?.restroomDao()?.deleteRestroomById(restroomId)
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@RestroomDetailActivity,
+                        "화장실 정보가 삭제되었습니다.",
+                        Toast.LENGTH_SHORT).show()
+                    finish()  // 액티비티 종료
+                }
+            } catch (e: Exception) {
+                Log.e("RestroomDetail", "Error deleting restroom", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@RestroomDetailActivity,
+                        "삭제 중 오류가 발생했습니다.",
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
     private fun setupBookmarkButton() {
         lifecycleScope.launch {
             try {

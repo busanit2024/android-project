@@ -18,16 +18,16 @@
 
         <!-- 프로필 사진 -->
         <ImageView
-            android:id="@+id/profile"
+            android:id="@+id/profileImage"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/profile"
             android:layout_marginRight="16dp"
-            android:background=
-                "?android:attr/selectableItemBackgroundBorderless"
+            android:background="@drawable/rounded_background"
             android:contentDescription="프로필 이미지"
-            android:scaleType="centerInside"
-            android:layout_gravity="center" />
+            android:scaleType="centerCrop"
+            android:layout_gravity="center"
+            android:clipToOutline="true"/>
 
         <!-- 회원 정보 -->
         <LinearLayout

@@ -1,7 +1,9 @@
 package com.busanit.searchrestroom.myPage
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -44,6 +46,12 @@ class MyPageActivity : AppCompatActivity() {
 
         // 사용자 정보 불러오기
         loadUserInfo()
+
+        val uriString = sharedPreferences.getString("profileImageUri", null)
+        if (uriString != null) {
+            val uri = Uri.parse(uriString)
+            binding.profileImage.setImageURI(uri)
+        }
 
         // 각 버튼의 클릭 리스너 설정
         binding.myReview.setOnClickListener {
@@ -124,6 +132,12 @@ class MyPageActivity : AppCompatActivity() {
     private fun updateUI() {
         val isAdmin = AuthHelper.isAdmin()
         val isLoggedIn = AuthHelper.isLoggedIn()
+        val uriString = sharedPreferences.getString("profileImageUri", null)
+
+        if (uriString != null) {
+            val uri = Uri.parse(uriString)
+            binding.profileImage.setImageURI(uri)
+        }
 
         binding.logout.text = if (isLoggedIn) "로그아웃" else "로그인"
         binding.deleteAccount.text = if (isLoggedIn) "회원탈퇴" else "회원가입"
@@ -186,5 +200,10 @@ class MyPageActivity : AppCompatActivity() {
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateUI()
     }
 }

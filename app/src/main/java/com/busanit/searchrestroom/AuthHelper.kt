@@ -62,6 +62,8 @@ object AuthHelper {
       remove("member_id")
       remove("email")
       remove("nickname")
+      remove("admin")
+      remove("profileImageUri")
       apply()
     }
     Log.i("authHelper", "로그아웃 완료")

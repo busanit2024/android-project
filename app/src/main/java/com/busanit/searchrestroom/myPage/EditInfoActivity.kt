@@ -3,8 +3,11 @@ package com.busanit.searchrestroom.myPage
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -19,6 +22,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.room.Room
+import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.dao.MemberDao
 import com.busanit.searchrestroom.database.AppDatabase
@@ -29,21 +33,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.jvm.Throws
 
 class EditInfoActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEditInfoBinding
     private val CAMERA_PERMISSION = Manifest.permission.CAMERA
-    private val READ_STORAGE_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE
-    private val WRITE_STORAGE_PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE
     // 안드로이드 10 이상이라면 WRITE_EXTERNAL_STORAGE는 필요하지 않을 수 있다.
     private val PERMISSION_REQUEST_CODE = 100
     private lateinit var currentPhotoPath: String
     private var currentMember: Member? = null // 로그인한 사용자의 정보
-    private lateinit var memberDao: MemberDao
+    private var photoUri: Uri? = null
+    private lateinit var sharedPreferences: SharedPreferences
+
 
     // 카메라로 사진 촬영
     private val requestCameraLauncher = registerForActivityResult(
@@ -72,6 +79,8 @@ class EditInfoActivity : AppCompatActivity() {
                 inputStream?.close()
 
                 bitmap?.let {
+                    val imagePath = saveBitmapToFile(bitmap, "profile_image.jpg")
+                    photoUri = Uri.parse(imagePath)
                     binding.profileImage.setImageBitmap(bitmap)
                 } ?: run {
                     Log.d("test", "bitmap null")
@@ -87,14 +96,28 @@ class EditInfoActivity : AppCompatActivity() {
         }
     }
 
+    private fun saveBitmapToFile(bitmap: Bitmap, fileName: String): String {
+        val file = File(filesDir, fileName)
+        val outputStream = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        outputStream.flush()
+        outputStream.close()
+        return file.absolutePath
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityEditInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // sharedPreferences에서 memberId를 가져오기
-        val sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
-        val memberId = sharedPreferences.getInt("member_id", -1)
+        sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
+        val memberId = AuthHelper.getMemberId()
+        val uriString = sharedPreferences.getString("profileImageUri", null)
+        if (uriString != null) {
+            photoUri = Uri.parse(uriString)
+            binding.profileImage.setImageURI(photoUri)
+        }
 
         // 로그인한 사용자의 정보를 DB에서 가져오기
         loadMemberInfo(memberId)
@@ -183,6 +206,10 @@ class EditInfoActivity : AppCompatActivity() {
             }
 
             withContext(Dispatchers.Main) {
+                with(sharedPreferences.edit()) {
+                    putString("profileImageUri", photoUri.toString())
+                    apply()
+                }
                 Toast.makeText(this@EditInfoActivity, "정보가 수정되었습니다.", Toast.LENGTH_SHORT).show()
                 setResult(RESULT_OK)    // 결과 설정
                 finish()  // 수정 후 액티비티 종료
@@ -192,18 +219,15 @@ class EditInfoActivity : AppCompatActivity() {
 
     private fun checkPermission(): Boolean {
         val cameraPermission = ContextCompat.checkSelfPermission(this, CAMERA_PERMISSION)
-        val readStoragePermission = ContextCompat.checkSelfPermission(this, READ_STORAGE_PERMISSION)
-        val writeStoragePermission = ContextCompat.checkSelfPermission(this, WRITE_STORAGE_PERMISSION)
 
-        return cameraPermission == PackageManager.PERMISSION_GRANTED &&
-                readStoragePermission == PackageManager.PERMISSION_GRANTED &&
-                writeStoragePermission == PackageManager.PERMISSION_GRANTED
+
+        return cameraPermission == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestPermissions() {
         ActivityCompat.requestPermissions(
             this,
-            arrayOf(CAMERA_PERMISSION, READ_STORAGE_PERMISSION, WRITE_STORAGE_PERMISSION),
+            arrayOf(CAMERA_PERMISSION),
             PERMISSION_REQUEST_CODE
         )
     }
@@ -219,6 +243,7 @@ class EditInfoActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
                 showImagePickerDialog()
             } else {
+
                 Toast.makeText(this, "권한이 필요합니다!", Toast.LENGTH_SHORT).show()
             }
         }
@@ -231,29 +256,7 @@ class EditInfoActivity : AppCompatActivity() {
             .setTitle("프로필 이미지 설정")
             .setItems(options) { dialog, which ->
                 when (which) {
-                    0 -> {
-                        try {
-                            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                            if (takePictureIntent.resolveActivity(packageManager) != null) {
-                                // 이미지 파일 생성
-                                val photoFile: File? = createImageFile()
-                                photoFile?.also {
-                                    val photoURI: Uri = FileProvider.getUriForFile(
-                                        this,
-                                        "com.busanit.searchrestroom.fileprovider",
-                                        it
-                                    )
-                                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                                    requestCameraLauncher.launch(takePictureIntent)
-                                }
-                            } else {
-                                Toast.makeText(this, "카메라 앱이 설치되어 있지 않습니다.", Toast.LENGTH_SHORT).show()
-                            }
-                        } catch (e: Exception) {
-                            Log.e("카메라 오류", "카메라 촬영 중 오류 발생: ${e.message}")
-                            Toast.makeText(this, "카메라 촬영 중 오류 발생!", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                    0 -> launchCamera()
                     1 -> {
                         try {
                             val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
@@ -269,11 +272,41 @@ class EditInfoActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun launchCamera() {
+        if (!checkPermission()) {
+            requestPermissions()
+            return
+        }
+
+            try {
+                val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    // 이미지 파일 생성
+                    val photoFile: File? = createImageFile()
+                    if (photoFile != null) {
+                        val photoURI: Uri = FileProvider.getUriForFile(
+                            this,
+                            "com.busanit.searchrestroom.fileprovider",
+                            photoFile
+                        )
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                        requestCameraLauncher.launch(takePictureIntent)
+                        photoUri = photoURI
+                    } else {
+                        Toast.makeText(this, "이미지 파일 생성에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                    }
+            } catch (e: Exception) {
+                Log.e("카메라 오류", "카메라 촬영 중 오류 발생: ${e.message}")
+                Toast.makeText(this, "카메라 촬영 중 오류 발생!", Toast.LENGTH_SHORT).show()
+            }
+
+    }
+
+    @Throws(IOException::class)
     private fun createImageFile(): File {
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
-            "JPEG_$timeStamp",  /* prefix */
+            "JPEG_${timeStamp}_",  /* prefix */
             ".jpg",         /* suffix */
             storageDir      /* directory */
         ).apply {

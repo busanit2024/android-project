@@ -3,6 +3,7 @@ package com.busanit.searchrestroom.myPage
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -188,9 +189,13 @@ class EditInfoActivity : AppCompatActivity() {
                 val db = AppDatabase.getDatabase(this@EditInfoActivity)
                 db!!.memberDao().updateNickname(currentMember!!.memberId, newNickname)
 
-                with(sharedPreferences.edit()) {
-                    putString("profileImageUri", photoUri.toString())
-                    apply()
+                if (photoUri != null) {
+                    db!!.memberDao().updateProfilePic(currentMember!!.memberId, photoUri.toString())
+                    with(sharedPreferences.edit()) {
+                        putString("profileImageUri", photoUri.toString())
+                        apply()
+                    }
+                    Log.d("EditInfoActivity", "프로필 이미지 업데이트 완료")
                 }
 
                 withContext(Dispatchers.Main) {
@@ -254,6 +259,7 @@ class EditInfoActivity : AppCompatActivity() {
                     putString("profileImageUri", photoUri.toString())
                     apply()
                 }
+                Log.d("EditInfoActivity", "프로필 이미지 업데이트 완료")
             }
 
 
@@ -267,10 +273,17 @@ class EditInfoActivity : AppCompatActivity() {
     }
 
     private fun setProfileImage() {
-        val uriString = sharedPreferences.getString("profileImageUri", null)
+        val db = AppDatabase.getDatabase(this@EditInfoActivity)
+        val uriString = db!!.memberDao().getProfilePic(AuthHelper.getMemberId())
         if (uriString != null) {
             val uri = Uri.parse(uriString)
             binding.profileImage.setImageURI(uri)
+            binding.profileImage.postDelayed({
+                if (binding.profileImage.drawable == null) {
+                    Log.d("EditInfoActivity", "프로필 이미지 로드 실패")
+                    binding.profileImage.setImageResource(R.drawable.profile)
+                }
+            }, 1000)
         } else {
             binding.profileImage.setImageResource(R.drawable.profile)
         }

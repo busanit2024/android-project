@@ -143,19 +143,17 @@ class MyPageActivity : AppCompatActivity() {
 
     }
 
-    private fun isLocalFileUri(uri: Uri): Boolean {
-        return uri.scheme?.let { it == ContentResolver.SCHEME_FILE || it == ContentResolver.SCHEME_CONTENT } == true
-    }
-
     private fun setProfileImage() {
         val uriString = db!!.memberDao().getProfilePic(AuthHelper.getMemberId())
         if (uriString != null) {
             val uri = Uri.parse(uriString)
-            if (isLocalFileUri(uri)) {
-                binding.profileImage.setImageURI(uri)
-            } else {
-                binding.profileImage.setImageResource(R.drawable.profile)
-            }
+            binding.profileImage.setImageURI(uri)
+            binding.profileImage.postDelayed({
+                if (binding.profileImage.drawable == null) {
+                    Log.d("MyPageActivity", "프로필 이미지 로드 실패")
+                    binding.profileImage.setImageResource(R.drawable.profile)
+                }
+            }, 1000)
         } else {
             binding.profileImage.setImageResource(R.drawable.profile)
         }

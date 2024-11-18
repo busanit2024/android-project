@@ -108,10 +108,11 @@ class RestroomDetailActivity : AppCompatActivity() {
                 location.text = it.location
                 openTime.text = it.openTime
 
-                chipFullTime.isChecked = it.fullTime == true
-                chipDiaper.isChecked = it.diaper == true
-                chipAccessible.isChecked = it.accessible == true
-                chipUnisex.isChecked = it.unisex == true
+                // 칩 체크 시에만 보이도록
+                chipFullTime.visibility = if (it.fullTime == true) View.VISIBLE else View.GONE
+                chipDiaper.visibility = if (it.diaper == true) View.VISIBLE else View.GONE
+                chipAccessible.visibility = if (it.accessible == true) View.VISIBLE else View.GONE
+                chipUnisex.visibility = if (it.unisex == true) View.VISIBLE else View.GONE
 
                 memoText.text = it.memo ?: "기타 정보가 없습니다."
                 memoText.visibility = if (it.memo.isNullOrEmpty()) View.GONE else View.VISIBLE

@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.databinding.ActivityReviewListAllBinding
-import com.busanit.searchrestroom.databinding.ActivityReviewListBinding
 import com.busanit.searchrestroom.databinding.ActivityReviewRegBinding
 import kotlinx.coroutines.launch
 

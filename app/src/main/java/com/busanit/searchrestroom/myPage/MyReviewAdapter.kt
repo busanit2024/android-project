@@ -9,12 +9,14 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.R
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.database.Restroom
 import com.busanit.searchrestroom.database.Review
+import com.busanit.searchrestroom.restroomDetail.RestroomDetailActivity
 import com.busanit.searchrestroom.review.ReviewUpdateActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,17 +33,18 @@ class MyReviewAdapter(
         val buildingName: TextView = view.findViewById(R.id.building_name)
         val reviewDate: TextView = view.findViewById(R.id.review_date)
         val reviewContent: TextView = view.findViewById(R.id.review_content)
-        val editButton: Button = view.findViewById(R.id.update)
-        val deleteButton: Button = view.findViewById(R.id.delete)
+        val editButton: TextView = view.findViewById(R.id.update)
+        val deleteButton: TextView = view.findViewById(R.id.delete)
         val images: List<ImageView> = listOf(
             view.findViewById(R.id.review_image1),
             view.findViewById(R.id.review_image2),
             view.findViewById(R.id.review_image3)
         )
+        val root: CardView = view.findViewById(R.id.review_item_layout)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReviewViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.activity_review_list, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_review_mypage, parent, false)
         return ReviewViewHolder(view)
     }
 
@@ -92,6 +95,14 @@ class MyReviewAdapter(
                 show()
             }
         }
+
+        holder.root.setOnClickListener {
+            val intent = Intent(holder.itemView.context, RestroomDetailActivity::class.java)
+            intent.putExtra("restroomId", restRoom?.restroomId)
+            intent.putExtra("restroom", restRoom)
+            holder.itemView.context.startActivity(intent)
+        }
+
     }
 
     override fun getItemCount(): Int = reviewList.size

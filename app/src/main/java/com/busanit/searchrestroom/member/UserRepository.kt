@@ -104,7 +104,10 @@ class UserRepository(val memberDao: MemberDao, private val context: Context) {
                             )
                             memberDao.insert(member)
                         }
-                        saveUserInfoToPreferences(member.memberId, member.email, member.nickname ?: "", admin = member.admin)
+                        val searchMember = memberDao.getMemberByEmail(email)
+                        if (searchMember != null) {
+                            saveUserInfoToPreferences(searchMember.memberId, email, member.nickname ?: "", member.admin)
+                        }
                         onComplete(true, null)  // 로그인 성공
                     }
                 } else {
@@ -191,7 +194,10 @@ class UserRepository(val memberDao: MemberDao, private val context: Context) {
                     admin = false
                 )
                 memberDao.insert(member)
-                saveUserInfoToPreferences(member.memberId, member.email, member.nickname ?: "", member.admin)
+                val searchMember = memberDao.getMemberByEmail(email)
+                if (searchMember != null) {
+                    saveUserInfoToPreferences(searchMember.memberId, email, member.nickname ?: "", member.admin)
+                }
             } else {
                 saveUserInfoToPreferences(existingMember.memberId, existingMember.email, existingMember.nickname ?: "", existingMember.admin)
             }

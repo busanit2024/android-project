@@ -68,6 +68,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withContext
 import java.util.Collections
 import kotlin.math.cos
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity(){
 
@@ -283,7 +284,7 @@ class MainActivity : AppCompatActivity(){
       override fun handleOnBackPressed() {
         if (backPressedTime + 2000 > System.currentTimeMillis()) {
           isEnabled = false
-          finish()
+          finishAffinity()
         } else {
           backPressedToast?.cancel()
           backPressedToast = Toast.makeText(this@MainActivity, "'뒤로' 버튼을 한 번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT)
@@ -628,13 +629,6 @@ class MainActivity : AppCompatActivity(){
   }
 
 
-  override fun onStop() {
-    super.onStop()
-//    ///테스트용 : 앱 종료 시 자동 로그아웃
-//    AuthHelper.logout()
-
-  }
-
   override fun onResume() {
     super.onResume()
     binding.mapView.onResume()
@@ -651,8 +645,6 @@ class MainActivity : AppCompatActivity(){
     super.onDestroy()
     binding.mapView.onDestroy()
 
-    ///테스트용 : 앱 종료 시 자동 로그아웃
-//    AuthHelper.logout()
   }
 
   override fun onLowMemory() {

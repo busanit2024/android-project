@@ -428,14 +428,26 @@ class MainActivity : AppCompatActivity(){
             titleTextView?.text = marker.title
 
 
+//            detailsButton?.setOnClickListener {
+//              Log.d("test", "detailsButton clicked")
+//              val id = marker.tag as Int
+//              val restroom = locations.find { it.restroomId == id }
+//              val intent = Intent(context, RestroomDetailActivity::class.java)
+//              intent.putExtra("restroom_id", id)
+//              intent.putExtra("restroom", restroom)
+//              startActivityForResult(intent, RESTROOM_DETAIL_REQUEST)  // startActivity 대신 사용
+//            }
+
             detailsButton?.setOnClickListener {
               Log.d("test", "detailsButton clicked")
-              val id = marker.tag as Int
-              val restroom = locations.find { it.restroomId == id }
-              val intent = Intent(context, RestroomDetailActivity::class.java)
-              intent.putExtra("restroom_id", id)
-              intent.putExtra("restroom", restroom)
-              startActivityForResult(intent, RESTROOM_DETAIL_REQUEST)  // startActivity 대신 사용
+              marker.tag?.let { tag ->  // null이 아닌 경우에만 실행
+                val id = tag as? Int ?: return@let  // 안전한 캐스팅, 실패시 리턴
+                val restroom = locations.find { it.restroomId == id }
+                val intent = Intent(context, RestroomDetailActivity::class.java)
+                intent.putExtra("restroom_id", id)
+                intent.putExtra("restroom", restroom)
+                startActivityForResult(intent, RESTROOM_DETAIL_REQUEST)
+              }
             }
 
 

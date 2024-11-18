@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:map="http://schemas.android.com/tools"
     android:id="@+id/scrollView"
-    android:background="#F5F5F5">
+    android:background="#F1EEDC">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

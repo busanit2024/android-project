@@ -5,6 +5,8 @@
   <color name="light_gray">#C5C5C5</color>
   <color name="gray">#939393</color>
   <color name="blue">#2196F3</color>
-  <color name="my_light_primary">#8CC8FF</color>
+  <color name="my_light_primary">#B3C8CF</color>
+  <color name="windowBackground">#FBF9F1</color>
+  <color name="bottomNavigation">#FBF9F1</color>
 </resources>
 

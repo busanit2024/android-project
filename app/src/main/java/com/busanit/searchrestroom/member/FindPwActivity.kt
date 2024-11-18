@@ -46,66 +46,74 @@ class FindPwActivity : AppCompatActivity() {
                 GlobalScope.launch {
                     var member = memberDao.getMemberByEmail(email)
                     withContext(Dispatchers.Main) {
-                        when (member!!.social) {
-                            true -> {
-                                Toast.makeText(
-                                    this@FindPwActivity,
-                                    "소셜회원은 비밀번호를 찾을 수 없습니다.",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                finish()
-                            }
+                        if (member != null) {
+                            when (member!!.social) {
+                                true -> {
+                                    Toast.makeText(
+                                        this@FindPwActivity,
+                                        "소셜회원은 비밀번호를 찾을 수 없습니다.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    finish()
+                                }
 
-                            false -> // Firebase에서 비밀번호 재설정 이메일 보내기
-                                FirebaseAuth.getInstance().sendPasswordResetEmail(email)
-                                    .addOnCompleteListener { task ->
-                                        if (task.isSuccessful) {
-                                            Toast.makeText(
-                                                this@FindPwActivity,
-                                                "가입하신 이메일로 비밀번호 재설정 메일을 전송했습니다.",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            // 로그인 액티비티 이동
-                                            startActivity(
-                                                Intent(
+                                false -> // Firebase에서 비밀번호 재설정 이메일 보내기
+                                    FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                                        .addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
+                                                Toast.makeText(
                                                     this@FindPwActivity,
-                                                    LoginActivity::class.java
+                                                    "가입하신 이메일로 비밀번호 재설정 메일을 전송했습니다.",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                // 로그인 액티비티 이동
+                                                startActivity(
+                                                    Intent(
+                                                        this@FindPwActivity,
+                                                        LoginActivity::class.java
+                                                    )
                                                 )
-                                            )
-                                        } else {
-                                            // Firebase 예외처리
-                                            try {
-                                                throw task.exception ?: Exception("Unknown error")
-                                            } catch (e: FirebaseAuthInvalidUserException) {
-                                                Toast.makeText(
-                                                    this@FindPwActivity,
-                                                    "존재하지 않는 이메일입니다.",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            } catch (e: FirebaseAuthRecentLoginRequiredException) {
-                                                Toast.makeText(
-                                                    this@FindPwActivity,
-                                                    "최근에 로그인한 기기가 아닙니다.",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            } catch (e: FirebaseAuthUserCollisionException) {
-                                                Toast.makeText(
-                                                    this@FindPwActivity,
-                                                    "사용자 충돌이 발생했습니다.",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            } catch (e: Exception) {
-                                                Toast.makeText(
-                                                    this@FindPwActivity,
-                                                    "비밀번호 재설정 이메일 전송에 실패했습니다.",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
+                                            } else {
+                                                // Firebase 예외처리
+                                                try {
+                                                    throw task.exception ?: Exception("Unknown error")
+                                                } catch (e: FirebaseAuthInvalidUserException) {
+                                                    Toast.makeText(
+                                                        this@FindPwActivity,
+                                                        "존재하지 않는 이메일입니다.",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                } catch (e: FirebaseAuthRecentLoginRequiredException) {
+                                                    Toast.makeText(
+                                                        this@FindPwActivity,
+                                                        "최근에 로그인한 기기가 아닙니다.",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                } catch (e: FirebaseAuthUserCollisionException) {
+                                                    Toast.makeText(
+                                                        this@FindPwActivity,
+                                                        "사용자 충돌이 발생했습니다.",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                } catch (e: Exception) {
+                                                    Toast.makeText(
+                                                        this@FindPwActivity,
+                                                        "비밀번호 재설정 이메일 전송에 실패했습니다.",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
                                             }
-                                        }
                                     }
-
+                            }
+                        } else {
+                            Toast.makeText(
+                                this@FindPwActivity,
+                                "존재하지 않는 이메일입니다.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
+
                 }
             }
 

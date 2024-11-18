@@ -188,6 +188,11 @@ class EditInfoActivity : AppCompatActivity() {
                 val db = AppDatabase.getDatabase(this@EditInfoActivity)
                 db!!.memberDao().updateNickname(currentMember!!.memberId, newNickname)
 
+                with(sharedPreferences.edit()) {
+                    putString("profileImageUri", photoUri.toString())
+                    apply()
+                }
+
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@EditInfoActivity, "정보가 수정되었습니다.", Toast.LENGTH_SHORT).show()
                     setResult(RESULT_OK)    // 결과 설정

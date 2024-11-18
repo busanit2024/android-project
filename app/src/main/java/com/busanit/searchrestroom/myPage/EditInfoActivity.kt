@@ -28,6 +28,7 @@ import com.busanit.searchrestroom.dao.MemberDao
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.database.Member
 import com.busanit.searchrestroom.databinding.ActivityEditInfoBinding
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -113,11 +114,6 @@ class EditInfoActivity : AppCompatActivity() {
         // sharedPreferences에서 memberId를 가져오기
         sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
         val memberId = AuthHelper.getMemberId()
-        val uriString = sharedPreferences.getString("profileImageUri", null)
-        if (uriString != null) {
-            photoUri = Uri.parse(uriString)
-            binding.profileImage.setImageURI(photoUri)
-        }
 
         // 로그인한 사용자의 정보를 DB에서 가져오기
         loadMemberInfo(memberId)
@@ -162,6 +158,7 @@ class EditInfoActivity : AppCompatActivity() {
                     binding.email.setText(currentMember?.email)
                     binding.email.isEnabled = false // 이메일은 수정 불가
                     binding.newNickname.setText(currentMember?.nickname)
+                    setProfileImage()
                 } else {
                     Log.d("test", "No member found with the given ID.")
                 }
@@ -199,21 +196,41 @@ class EditInfoActivity : AppCompatActivity() {
             if (newPassword.isNotEmpty()) {
                 if (newPassword != currentPassword) {
                     db!!.memberDao().updatePassword(currentMember!!.memberId, newPassword)  // 비밀번호 업데이트
+                    FirebaseAuth.getInstance().currentUser?.updatePassword(newPassword)
+                        ?.addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                Toast.makeText(this@EditInfoActivity, "비밀번호가 변경되었습니다.", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(this@EditInfoActivity, "비밀번호 변경에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                 } else {
                     Toast.makeText(this@EditInfoActivity, "새 비밀번호는 기존 비밀번호와 달라야 합니다!", Toast.LENGTH_SHORT).show()
                     return@launch
                 }
             }
 
+            with(sharedPreferences.edit()) {
+                putString("profileImageUri", photoUri.toString())
+                apply()
+            }
+
             withContext(Dispatchers.Main) {
-                with(sharedPreferences.edit()) {
-                    putString("profileImageUri", photoUri.toString())
-                    apply()
-                }
+
                 Toast.makeText(this@EditInfoActivity, "정보가 수정되었습니다.", Toast.LENGTH_SHORT).show()
                 setResult(RESULT_OK)    // 결과 설정
                 finish()  // 수정 후 액티비티 종료
             }
+        }
+    }
+
+    private fun setProfileImage() {
+        val uriString = sharedPreferences.getString("profileImageUri", null)
+        if (uriString != null) {
+            val uri = Uri.parse(uriString)
+            binding.profileImage.setImageURI(uri)
+        } else {
+            binding.profileImage.setImageResource(R.drawable.profile)
         }
     }
 

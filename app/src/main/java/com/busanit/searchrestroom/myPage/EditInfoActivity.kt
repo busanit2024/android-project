@@ -210,10 +210,14 @@ class EditInfoActivity : AppCompatActivity() {
                 }
             }
 
-            with(sharedPreferences.edit()) {
-                putString("profileImageUri", photoUri.toString())
-                apply()
+            if (photoUri != null) {
+                db!!.memberDao().updateProfilePic(currentMember!!.memberId, photoUri.toString())
+                with(sharedPreferences.edit()) {
+                    putString("profileImageUri", photoUri.toString())
+                    apply()
+                }
             }
+
 
             withContext(Dispatchers.Main) {
 

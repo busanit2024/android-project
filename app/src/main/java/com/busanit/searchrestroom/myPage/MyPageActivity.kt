@@ -1,6 +1,7 @@
 package com.busanit.searchrestroom.myPage
 
 import android.app.ComponentCaller
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -41,6 +42,7 @@ class MyPageActivity : AppCompatActivity() {
     private lateinit var memberDao: MemberDao
     private var currentMember: Member? = null
     private lateinit var userRepository: UserRepository
+    private var db: AppDatabase? = null
 
     companion object {
         private const val EDIT_INFO_REQUEST_CODE = 1
@@ -59,7 +61,7 @@ class MyPageActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
-        val db = AppDatabase.getDatabase(applicationContext)
+        db = AppDatabase.getDatabase(applicationContext)
         memberDao = db!!.memberDao()
         userRepository = UserRepository(memberDao, this)
 
@@ -139,15 +141,21 @@ class MyPageActivity : AppCompatActivity() {
             showToast("로그인 정보가 없습니다.")
         }
 
-        setProfileImage()
+    }
 
+    private fun isLocalFileUri(uri: Uri): Boolean {
+        return uri.scheme?.let { it == ContentResolver.SCHEME_FILE || it == ContentResolver.SCHEME_CONTENT } == true
     }
 
     private fun setProfileImage() {
-        val uriString = sharedPreferences.getString("profileImageUri", null)
+        val uriString = db!!.memberDao().getProfilePic(AuthHelper.getMemberId())
         if (uriString != null) {
             val uri = Uri.parse(uriString)
-            binding.profileImage.setImageURI(uri)
+            if (isLocalFileUri(uri)) {
+                binding.profileImage.setImageURI(uri)
+            } else {
+                binding.profileImage.setImageResource(R.drawable.profile)
+            }
         } else {
             binding.profileImage.setImageResource(R.drawable.profile)
         }

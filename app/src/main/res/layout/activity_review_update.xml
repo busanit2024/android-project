@@ -188,11 +188,12 @@
                         android:layout_height="100dp"
                         android:hint="@string/review_txt"
                         android:background="@drawable/review_border"/>
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/updateReviewButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
+                        android:background="@drawable/member_button"
                         android:text="수정" />
                 </LinearLayout>
             </LinearLayout>

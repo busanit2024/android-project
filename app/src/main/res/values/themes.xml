@@ -2,8 +2,12 @@
   <!-- Base application theme. -->
   <style name="Base.Theme.SearchRestroom" parent="Theme.Material3.DayNight.NoActionBar">
     <!-- Customize your light theme here. -->
-    <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <item name="colorPrimaryDark">@color/my_light_primary</item>
+    <item name="android:windowBackground">@color/windowBackground</item>
+    <item name="bottomNavigationStyle">@style/BottomNavigationCustomStyle</item>
   </style>
-
+  <style name="BottomNavigationCustomStyle">
+    <item name="android:background">@color/bottomNavigation</item>
+  </style>
   <style name="Theme.SearchRestroom" parent="Base.Theme.SearchRestroom" />
 </resources>

@@ -263,7 +263,6 @@ class MainActivity : AppCompatActivity(){
         R.id.menu_login -> {
           val intent = Intent(this, LoginActivity::class.java)
           startActivity(intent)
-          finish()
           true
         }
         R.id.menu_mypage -> {

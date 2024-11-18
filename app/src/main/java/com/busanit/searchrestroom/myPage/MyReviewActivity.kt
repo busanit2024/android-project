@@ -84,7 +84,7 @@ class MyReviewActivity : AppCompatActivity() {
         return try {
             if (dateStr.isNullOrEmpty()) return ""
 
-            val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             val outputFormat = SimpleDateFormat("yy.MM.dd HH:mm:ss", Locale.getDefault())
 
             val date = inputFormat.parse(dateStr)

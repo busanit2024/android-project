@@ -158,6 +158,19 @@ class EditInfoActivity : AppCompatActivity() {
                     binding.email.setText(currentMember?.email)
                     binding.email.isEnabled = false // 이메일은 수정 불가
                     binding.newNickname.setText(currentMember?.nickname)
+
+                    // 소셜 로그인 여부에 따라 UI 조정
+                    if (currentMember!!.social) {
+                        binding.currentPassword.hint = "소셜 로그인은 비밀번호 수정이 불가합니다"
+                        binding.newPassword.hint = "소셜 로그인은 비밀번호 수정이 불가합니다"
+                        binding.currentPassword.isEnabled = false
+                        binding.newPassword.isEnabled = false
+                    } else {
+                        // 일반 로그인일 때 비밀번호 필드 활성화
+                        binding.currentPassword.isEnabled = true
+                        binding.newPassword.isEnabled = true
+                    }
+
                     setProfileImage()
                 } else {
                     Log.d("test", "No member found with the given ID.")
@@ -167,6 +180,29 @@ class EditInfoActivity : AppCompatActivity() {
     }
 
     private fun validateAndUpdateInfo() {
+        // 소셜 로그인일 경우 비밀번호 검증 건너뛰기
+        if (currentMember?.social == true) {
+            // 닉네임만 업데이트 가능하게 함
+            val newNickname = binding.newNickname.text.toString()
+            CoroutineScope(Dispatchers.IO).launch {
+                val db = AppDatabase.getDatabase(this@EditInfoActivity)
+                db!!.memberDao().updateNickname(currentMember!!.memberId, newNickname)
+
+                with(sharedPreferences.edit()) {
+                    putString("profileImageUri", photoUri.toString())
+                    apply()
+                }
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@EditInfoActivity, "정보가 수정되었습니다.", Toast.LENGTH_SHORT).show()
+                    setResult(RESULT_OK)    // 결과 설정
+                    finish()  // 수정 후 액티비티 종료
+                }
+            }
+            return  // 조기 종료
+        }
+
+        // 일반 회원일 때는 기존 비밀번호 확인 및 업데이트
         val currentPassword = binding.currentPassword.text.toString()
         val newPassword = binding.newPassword.text.toString()
         val newNickname = binding.newNickname.text.toString()
@@ -195,7 +231,9 @@ class EditInfoActivity : AppCompatActivity() {
             db!!.memberDao().updateNickname(currentMember!!.memberId, newNickname)    // 닉네임 업데이트
             if (newPassword.isNotEmpty()) {
                 if (newPassword != currentPassword) {
-                    db!!.memberDao().updatePassword(currentMember!!.memberId, newPassword)  // 비밀번호 업데이트
+                    db!!.memberDao().updatePassword(currentMember!!.memberId, newPassword)  // db 비밀번호 업데이트
+
+                    // Firebase에서 비밀번호 업데이트
                     FirebaseAuth.getInstance().currentUser?.updatePassword(newPassword)
                         ?.addOnCompleteListener {
                             if (it.isSuccessful) {

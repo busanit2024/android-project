@@ -7,11 +7,13 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.documentfile.provider.DocumentFile
 import androidx.room.Room
 import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.R
@@ -63,12 +65,6 @@ class MyPageActivity : AppCompatActivity() {
 
         // 사용자 정보 불러오기
         loadUserInfo()
-
-        val uriString = sharedPreferences.getString("profileImageUri", null)
-        if (uriString != null) {
-            val uri = Uri.parse(uriString)
-            binding.profileImage.setImageURI(uri)
-        }
 
         // 각 버튼의 클릭 리스너 설정
         binding.myReview.setOnClickListener {
@@ -125,7 +121,6 @@ class MyPageActivity : AppCompatActivity() {
 
     private fun loadUserInfo() {
         val email = sharedPreferences.getString("email", null)
-
         // DB에서 사용자 정보를 로드(코루틴 활용)
         if (email != null) {
             CoroutineScope(Dispatchers.IO).launch {
@@ -144,11 +139,11 @@ class MyPageActivity : AppCompatActivity() {
             showToast("로그인 정보가 없습니다.")
         }
 
+        setProfileImage()
+
     }
 
-    private fun updateUI() {
-        val isAdmin = AuthHelper.isAdmin()
-        val isLoggedIn = AuthHelper.isLoggedIn()
+    private fun setProfileImage() {
         val uriString = sharedPreferences.getString("profileImageUri", null)
         if (uriString != null) {
             val uri = Uri.parse(uriString)
@@ -156,6 +151,12 @@ class MyPageActivity : AppCompatActivity() {
         } else {
             binding.profileImage.setImageResource(R.drawable.profile)
         }
+    }
+
+    private fun updateUI() {
+        val isAdmin = AuthHelper.isAdmin()
+        val isLoggedIn = AuthHelper.isLoggedIn()
+        setProfileImage()
         binding.username.text = if (isLoggedIn) currentMember?.nickname ?: "" else "Unknown"    // 닉네임
         binding.email.text = if (isLoggedIn) currentMember?.email ?: "" else "Unknown@email.com"    // 이메일
         binding.logout.text = if (isLoggedIn) "로그아웃" else "로그인"

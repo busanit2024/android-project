@@ -222,6 +222,7 @@ class RestroomDetailActivity : AppCompatActivity() {
                     Toast.makeText(this@RestroomDetailActivity,
                         "화장실 정보가 삭제되었습니다.",
                         Toast.LENGTH_SHORT).show()
+                    setResult(RESULT_OK)  // 삭제 성공 결과 설정
                     finish()  // 액티비티 종료
                 }
             } catch (e: Exception) {
@@ -260,6 +261,22 @@ class RestroomDetailActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
+
+                // Restroom과 Member가 존재하는지 확인
+                val restroomExists = withContext(Dispatchers.IO) {
+                    db?.restroomDao()?.getRestroomById(restroomId) != null
+                }
+                val memberExists = withContext(Dispatchers.IO) {
+                    db?.memberDao()?.getMemberById(memberId) != null
+                }
+
+                if (!restroomExists || !memberExists) {
+                    Toast.makeText(this@RestroomDetailActivity, "화장실 또는 회원 정보가 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
+                    binding.restroomBookmark.isChecked = !isChecked
+                    return@launch
+                }
+
+
                 val currentBookmarkStatus = withContext(Dispatchers.IO) {
                     bookmarkRepository.isBookmarked(memberId, restroomId)
                 }

@@ -43,6 +43,7 @@
             <View
                 android:id="@+id/divisionLine"
                 android:layout_width="1dp"
+                android:layout_gravity="center_vertical"
                 android:layout_height="12dp"
                 android:background="@color/black"
                 android:layout_marginHorizontal="8dp" />

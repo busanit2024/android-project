@@ -62,6 +62,8 @@ class SearchListActivity : AppCompatActivity() {
     binding.bottomNavigation.setOnItemSelectedListener { item ->
       when (item.itemId) {
         R.id.menu_home -> {
+          val intent = Intent(this, MainActivity::class.java)
+          startActivity(intent)
           true
         }
         R.id.menu_login -> {

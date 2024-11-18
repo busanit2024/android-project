@@ -243,7 +243,6 @@ class RestroomDetailActivity : AppCompatActivity() {
                 }
                 binding.restroomBookmark.isChecked = isBookmarked
             } catch (e: Exception) {
-                Log.e("RestroomDetail", "Error checking bookmark status", e)
                 Toast.makeText(
                     this@RestroomDetailActivity,
                     "북마크 상태 확인 중 오류가 발생했습니다",
@@ -280,7 +279,6 @@ class RestroomDetailActivity : AppCompatActivity() {
                     Toast.makeText(this@RestroomDetailActivity, message, Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Log.e("RestroomDetail", "Error toggling bookmark", e)
                 binding.restroomBookmark.isChecked = !isChecked
                 Toast.makeText(
                     this@RestroomDetailActivity,

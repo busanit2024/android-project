@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.busanit.searchrestroom.AuthHelper
 import com.busanit.searchrestroom.databinding.ActivityMyReviewBinding
 import com.busanit.searchrestroom.database.AppDatabase
 import com.busanit.searchrestroom.database.Review
@@ -83,7 +84,7 @@ class MyReviewActivity : AppCompatActivity() {
         return try {
             if (dateStr.isNullOrEmpty()) return ""
 
-            val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             val outputFormat = SimpleDateFormat("yy.MM.dd HH:mm:ss", Locale.getDefault())
 
             val date = inputFormat.parse(dateStr)
@@ -93,5 +94,10 @@ class MyReviewActivity : AppCompatActivity() {
             Log.e("MyReviewActivity", "Date formatting error: $dateStr", e)
             dateStr ?: ""
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadReviews(AuthHelper.getMemberId())
     }
 }

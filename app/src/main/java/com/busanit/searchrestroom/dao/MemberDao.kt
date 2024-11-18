@@ -17,6 +17,10 @@ interface MemberDao {
   @Query("select * from member where member_id = :id")
   suspend fun getMemberById(id: Int): Member
 
+  @Query("select profile_pic from member where member_id = :memberId")
+  fun getProfilePic(memberId: Int): String?
+
+
   @Insert
   suspend fun insert(vararg member: Member)
 
@@ -30,5 +34,8 @@ interface MemberDao {
   // 비밀번호 업데이트
   @Query("UPDATE member SET password = :newPassword WHERE member_id = :memberId")
   suspend fun updatePassword(memberId: Int, newPassword: String)
+
+  @Query("UPDATE member SET profile_pic = :newProfileImage WHERE member_id = :memberId")
+  suspend fun updateProfilePic(memberId: Int, newProfileImage: String)
 
 }

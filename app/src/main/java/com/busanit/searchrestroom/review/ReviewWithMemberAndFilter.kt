@@ -38,7 +38,7 @@ data class ReviewWithMemberAndFilter(
                 when (it) {
                     1 -> options.add("휴지 있음")
                     2 -> options.add("휴지 없음")
-                    else -> 1
+                    else -> {}
                 }
             }
 
@@ -48,7 +48,7 @@ data class ReviewWithMemberAndFilter(
                     2 -> options.add("2칸")
                     3 -> options.add("3칸")
                     4 -> options.add("4칸 이상")
-                    else -> 1
+                    else -> {}
                 }
             }
 
@@ -57,11 +57,10 @@ data class ReviewWithMemberAndFilter(
                     1 -> options.add("깨끗함")
                     2 -> options.add("보통")
                     3 -> options.add("지저분함")
-                    else -> 1
+                    else -> {}
                 }
             }
 
             return options
         }
-    
-}
+    }

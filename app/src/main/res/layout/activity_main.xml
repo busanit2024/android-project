@@ -50,7 +50,8 @@
         app:layout_anchor="@id/bottomSheet"
         app:layout_anchorGravity="top|end"
         app:layout_behavior="@string/bottom_sheet_behavior"
-        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full" />
+        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
+        app:backgroundTint="@color/bottomNavigation"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addRestroomButton"
@@ -65,7 +66,8 @@
         app:fabSize="normal"
         app:layout_anchor="@id/myLocationButton"
         app:layout_anchorGravity="top|center_horizontal"
-        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"/>
+        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
+        app:backgroundTint="@color/bottomNavigation"/>
 
 
     <LinearLayout
@@ -129,14 +131,16 @@
               android:layout_marginEnd="8dp"
               android:id="@+id/searchRadius200"
               android:text="200m"
-              android:checked="true"/>
+              android:checked="true"
+              app:chipBackgroundColor="@color/chip_radio_selector"/>
           <com.google.android.material.chip.Chip
               style="@style/Widget.MaterialComponents.Chip.Choice"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:id="@+id/searchRadius500"
               android:text="500m"
-              android:checked="false"/>
+              android:checked="false"
+              app:chipBackgroundColor="@color/chip_radio_selector"/>
 
         </com.google.android.material.chip.ChipGroup>
       </LinearLayout>
@@ -166,21 +170,25 @@
               android:layout_height="wrap_content"
               android:text="@string/unisex"
               app:chipCornerRadius="99dp"
-              android:layout_marginEnd="8dp"/>
+              android:layout_marginEnd="8dp"
+              app:chipBackgroundColor="@color/chip_radio_selector"/>
           <com.google.android.material.chip.Chip
               android:id="@+id/checkAccessible"
               style="@style/Widget.MaterialComponents.Chip.Filter"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:text="@string/accessible"
-              app:chipCornerRadius="99dp"/>
+              app:chipCornerRadius="99dp"
+              app:chipBackgroundColor="@color/chip_radio_selector"/>
           <com.google.android.material.chip.Chip
               android:id="@+id/checkDiaper"
               style="@style/Widget.MaterialComponents.Chip.Filter"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:text="@string/diaper"
-              app:chipCornerRadius="99dp"/>
+              app:chipCornerRadius="99dp"
+
+              app:chipBackgroundColor="@color/chip_radio_selector"/>
         </com.google.android.material.chip.ChipGroup>
 
 

@@ -79,19 +79,29 @@ class MyReviewActivity : AppCompatActivity() {
         return reviewImageDao.getReviewImageById(reviewId) // 메소드 이름 수정
     }
 
-    // 나의 리뷰 리뷰등록날짜 형식 포맷 함수
     private fun formatDate(dateStr: String?): String {
         return try {
             if (dateStr.isNullOrEmpty()) return ""
 
-            val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-            val outputFormat = SimpleDateFormat("yy.MM.dd HH:mm:ss", Locale.getDefault())
+            val possibleFormats = listOf(
+                SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH),
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            )
 
-            val date = inputFormat.parse(dateStr)
-            date?.let { outputFormat.format(it) } ?: dateStr
+            val outputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
+            for (format in possibleFormats) {
+                try {
+                    val date = format.parse(dateStr)
+                    if (date != null) {
+                        return outputFormat.format(date)
+                    }
+                } catch (e: Exception) {
+                    continue
+                }
+            }
+            dateStr
         } catch (e: Exception) {
-            Log.e("MyReviewActivity", "Date formatting error: $dateStr", e)
             dateStr ?: ""
         }
     }

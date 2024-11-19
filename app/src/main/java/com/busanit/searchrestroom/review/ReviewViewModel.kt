@@ -17,21 +17,27 @@ class ReviewViewModel(application: Application) : AndroidViewModel(application) 
     companion object {
         fun formatDateForDisplay(dateStr: String?): String {
             return try {
-                if (dateStr.isNullOrEmpty()) {
-                    Log.d("ReviewViewModel", "Date string is null or empty")
-                    return ""
+                if (dateStr.isNullOrEmpty()) return ""
+                
+                val possibleFormats = listOf(
+                    SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH),
+                    SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                )
+
+                val outputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+
+                for (format in possibleFormats) {
+                    try {
+                        val date = format.parse(dateStr)
+                        if (date != null) {
+                            return outputFormat.format(date)
+                        }
+                    } catch (e: Exception) {
+                        continue
+                    }
                 }
 
-                val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
-                val outputFormat = SimpleDateFormat("yy.MM.dd HH:mm:ss", Locale.getDefault())
-
-                val date = inputFormat.parse(dateStr)
-                if (date == null) {
-                    return dateStr
-                }
-
-                val formattedDate = outputFormat.format(date)
-                formattedDate
+                dateStr
 
             } catch (e: Exception) {
                 dateStr ?: ""
@@ -65,7 +71,6 @@ class ReviewViewModel(application: Application) : AndroidViewModel(application) 
             try {
                 reviewDao.insert(review)
 
-                // 리뷰 목록 갱신
                 review.restroomId?.let { restroomId ->
                     loadLatestReviews(restroomId)
                 }

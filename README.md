@@ -1,9 +1,9 @@
-# 내 주변의 공공 화장실 Catch Toilet
+# 🧻내 주변의 공공 화장실 Catch Toilet
 ![logo](https://github.com/busanit2024/android-project/blob/dev/catchToiletLogo.png)
 
 오픈API를 활용하여 내 주변의 공공 화장실 위치를 알려주는 Android App을 Android Studio와 Kotlin 을 활용하여 제작하여 구현하였습니다.
 
-## 프로젝트 소개
+## 🎬프로젝트 소개
 Catch Toilet은
 > **편의성** : 누구나 쉽게 접근 가능한 공공 편의시설 정보 제공을 목표로, 깔끔하고 직관적인 디자인과 편리한 기능을 갖추고 있습니다.
 > 

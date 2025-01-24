@@ -24,10 +24,13 @@ Catch Toilet은
 - 엄채연 :
 - 이상헌 :
 
-## 💻기술 스택
+## 💻개발 환경
 - Android Studio
+  
+## ⚙️기술 스택
+- Android
 - Kotlin
-- SQLite
+- SQLite, Firebase
 
 ## 🧩주요 기능
 ### ✔️ 화장실 정보 지도에 표시하기
